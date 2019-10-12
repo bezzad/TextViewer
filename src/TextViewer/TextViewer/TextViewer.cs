@@ -45,8 +45,6 @@ namespace TextViewer
             var nonDirectionalWordsStack = new Stack<WordInfo>();
             var lineWidth = ActualWidth - Padding.Left - Padding.Right;
             var lineRemainWidth = lineWidth;
-            double wordWidth = 0;
-            WordInfo wordPointer = null;
             var lineBuffer = new List<WordInfo>();
             DrawWords.Clear();
 
@@ -102,36 +100,34 @@ namespace TextViewer
 
             foreach (var para in content)
             {
-                for (var i = 0; i < para.Count; i++)
+                foreach (var word in para)
                 {
-                    wordWidth = 0;
-                    var pointer = i;
-                    do
-                    {
-                        wordPointer = para[pointer++];
-                        wordPointer.GetFormattedText(FontFamily, FontSize, PixelsPerDip, LineHeight);
-                        wordWidth += wordPointer.Width;
-                    } while (wordPointer.IsInnerWord);
+                    word.GetFormattedText(FontFamily, FontSize, PixelsPerDip, LineHeight);
+                    var wordWidth = word.Width;
+                    var wordPointer = word;
 
-                    wordPointer = para[i];
-                    if (lineRemainWidth - wordWidth <= 0)
+                    while (word.PreviousWord?.IsInnerWord != true && wordPointer.IsInnerWord)
                     {
-                        AddLine();
+                        wordPointer = wordPointer.NextWord;
+                        wordWidth += wordPointer.Width;
                     }
 
-                    lineBuffer.Add(wordPointer);
-                    if (IsContentRtl != wordPointer.IsRtl)
-                        nonDirectionalWordsStack.Push(wordPointer);
+                    if (lineRemainWidth - wordWidth <= 0)
+                        AddLine();
+
+                    lineBuffer.Add(word);
+                    if (IsContentRtl != word.IsRtl)
+                        nonDirectionalWordsStack.Push(word);
                     else
                     {
                         if (nonDirectionalWordsStack.Any())
                             while (nonDirectionalWordsStack.TryPop(out var nWord))
                                 AddWordToCurrentLine(nWord);
 
-                        AddWordToCurrentLine(wordPointer);
+                        AddWordToCurrentLine(word);
                     }
 
-                    lineRemainWidth -= wordPointer.Width + wordPointer.SpaceWidth;
+                    lineRemainWidth -= word.Width + word.SpaceWidth;
                 }
 
                 // new line + ParagraphSpace

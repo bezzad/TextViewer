@@ -7,6 +7,10 @@ namespace TextViewer
 {
     public class WordInfo : Word, IComparable<Point>
     {
+        public WordInfo NextWord { get; set; }
+        public WordInfo PreviousWord { get; set; }
+
+
         public WordInfo(string text, int offset, bool isRtl)
             : base(text, offset)
         {
