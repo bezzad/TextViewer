@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows;
+using MethodTimer;
 
 namespace TextViewer
 {
@@ -12,7 +13,7 @@ namespace TextViewer
     {
         private static readonly Regex RtlCharsPattern = new Regex("[\u061b-\u06f5]+");
         private static readonly Regex LtrCharsPattern = new Regex("[a-zA-Z0-9۰۱۲۳۴۵۶۷۸۹]");
-        private static readonly string InertChars = "،.»«[]{}()'/\\:!@#$%^&~*-+\"`";
+        private static readonly string InertChars = "\\،.»«[]{}()'/:!@#$%^&~*-+\"`";
 
 
         public static List<List<WordInfo>> Content = new List<List<WordInfo>>();
@@ -63,7 +64,8 @@ namespace TextViewer
             return words.BinarySearch(0, words.Count, value);
         }
 
-        public static List<List<WordInfo>> GetWords(this string path, bool isContentRtl)
+        [Time]
+        public static List<List<WordInfo>> GetWords(this string path, bool isParaRtl)
         {
             var content = File.ReadAllLines(path, Encoding.UTF8);
             Content = new List<List<WordInfo>>();
@@ -75,25 +77,8 @@ namespace TextViewer
 
                 foreach (var word in rawPara.Split(' '))
                 {
-                    var splitWords = word.ConvertInertCharToWord();
-                    for (var i = 0; i < splitWords.Count; i++)
-                    {
-                        var w = splitWords[i];
-                        var wordInfo = new WordInfo(w, offset, w.IsRtl(isContentRtl));
-                        //
-                        // define some test styles
-                        if (w.Length > 10)
-                            wordInfo.Styles.Add(StyleType.FontWeight, new InlineStyle(StyleType.FontWeight, "bold"));
-                        if (wordInfo.IsRtl == false)
-                            wordInfo.Styles.Add(StyleType.Color, new InlineStyle(StyleType.Color, "Blue"));
-
-                        if (i < splitWords.Count - 1)
-                            wordInfo.IsInnerWord = true;
-
-                        words.Add(wordInfo);
-                        offset += w.Length;
-                    }
-
+                    var splitWords = word.ConvertInertCharsToWord(ref offset, isParaRtl);
+                    words.AddRange(splitWords);
                     offset++; // word space
                 }
 
@@ -104,38 +89,60 @@ namespace TextViewer
         }
 
 
-        public static bool IsRtl(this string word, bool isContentRtl)
+        public static bool IsRtl(this string word)
         {
-            var res = LtrCharsPattern.Matches(word).Count == word.Length;
-
-            if (word.Any(c => InertChars.IndexOf(c) < 0) == false)
-                return isContentRtl;
-
-            return !res;
+            return LtrCharsPattern.Matches(word).Count != word.Length;
         }
 
-        private static List<string> ConvertInertCharToWord(this string word)
+        private static void SetStyles(this Word word)
         {
-            var res = new List<string>();
+            // set word styles --------------------------------------------------------------------------------
+            if (word.Text.Length > 10)
+                word.Styles.Add(StyleType.FontWeight, new InlineStyle(StyleType.FontWeight, "bold"));
+            if (word.IsRtl == false)
+                word.Styles.Add(StyleType.Color, new InlineStyle(StyleType.Color, "Blue"));
+        }
+
+        private static IEnumerable<WordInfo> ConvertInertCharsToWord(this string word, ref int offset, bool isContentRtl)
+        {
+            var res = new List<WordInfo>();
             var wordBuffer = "";
+
+            void AddWord(WordInfo w)
+            {
+                // set last word to inner word for remove space after word
+                if (res.Count > 0)
+                    res.Last().IsInnerWord = true;
+
+                w.SetStyles();
+                res.Add(w);
+                wordBuffer = ""; // clear buffer
+            }
 
             foreach (var c in word)
             {
+                // is current char a inert char?
                 if (InertChars.IndexOf(c) >= 0)
                 {
+                    // first, store buffering word and then keep this char as next word
                     if (wordBuffer.Length > 0)
                     {
-                        res.Add(wordBuffer);
-                        wordBuffer = "";
+                        AddWord(new WordInfo(wordBuffer, offset, wordBuffer.IsRtl()));
+                        offset += wordBuffer.Length;
                     }
-                    res.Add(c.ToString());
+                    // inert char as word
+                    AddWord(new WordInfo(c.ToString(), offset++, isContentRtl));
                 }
                 else
-                    wordBuffer += c;
+                    wordBuffer += c; // keep real word chars
             }
 
+            // keep last word from buffer
             if (wordBuffer.Length > 0)
-                res.Add(wordBuffer);
+            {
+                AddWord(new WordInfo(wordBuffer, offset, wordBuffer.IsRtl()));
+                offset += wordBuffer.Length;
+            }
 
             return res;
         }
