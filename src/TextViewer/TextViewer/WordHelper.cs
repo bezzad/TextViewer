@@ -69,16 +69,24 @@ namespace TextViewer
         {
             var content = File.ReadAllLines(path, Encoding.UTF8);
             Content = new List<List<WordInfo>>();
+            WordInfo lastWordPointer = null;
 
             foreach (var rawPara in content)
             {
                 var offset = 0;
                 var words = new List<WordInfo>();
 
-                foreach (var word in rawPara.Split(' '))
+                foreach (var word in rawPara.Split(' ', StringSplitOptions.RemoveEmptyEntries))
                 {
                     var splitWords = word.ConvertInertCharsToWord(ref offset, isParaRtl);
+                    if (lastWordPointer != null)
+                    {
+                        var firstW = splitWords.First();
+                        firstW.PreviousWord = lastWordPointer;
+                        lastWordPointer.NextWord = firstW;
+                    }
                     words.AddRange(splitWords);
+                    lastWordPointer = splitWords.Last();
                     offset++; // word space
                 }
 
@@ -103,7 +111,7 @@ namespace TextViewer
                 word.Styles.Add(StyleType.Color, new InlineStyle(StyleType.Color, "Blue"));
         }
 
-        private static IEnumerable<WordInfo> ConvertInertCharsToWord(this string word, ref int offset, bool isContentRtl)
+        private static List<WordInfo> ConvertInertCharsToWord(this string word, ref int offset, bool isContentRtl)
         {
             var res = new List<WordInfo>();
             var wordBuffer = "";
@@ -112,7 +120,11 @@ namespace TextViewer
             {
                 // set last word to inner word for remove space after word
                 if (res.Count > 0)
-                    res.Last().IsInnerWord = true;
+                {
+                    w.PreviousWord = res.Last();
+                    w.PreviousWord.NextWord = w;
+                    w.PreviousWord.IsInnerWord = true;
+                }
 
                 w.SetStyles();
                 res.Add(w);

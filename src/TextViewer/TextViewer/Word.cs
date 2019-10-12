@@ -20,6 +20,8 @@ namespace TextViewer
         public static CultureInfo RtlCulture { get; set; }
         public static CultureInfo LtrCulture { get; set; }
 
+        public Word NextWord { get; set; }
+        public Word PreviousWord { get; set; }
         public FormattedText Format { get; set; }
         public Point DrawPoint { get; set; }
         public Rect Area { get; set; }
