@@ -1,11 +1,13 @@
 ﻿using System;
+using MethodTimer;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
-using MethodTimer;
+using System.Windows.Media.Imaging;
 
 namespace TextViewer
 {
@@ -50,7 +52,6 @@ namespace TextViewer
             var lineBuffer = new List<WordInfo>();
             DrawWords.Clear();
 
-
             void AddLine(bool justify)
             {
                 if (nonDirectionalWordsStack.Any())
@@ -76,13 +77,13 @@ namespace TextViewer
                 }
 
                 Lines.Add(lineBuffer);
-                lineBuffer = new List<WordInfo>(); // create new line buffer, without cleaning last line
                 lineRemainWidth = lineWidth;
-                startPoint.Y += LineHeight; // new line
+                startPoint.Y += lineBuffer.Last().Height; // new line
                 startPoint.X = IsContentRtl
                     ? ActualWidth - Padding.Right
                     : Padding.Left;
                 nonDirectionalWordsStack.Clear();
+                lineBuffer = new List<WordInfo>(); // create new line buffer, without cleaning last line
             }
 
             WordInfo AddWordToCurrentLine(WordInfo word)
@@ -97,7 +98,7 @@ namespace TextViewer
                     //    |                                             |
                     //    |_____________________________________________| 
                     //
-                    word.Area = new Rect(new Point(startPoint.X - word.Width, startPoint.Y), new Size(word.Width, LineHeight));
+                    word.Area = new Rect(new Point(startPoint.X - word.Width, startPoint.Y), new Size(word.Width, word.Height));
                     word.DrawPoint = word.IsRtl ? startPoint : word.Area.Location;
                     startPoint.X -= word.Width + word.SpaceWidth;
                 }
@@ -111,7 +112,7 @@ namespace TextViewer
                     //    |                                             |
                     //    |_____________________________________________| 
                     //
-                    word.Area = new Rect(startPoint, new Size(word.Width, LineHeight));
+                    word.Area = new Rect(startPoint, new Size(word.Width, word.Height));
                     word.DrawPoint = word.IsRtl ? startPoint : word.Area.Location;
                     startPoint.X += word.Width + word.SpaceWidth;
                 }
@@ -179,10 +180,19 @@ namespace TextViewer
 
             foreach (var word in DrawWords)
             {
-                dc.DrawText(word.Format, word.DrawPoint);
+                if (word.Styles.ContainsKey(StyleType.Image))
+                {
+                    var img = word.Styles[StyleType.Image].BitmapFromBase64();
+                    dc.DrawImage(img, word.Area);
+                }
+                else
+                    dc.DrawText(word.Format, word.DrawPoint);
+
                 if (ShowWireFrame)
                     dc.DrawRectangle(null, WireFramePen, word.Area);
             }
         }
+
+        
     }
 }

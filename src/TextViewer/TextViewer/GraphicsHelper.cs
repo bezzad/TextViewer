@@ -1,6 +1,8 @@
 ﻿using System;
+using System.IO;
 using System.Windows;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace TextViewer
 {
@@ -28,6 +30,13 @@ namespace TextViewer
                 return -1;
 
             return 0;
+        }
+
+        public static BitmapSource BitmapFromBase64(this string b64String)
+        {
+            var bytes = Convert.FromBase64String(b64String);
+            using var stream = new MemoryStream(bytes);
+            return BitmapFrame.Create(stream, BitmapCreateOptions.None, BitmapCacheOption.OnLoad);
         }
     }
 }

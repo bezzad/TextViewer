@@ -14,7 +14,7 @@ namespace TextViewer
         public WordInfo(string text, int offset, bool isRtl)
             : base(text, offset)
         {
-            Styles.Add(StyleType.Direction, new InlineStyle(StyleType.Direction, isRtl ? "rtl" : "ltr"));
+            Styles.Add(StyleType.Direction, isRtl ? "rtl" : "ltr");
         }
 
         public int CompareTo([AllowNull] Point other)
@@ -49,7 +49,7 @@ namespace TextViewer
                     FontStretches.Normal),
                 fontSize,
                 Styles.ContainsKey(StyleType.Color)
-                    ? (SolidColorBrush)new BrushConverter().ConvertFromString(Styles[StyleType.Color].Value)
+                    ? (SolidColorBrush)new BrushConverter().ConvertFromString(Styles[StyleType.Color])
                     : Brushes.Black,
                 pixelsPerDip)
             {

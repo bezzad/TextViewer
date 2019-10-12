@@ -12,7 +12,7 @@ namespace TextViewer
             Text = text;
             OffsetRange = new Range(offset, offset + text.Length - 1);
             ImpressivePaddingPercent = 0.2; // 20% of word length
-            Styles = new Dictionary<StyleType, InlineStyle>();
+            Styles = new Dictionary<StyleType, string>();
             RtlCulture ??= CultureInfo.GetCultureInfo("fa-ir");
             LtrCulture ??= CultureInfo.GetCultureInfo("en-us");
         }
@@ -24,7 +24,7 @@ namespace TextViewer
         public Point DrawPoint { get; set; }
         public Rect Area { get; set; }
         public Range OffsetRange { get; set; }
-        public Dictionary<StyleType, InlineStyle> Styles { get; set; }
+        public Dictionary<StyleType, string> Styles { get; set; }
         private double _spaceWidth;
         public double SpaceWidth
         {
@@ -35,11 +35,16 @@ namespace TextViewer
         public bool IsInnerWord { get; set; }
         public double ImpressivePaddingPercent { get; set; }
         public string Text { get; set; }
-        public double Width => Format?.Width ?? 0;
-        public double Height => Format?.Height ?? 0;
+        public double Width => IsImage 
+            ? double.Parse(Styles[StyleType.Width]) 
+            : Format?.Width ?? 0;
+        public double Height => IsImage
+            ? double.Parse(Styles[StyleType.Height])
+            : Format?.Height ?? 0;
+        public bool IsImage => Text.Equals("img") && Styles.ContainsKey(StyleType.Image);
 
 
-        public bool IsRtl => Styles[StyleType.Direction].Value == "rtl";
+        public bool IsRtl => Styles[StyleType.Direction] == "rtl";
         public int Offset => OffsetRange.Start;
     }
 }

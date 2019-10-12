@@ -74,9 +74,40 @@ namespace TextViewer
             {
                 var offset = 0;
                 var words = new List<WordInfo>();
-
+                var imgTagStarted = false;
+                WordInfo imgWord = null;
                 foreach (var word in rawPara.Split(' ', StringSplitOptions.RemoveEmptyEntries))
                 {
+                    if (word == "<img")
+                    {
+                        imgTagStarted = true;
+                        imgWord = new WordInfo("img", 0, isParaRtl);
+                        words.Add(imgWord);
+                        continue;
+                    }
+                    if (imgTagStarted)
+                    {
+                        if (word.StartsWith("width"))
+                        {
+                            var startVal = word.IndexOf("\"", StringComparison.Ordinal) + 1;
+                            var w = word.Substring(startVal, word.LastIndexOf("\"", StringComparison.Ordinal) - startVal);
+                            imgWord.Styles.Add(StyleType.Width, w);
+                        }
+                        else if (word.StartsWith("height"))
+                        {
+                            var startVal = word.IndexOf("\"", StringComparison.Ordinal) + 1;
+                            var h = word.Substring(startVal, word.LastIndexOf("\"", StringComparison.Ordinal) - startVal);
+                            imgWord.Styles.Add(StyleType.Height, h);
+                        }
+                        else if (word.StartsWith("src"))
+                        {
+                            var startVal = word.IndexOf("\"", StringComparison.Ordinal) + 1;
+                            var src = word.Substring(startVal, word.LastIndexOf("\"", StringComparison.Ordinal) - startVal);
+                            imgWord.Styles.Add(StyleType.Image, src);
+                        }
+                        continue;
+                    }
+
                     var splitWords = word.ConvertInertCharsToWord(ref offset, isParaRtl);
                     if (lastWordPointer != null)
                     {
@@ -105,9 +136,9 @@ namespace TextViewer
         {
             // set word styles --------------------------------------------------------------------------------
             if (word.Text.Length > 10)
-                word.Styles.Add(StyleType.FontWeight, new InlineStyle(StyleType.FontWeight, "bold"));
+                word.Styles.Add(StyleType.FontWeight, "bold");
             if (word.IsRtl == false)
-                word.Styles.Add(StyleType.Color, new InlineStyle(StyleType.Color, "Blue"));
+                word.Styles.Add(StyleType.Color, "Blue");
         }
 
         private static List<WordInfo> ConvertInertCharsToWord(this string word, ref int offset, bool isContentRtl)
