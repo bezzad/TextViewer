@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Media;
@@ -49,11 +51,30 @@ namespace TextViewer
             DrawWords.Clear();
 
 
-            void AddLine()
+            void AddLine(bool justify)
             {
                 if (nonDirectionalWordsStack.Any())
                     while (nonDirectionalWordsStack.TryPop(out var nWord))
-                        AddWordToCurrentLine(nWord);
+                        DrawWords.Add(AddWordToCurrentLine(nWord));
+
+                if (IsJustify && lineRemainWidth > 0 && justify)
+                {
+                    startPoint.X = IsContentRtl
+                        ? ActualWidth - Padding.Right
+                        : Padding.Left;
+
+                    var extendSpace = lineRemainWidth / (lineBuffer.Count(w => w.IsInnerWord == false) - 1);
+                    foreach (var word in lineBuffer)
+                    {
+                        if (word.IsInnerWord == false)
+                        {
+                            word.SpaceWidth += extendSpace;
+                        }
+
+                        AddWordToCurrentLine(word);
+                    }
+                }
+
                 Lines.Add(lineBuffer);
                 lineBuffer = new List<WordInfo>(); // create new line buffer, without cleaning last line
                 lineRemainWidth = lineWidth;
@@ -64,10 +85,8 @@ namespace TextViewer
                 nonDirectionalWordsStack.Clear();
             }
 
-            void AddWordToCurrentLine(WordInfo word)
+            WordInfo AddWordToCurrentLine(WordInfo word)
             {
-                DrawWords.Add(word);
-
                 if (IsContentRtl)
                 {
                     //     _____________________________________________
@@ -96,6 +115,8 @@ namespace TextViewer
                     word.DrawPoint = word.IsRtl ? startPoint : word.Area.Location;
                     startPoint.X += word.Width + word.SpaceWidth;
                 }
+
+                return word;
             }
 
             foreach (var para in content)
@@ -115,7 +136,10 @@ namespace TextViewer
                     if (lineRemainWidth - wordWidth <= 0)
                     {
                         if (lineBuffer.Count > 0)
-                            AddLine();
+                        {
+                            lineRemainWidth += lineBuffer.Last().SpaceWidth; // end of line has no space (important for justify)
+                            AddLine(IsJustify);
+                        }
                         else // the current word width is more than a line!
                         {
                             word.Format.MaxTextWidth = lineRemainWidth;
@@ -129,16 +153,16 @@ namespace TextViewer
                     {
                         if (nonDirectionalWordsStack.Any())
                             while (nonDirectionalWordsStack.TryPop(out var nWord))
-                                AddWordToCurrentLine(nWord);
+                                DrawWords.Add(AddWordToCurrentLine(nWord));
 
-                        AddWordToCurrentLine(word);
+                        DrawWords.Add(AddWordToCurrentLine(word));
                     }
 
                     lineRemainWidth -= word.Width + word.SpaceWidth;
                 }
 
-                // new line + ParagraphSpace
-                AddLine();
+                AddLine(false); // last line of paragraph
+                // + ParagraphSpace
                 startPoint.Y += ParagraphSpace;
             }
         }
