@@ -2,6 +2,7 @@
 using MethodTimer;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Windows;
@@ -124,7 +125,11 @@ namespace TextViewer
             {
                 foreach (var word in para)
                 {
-                    word.GetFormattedText(FontFamily, FontSize, PixelsPerDip, LineHeight);
+                    if (word.IsImage)
+                        word.ImageScale = 1;
+                    else
+                        word.GetFormattedText(FontFamily, FontSize, PixelsPerDip, LineHeight);
+
                     var wordWidth = word.Width;
                     var wordPointer = word;
 
@@ -143,7 +148,10 @@ namespace TextViewer
                         }
                         else // the current word width is more than a line!
                         {
-                            word.Format.MaxTextWidth = lineRemainWidth;
+                            if (word.IsImage) // set image scale according by image and page width
+                                word.ImageScale = lineRemainWidth / double.Parse(word.Styles[StyleType.Width]);
+                            else
+                                word.Format.MaxTextWidth = lineRemainWidth;
                         }
                     }
 
@@ -193,6 +201,6 @@ namespace TextViewer
             }
         }
 
-        
+
     }
 }
