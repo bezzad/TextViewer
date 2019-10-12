@@ -3,7 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Windows;
 using System.Windows.Media;
 
-namespace SvgTextViewer
+namespace TextViewer
 {
     public class WordInfo : Word, IComparable<Point>
     {

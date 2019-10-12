@@ -5,7 +5,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 
-namespace SvgTextViewer
+namespace TextViewer
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml

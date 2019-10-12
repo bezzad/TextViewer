@@ -6,7 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows;
 
-namespace SvgTextViewer
+namespace TextViewer
 {
     public static class WordHelper
     {

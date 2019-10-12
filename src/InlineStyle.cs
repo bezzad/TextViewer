@@ -1,4 +1,4 @@
-﻿namespace SvgTextViewer
+﻿namespace TextViewer
 {
     public class InlineStyle
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SvgTextViewer
+namespace TextViewer
 {
     public class Range : IEquatable<int>, IEquatable<Range>, IEqualityComparer<Range>, IEqualityComparer<int>, IComparable<int>, IComparable<Range>
     {

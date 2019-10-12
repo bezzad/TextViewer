@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Media;
 
-namespace SvgTextViewer
+namespace TextViewer
 {
     public abstract class Word
     {

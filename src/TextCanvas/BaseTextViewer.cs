@@ -3,7 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
-namespace SvgTextViewer.TextCanvas
+namespace TextViewer.TextCanvas
 {
     public abstract class BaseTextViewer : Canvas
     {

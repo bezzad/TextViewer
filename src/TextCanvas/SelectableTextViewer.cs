@@ -4,7 +4,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 
-namespace SvgTextViewer.TextCanvas
+namespace TextViewer.TextCanvas
 {
     public class SelectableTextViewer : TextViewer
     {

@@ -5,7 +5,7 @@ using System.Windows;
 using System.Windows.Media;
 using MethodTimer;
 
-namespace SvgTextViewer.TextCanvas
+namespace TextViewer.TextCanvas
 {
     public class TextViewer : BaseTextViewer
     {
