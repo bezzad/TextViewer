@@ -8,7 +8,7 @@
     ".NETCoreApp,Version=v3.0": {
       "TextViewerSample/1.0.0": {
         "dependencies": {
-          "TextViewer": "1.0.0"
+          "TextViewer": "1.1.1"
         },
         "runtime": {
           "TextViewerSample.dll": {}
@@ -693,7 +693,7 @@
           "System.Xml.ReaderWriter": "4.3.0"
         }
       },
-      "TextViewer/1.0.0": {
+      "TextViewer/1.1.1": {
         "dependencies": {
           "MethodTimer.Fody": "3.1.0"
         },
@@ -1234,7 +1234,7 @@
       "path": "system.xml.xdocument/4.3.0",
       "hashPath": "system.xml.xdocument.4.3.0.nupkg.sha512"
     },
-    "TextViewer/1.0.0": {
+    "TextViewer/1.1.1": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

@@ -1212,7 +1212,7 @@
           "lib/netstandard1.3/System.Xml.XDocument.dll": {}
         }
       },
-      "TextViewer/1.0.0": {
+      "TextViewer/1.1.1": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v3.0",
         "dependencies": {
@@ -4549,7 +4549,7 @@
         "system.xml.xdocument.nuspec"
       ]
     },
-    "TextViewer/1.0.0": {
+    "TextViewer/1.1.1": {
       "type": "project",
       "path": "../TextViewer/TextViewer.csproj",
       "msbuildProject": "../TextViewer/TextViewer.csproj"
@@ -4557,7 +4557,7 @@
   },
   "projectFileDependencyGroups": {
     ".NETCoreApp,Version=v3.0": [
-      "TextViewer >= 1.0.0"
+      "TextViewer >= 1.1.1"
     ]
   },
   "packageFolders": {
@@ -4567,11 +4567,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\TextViewer\\src\\TextViewer\\TextViewer.Sample\\TextViewerSample.csproj",
+      "projectUniqueName": "C:\\Users\\Behzad\\Desktop\\TextViewer\\src\\TextViewer\\TextViewer.Sample\\TextViewerSample.csproj",
       "projectName": "TextViewerSample",
-      "projectPath": "D:\\TextViewer\\src\\TextViewer\\TextViewer.Sample\\TextViewerSample.csproj",
+      "projectPath": "C:\\Users\\Behzad\\Desktop\\TextViewer\\src\\TextViewer\\TextViewer.Sample\\TextViewerSample.csproj",
       "packagesPath": "C:\\Users\\Behzad\\.nuget\\packages\\",
-      "outputPath": "D:\\TextViewer\\src\\TextViewer\\TextViewer.Sample\\obj\\",
+      "outputPath": "C:\\Users\\Behzad\\Desktop\\TextViewer\\src\\TextViewer\\TextViewer.Sample\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
@@ -4590,8 +4590,8 @@
       "frameworks": {
         "netcoreapp3.0": {
           "projectReferences": {
-            "D:\\TextViewer\\src\\TextViewer\\TextViewer\\TextViewer.csproj": {
-              "projectPath": "D:\\TextViewer\\src\\TextViewer\\TextViewer\\TextViewer.csproj"
+            "C:\\Users\\Behzad\\Desktop\\TextViewer\\src\\TextViewer\\TextViewer\\TextViewer.csproj": {
+              "projectPath": "C:\\Users\\Behzad\\Desktop\\TextViewer\\src\\TextViewer\\TextViewer\\TextViewer.csproj"
             }
           }
         }

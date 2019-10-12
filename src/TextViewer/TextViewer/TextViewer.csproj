@@ -3,6 +3,14 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <UseWPF>true</UseWPF>
+    <Version>1.1.1</Version>
+    <Authors>Behzad Khosravifar</Authors>
+    <Company>Taaghche</Company>
+    <Description>WPF canvas as text viewer like FlowDocument by more features like lines and word selection.
+</Description>
+    <Copyright>Taaghche @ 2019</Copyright>
+    <PackageProjectUrl>https://github.com/bezzad/TextViewer</PackageProjectUrl>
+    <PackageTags>wpf-controls, text-viewer, document, flow-document, canvas, 2d-text</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>

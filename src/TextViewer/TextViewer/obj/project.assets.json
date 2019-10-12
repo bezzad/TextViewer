@@ -4544,13 +4544,13 @@
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
-    "version": "1.0.0",
+    "version": "1.1.1",
     "restore": {
-      "projectUniqueName": "D:\\TextViewer\\src\\TextViewer\\TextViewer\\TextViewer.csproj",
+      "projectUniqueName": "C:\\Users\\Behzad\\Desktop\\TextViewer\\src\\TextViewer\\TextViewer\\TextViewer.csproj",
       "projectName": "TextViewer",
-      "projectPath": "D:\\TextViewer\\src\\TextViewer\\TextViewer\\TextViewer.csproj",
+      "projectPath": "C:\\Users\\Behzad\\Desktop\\TextViewer\\src\\TextViewer\\TextViewer\\TextViewer.csproj",
       "packagesPath": "C:\\Users\\Behzad\\.nuget\\packages\\",
-      "outputPath": "D:\\TextViewer\\src\\TextViewer\\TextViewer\\obj\\",
+      "outputPath": "C:\\Users\\Behzad\\Desktop\\TextViewer\\src\\TextViewer\\TextViewer\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"

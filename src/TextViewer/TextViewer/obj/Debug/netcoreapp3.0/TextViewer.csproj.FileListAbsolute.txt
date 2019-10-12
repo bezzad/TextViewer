@@ -6,3 +6,12 @@ D:\TextViewer\src\TextViewer\TextViewer\obj\Debug\netcoreapp3.0\TextViewer.Assem
 D:\TextViewer\src\TextViewer\TextViewer\obj\Debug\netcoreapp3.0\TextViewer.dll
 D:\TextViewer\src\TextViewer\TextViewer\obj\Debug\netcoreapp3.0\TextViewer.pdb
 D:\TextViewer\src\TextViewer\TextViewer\obj\Debug\netcoreapp3.0\TextViewer.csproj.Fody.CopyLocal.cache
+C:\Users\Behzad\Desktop\TextViewer\src\TextViewer\TextViewer\bin\Debug\netcoreapp3.0\TextViewer.deps.json
+C:\Users\Behzad\Desktop\TextViewer\src\TextViewer\TextViewer\bin\Debug\netcoreapp3.0\TextViewer.dll
+C:\Users\Behzad\Desktop\TextViewer\src\TextViewer\TextViewer\bin\Debug\netcoreapp3.0\TextViewer.pdb
+C:\Users\Behzad\Desktop\TextViewer\src\TextViewer\TextViewer\obj\Debug\netcoreapp3.0\TextViewer.csprojAssemblyReference.cache
+C:\Users\Behzad\Desktop\TextViewer\src\TextViewer\TextViewer\obj\Debug\netcoreapp3.0\TextViewer.AssemblyInfoInputs.cache
+C:\Users\Behzad\Desktop\TextViewer\src\TextViewer\TextViewer\obj\Debug\netcoreapp3.0\TextViewer.AssemblyInfo.cs
+C:\Users\Behzad\Desktop\TextViewer\src\TextViewer\TextViewer\obj\Debug\netcoreapp3.0\TextViewer.csproj.Fody.CopyLocal.cache
+C:\Users\Behzad\Desktop\TextViewer\src\TextViewer\TextViewer\obj\Debug\netcoreapp3.0\TextViewer.dll
+C:\Users\Behzad\Desktop\TextViewer\src\TextViewer\TextViewer\obj\Debug\netcoreapp3.0\TextViewer.pdb

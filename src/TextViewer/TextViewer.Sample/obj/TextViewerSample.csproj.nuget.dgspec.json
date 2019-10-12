@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\TextViewer\\src\\TextViewer\\TextViewer.Sample\\TextViewerSample.csproj": {}
+    "C:\\Users\\Behzad\\Desktop\\TextViewer\\src\\TextViewer\\TextViewer.Sample\\TextViewerSample.csproj": {}
   },
   "projects": {
-    "D:\\TextViewer\\src\\TextViewer\\TextViewer.Sample\\TextViewerSample.csproj": {
+    "C:\\Users\\Behzad\\Desktop\\TextViewer\\src\\TextViewer\\TextViewer.Sample\\TextViewerSample.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\TextViewer\\src\\TextViewer\\TextViewer.Sample\\TextViewerSample.csproj",
+        "projectUniqueName": "C:\\Users\\Behzad\\Desktop\\TextViewer\\src\\TextViewer\\TextViewer.Sample\\TextViewerSample.csproj",
         "projectName": "TextViewerSample",
-        "projectPath": "D:\\TextViewer\\src\\TextViewer\\TextViewer.Sample\\TextViewerSample.csproj",
+        "projectPath": "C:\\Users\\Behzad\\Desktop\\TextViewer\\src\\TextViewer\\TextViewer.Sample\\TextViewerSample.csproj",
         "packagesPath": "C:\\Users\\Behzad\\.nuget\\packages\\",
-        "outputPath": "D:\\TextViewer\\src\\TextViewer\\TextViewer.Sample\\obj\\",
+        "outputPath": "C:\\Users\\Behzad\\Desktop\\TextViewer\\src\\TextViewer\\TextViewer.Sample\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
@@ -30,8 +30,8 @@
         "frameworks": {
           "netcoreapp3.0": {
             "projectReferences": {
-              "D:\\TextViewer\\src\\TextViewer\\TextViewer\\TextViewer.csproj": {
-                "projectPath": "D:\\TextViewer\\src\\TextViewer\\TextViewer\\TextViewer.csproj"
+              "C:\\Users\\Behzad\\Desktop\\TextViewer\\src\\TextViewer\\TextViewer\\TextViewer.csproj": {
+                "projectPath": "C:\\Users\\Behzad\\Desktop\\TextViewer\\src\\TextViewer\\TextViewer\\TextViewer.csproj"
               }
             }
           }
@@ -66,14 +66,14 @@
         }
       }
     },
-    "D:\\TextViewer\\src\\TextViewer\\TextViewer\\TextViewer.csproj": {
-      "version": "1.0.0",
+    "C:\\Users\\Behzad\\Desktop\\TextViewer\\src\\TextViewer\\TextViewer\\TextViewer.csproj": {
+      "version": "1.1.1",
       "restore": {
-        "projectUniqueName": "D:\\TextViewer\\src\\TextViewer\\TextViewer\\TextViewer.csproj",
+        "projectUniqueName": "C:\\Users\\Behzad\\Desktop\\TextViewer\\src\\TextViewer\\TextViewer\\TextViewer.csproj",
         "projectName": "TextViewer",
-        "projectPath": "D:\\TextViewer\\src\\TextViewer\\TextViewer\\TextViewer.csproj",
+        "projectPath": "C:\\Users\\Behzad\\Desktop\\TextViewer\\src\\TextViewer\\TextViewer\\TextViewer.csproj",
         "packagesPath": "C:\\Users\\Behzad\\.nuget\\packages\\",
-        "outputPath": "D:\\TextViewer\\src\\TextViewer\\TextViewer\\obj\\",
+        "outputPath": "C:\\Users\\Behzad\\Desktop\\TextViewer\\src\\TextViewer\\TextViewer\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
