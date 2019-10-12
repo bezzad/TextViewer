@@ -11,10 +11,9 @@ namespace TextViewer
 {
     public static class WordHelper
     {
-        private static readonly Regex RtlCharsPattern = new Regex("[\u061b-\u06f5]+");
+        private static readonly Regex RtlCharsPattern = new Regex("[؛؟\u061b-\u06f5]+");
         private static readonly Regex LtrCharsPattern = new Regex("[a-zA-Z0-9۰۱۲۳۴۵۶۷۸۹]");
-        private static readonly string InertChars = "\\،.»«[]{}()'/:!@#$%^&~*-+\"`";
-
+        private static readonly string InertChars = "\\|«»<>[]{}()'/،.,:!@#$%٪^&~*_-+=~‍‍‍‍\"`×?";
 
         public static List<List<WordInfo>> Content = new List<List<WordInfo>>();
 

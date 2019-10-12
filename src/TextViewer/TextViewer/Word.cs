@@ -35,8 +35,8 @@ namespace TextViewer
         public bool IsInnerWord { get; set; }
         public double ImpressivePaddingPercent { get; set; }
         public string Text { get; set; }
-        public double Width { get; set; }
-        public double Height { get; set; }
+        public double Width => Format?.Width ?? 0;
+        public double Height => Format?.Height ?? 0;
 
 
         public bool IsRtl => Styles[StyleType.Direction].Value == "rtl";

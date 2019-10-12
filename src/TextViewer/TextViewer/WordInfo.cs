@@ -53,12 +53,11 @@ namespace TextViewer
                     : Brushes.Black,
                 pixelsPerDip)
             {
-                LineHeight = lineHeight
+                LineHeight = lineHeight,
+                Trimming = TextTrimming.None
             };
 
             SpaceWidth = fontSize * 0.3;
-            Width = Format.Width;
-            Height = lineHeight;
             return Format;
         }
 

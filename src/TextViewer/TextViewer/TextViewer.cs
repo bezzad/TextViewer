@@ -113,7 +113,14 @@ namespace TextViewer
                     }
 
                     if (lineRemainWidth - wordWidth <= 0)
-                        AddLine();
+                    {
+                        if (lineBuffer.Count > 0)
+                            AddLine();
+                        else // the current word width is more than a line!
+                        {
+                            word.Format.MaxTextWidth = lineRemainWidth;
+                        }
+                    }
 
                     lineBuffer.Add(word);
                     if (IsContentRtl != word.IsRtl)
