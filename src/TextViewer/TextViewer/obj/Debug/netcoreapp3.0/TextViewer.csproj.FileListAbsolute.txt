@@ -1,0 +1,8 @@
+D:\TextViewer\src\TextViewer\TextViewer\bin\Debug\netcoreapp3.0\TextViewer.deps.json
+D:\TextViewer\src\TextViewer\TextViewer\bin\Debug\netcoreapp3.0\TextViewer.dll
+D:\TextViewer\src\TextViewer\TextViewer\bin\Debug\netcoreapp3.0\TextViewer.pdb
+D:\TextViewer\src\TextViewer\TextViewer\obj\Debug\netcoreapp3.0\TextViewer.AssemblyInfoInputs.cache
+D:\TextViewer\src\TextViewer\TextViewer\obj\Debug\netcoreapp3.0\TextViewer.AssemblyInfo.cs
+D:\TextViewer\src\TextViewer\TextViewer\obj\Debug\netcoreapp3.0\TextViewer.dll
+D:\TextViewer\src\TextViewer\TextViewer\obj\Debug\netcoreapp3.0\TextViewer.pdb
+D:\TextViewer\src\TextViewer\TextViewer\obj\Debug\netcoreapp3.0\TextViewer.csproj.Fody.CopyLocal.cache

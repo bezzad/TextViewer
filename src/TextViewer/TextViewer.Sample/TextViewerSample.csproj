@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Data\LtrContentSample.txt" />
+    <None Remove="Data\RtlContentSample.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TextViewer\TextViewer.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Data\LtrContentSample.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\RtlContentSample.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+</Project>
