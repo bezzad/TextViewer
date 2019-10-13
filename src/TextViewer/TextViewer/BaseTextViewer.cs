@@ -21,18 +21,10 @@ namespace TextViewer
             "ShowWireFrame", typeof(bool), typeof(BaseTextViewer), new PropertyMetadata(default(bool)));
         public static readonly DependencyProperty ParagraphSpaceProperty = DependencyProperty.Register(
             "ParagraphSpace", typeof(double), typeof(BaseTextViewer), new PropertyMetadata(default(double)));
-        public static readonly DependencyProperty IsContentRtlProperty = DependencyProperty.Register(
-            "IsContentRtl", typeof(bool), typeof(BaseTextViewer), new PropertyMetadata(default(bool)));
-
         public static readonly DependencyProperty ShowOffsetProperty = DependencyProperty.Register(
             "ShowOffset", typeof(bool), typeof(BaseTextViewer), new PropertyMetadata(default(bool)));
 
         
-        public bool IsContentRtl
-        {
-            get => (bool)GetValue(IsContentRtlProperty);
-            set => SetValue(IsContentRtlProperty, value);
-        }
         public double ParagraphSpace
         {
             get => (double)GetValue(ParagraphSpaceProperty);
@@ -63,7 +55,6 @@ namespace TextViewer
             get => (int)GetValue(LineHeightProperty);
             set => SetValue(LineHeightProperty, value);
         }
-
         public bool IsJustify
         {
             get => (bool)GetValue(IsJustifyProperty);
@@ -74,13 +65,11 @@ namespace TextViewer
             get => (Thickness)GetValue(PaddingProperty);
             set => SetValue(PaddingProperty, value);
         }
+
         public Pen WireFramePen { get; set; }
-
-        public List<List<WordInfo>> PageContent { get; set; }
+        public List<Paragraph> PageContent { get; set; }
         public List<WordInfo> DrawWords { get; set; }
-        public List<List<WordInfo>> Lines { get; set; }
         public double PixelsPerDip { get; set; }
-
 
 
         protected BaseTextViewer()
@@ -88,7 +77,6 @@ namespace TextViewer
             TextOptions.SetTextFormattingMode(this, TextFormattingMode.Display);
             WireFramePen = new Pen(Brushes.Red, 0.7) { DashStyle = DashStyles.Dash };
             DrawWords = new List<WordInfo>();
-            Lines = new List<List<WordInfo>>();
             PixelsPerDip = GraphicsHelper.PixelsPerDip(this);
             ParagraphSpace = 10;
         }

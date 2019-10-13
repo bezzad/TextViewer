@@ -22,9 +22,9 @@ namespace TextViewerSample
             CmbFontFamily.ItemsSource = fonts;
             CmbFontFamily.SelectedIndex = fonts.FindIndex(f => f.Source == "Arial");
             CmbFontSize.ItemsSource = sizes;
-            CmbFontSize.SelectedIndex = sizes.IndexOf(28);
+            CmbFontSize.SelectedIndex = sizes.IndexOf(16);
             CmbLineHeight.ItemsSource = sizes;
-            CmbLineHeight.SelectedIndex = sizes.IndexOf(22);
+            CmbLineHeight.SelectedIndex = sizes.IndexOf(18);
 
             BtnRtlSampleChecked(this, null);
 
@@ -40,7 +40,6 @@ namespace TextViewerSample
             Reader.PageContent = Path.Combine(Environment.CurrentDirectory, "Data\\LtrContentSample.txt").GetWords(false);
             BtnLtrSample.IsChecked = true;
             BtnRtlSample.IsChecked = false;
-            Reader.IsContentRtl = false;
             Reader.Render();
         }
 
@@ -49,7 +48,6 @@ namespace TextViewerSample
             Reader.PageContent = Path.Combine(Environment.CurrentDirectory, "Data\\RtlContentSample.txt").GetWords(true);
             BtnRtlSample.IsChecked = true;
             BtnLtrSample.IsChecked = false;
-            Reader.IsContentRtl = true;
             Reader.Render();
         }
     }

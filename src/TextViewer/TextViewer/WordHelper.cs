@@ -15,7 +15,7 @@ namespace TextViewer
         private static readonly Regex LtrCharsPattern = new Regex("[a-zA-Z0-9۰۱۲۳۴۵۶۷۸۹]");
         private static readonly string InertChars = "\\|«»<>[]{}()'/،.,:!@#$%٪^&~*_-+=~‍‍‍‍\"`×?";
 
-        public static List<List<WordInfo>> Content = new List<List<WordInfo>>();
+        public static List<Paragraph> Content = new List<Paragraph>();
 
         /// <summary>
         /// Searches a section of the list for a given element using a binary search
@@ -64,25 +64,27 @@ namespace TextViewer
         }
 
         [Time]
-        public static List<List<WordInfo>> GetWords(this string path, bool isParaRtl)
+        public static List<Paragraph> GetWords(this string path, bool isParaRtl)
         {
             var content = File.ReadAllLines(path, Encoding.UTF8);
-            Content = new List<List<WordInfo>>();
+            Content = new List<Paragraph>();
             WordInfo lastWordPointer = null;
+            var paraOffset = 0;
 
+            // read paragraphs
             foreach (var rawPara in content)
             {
                 var offset = 0;
                 var words = new List<WordInfo>();
+                var para = new Paragraph(paraOffset++, words, isParaRtl);
                 var imgTagStarted = false;
-                WordInfo imgWord = null;
+                
                 foreach (var word in rawPara.Split(' ', StringSplitOptions.RemoveEmptyEntries))
                 {
                     if (word == @"<img")
                     {
                         imgTagStarted = true;
-                        imgWord = new WordInfo("img", offset++, isParaRtl);
-                        words.Add(imgWord);
+                        words.Add(new WordInfo("img", offset++, isParaRtl));
                         continue;
                     }
                     if (imgTagStarted)
@@ -91,19 +93,19 @@ namespace TextViewer
                         {
                             var startVal = word.IndexOf("\"", StringComparison.Ordinal) + 1;
                             var w = word.Substring(startVal, word.LastIndexOf("\"", StringComparison.Ordinal) - startVal);
-                            imgWord.Styles.Add(StyleType.Width, w);
+                            words.Last().Styles.Add(StyleType.Width, w);
                         }
                         else if (word.StartsWith("height"))
                         {
                             var startVal = word.IndexOf("\"", StringComparison.Ordinal) + 1;
                             var h = word.Substring(startVal, word.LastIndexOf("\"", StringComparison.Ordinal) - startVal);
-                            imgWord.Styles.Add(StyleType.Height, h);
+                            words.Last().Styles.Add(StyleType.Height, h);
                         }
                         else if (word.StartsWith("src"))
                         {
                             var startVal = word.IndexOf("\"", StringComparison.Ordinal) + 1;
                             var src = word.Substring(startVal, word.LastIndexOf("\"", StringComparison.Ordinal) - startVal);
-                            imgWord.Styles.Add(StyleType.Image, src);
+                            words.Last().Styles.Add(StyleType.Image, src);
                         }
                         if (word == @"/>")
                         {
@@ -111,7 +113,6 @@ namespace TextViewer
                         }
                         continue;
                     }
-
 
                     var splitWords = word.ConvertInertCharsToWord(ref offset, isParaRtl);
                     if (lastWordPointer != null)
@@ -125,7 +126,7 @@ namespace TextViewer
                     offset++; // word space
                 }
 
-                Content.Add(words);
+                Content.Add(para);
             }
 
             return Content;
