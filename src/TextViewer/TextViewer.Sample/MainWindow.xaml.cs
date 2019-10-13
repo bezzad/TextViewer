@@ -18,12 +18,13 @@ namespace TextViewerSample
             InitializeComponent();
 
             var fonts = Fonts.SystemFontFamilies.OrderBy(f => f.Source).ToList();
+            var sizes = new List<double>() { 8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72, 96 };
             CmbFontFamily.ItemsSource = fonts;
             CmbFontFamily.SelectedIndex = fonts.FindIndex(f => f.Source == "Arial");
-            CmbFontSize.ItemsSource = new List<double>() { 8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72 };
-            CmbFontSize.SelectedIndex = 8;
-            CmbLineHeight.ItemsSource = new List<double>() { 10, 11, 12, 13, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72, 96 };
-            CmbLineHeight.SelectedIndex = 8;
+            CmbFontSize.ItemsSource = sizes;
+            CmbFontSize.SelectedIndex = sizes.IndexOf(28);
+            CmbLineHeight.ItemsSource = sizes;
+            CmbLineHeight.SelectedIndex = sizes.IndexOf(22);
 
             BtnRtlSampleChecked(this, null);
 

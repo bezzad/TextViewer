@@ -78,10 +78,10 @@ namespace TextViewer
                 WordInfo imgWord = null;
                 foreach (var word in rawPara.Split(' ', StringSplitOptions.RemoveEmptyEntries))
                 {
-                    if (word == "<img")
+                    if (word == @"<img")
                     {
                         imgTagStarted = true;
-                        imgWord = new WordInfo("img", 0, isParaRtl);
+                        imgWord = new WordInfo("img", offset++, isParaRtl);
                         words.Add(imgWord);
                         continue;
                     }
@@ -105,8 +105,13 @@ namespace TextViewer
                             var src = word.Substring(startVal, word.LastIndexOf("\"", StringComparison.Ordinal) - startVal);
                             imgWord.Styles.Add(StyleType.Image, src);
                         }
+                        if (word == @"/>")
+                        {
+                            imgTagStarted = false;
+                        }
                         continue;
                     }
+
 
                     var splitWords = word.ConvertInertCharsToWord(ref offset, isParaRtl);
                     if (lastWordPointer != null)
@@ -170,7 +175,7 @@ namespace TextViewer
                     if (wordBuffer.Length > 0)
                     {
                         AddWord(new WordInfo(wordBuffer, offset, wordBuffer.IsRtl()));
-                        offset += wordBuffer.Length;
+                        offset += res.Last().Text.Length;
                     }
                     // inert char as word
                     AddWord(new WordInfo(c.ToString(), offset++, isContentRtl));
@@ -183,7 +188,7 @@ namespace TextViewer
             if (wordBuffer.Length > 0)
             {
                 AddWord(new WordInfo(wordBuffer, offset, wordBuffer.IsRtl()));
-                offset += wordBuffer.Length;
+                offset += res.Last().Text.Length;
             }
 
             return res;

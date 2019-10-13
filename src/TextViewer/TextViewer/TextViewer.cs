@@ -1,14 +1,10 @@
-﻿using System;
-using MethodTimer;
+﻿using MethodTimer;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 
 namespace TextViewer
 {
@@ -59,7 +55,7 @@ namespace TextViewer
                     while (nonDirectionalWordsStack.TryPop(out var nWord))
                         DrawWords.Add(AddWordToCurrentLine(nWord));
 
-                if (IsJustify && lineRemainWidth > 0 && justify)
+                if (justify && lineRemainWidth > 0)
                 {
                     startPoint.X = IsContentRtl
                         ? ActualWidth - Padding.Right
@@ -198,6 +194,12 @@ namespace TextViewer
 
                 if (ShowWireFrame)
                     dc.DrawRectangle(null, WireFramePen, word.Area);
+
+                if (ShowOffset)
+                    dc.DrawText(new FormattedText(word.Offset.ToString(), CultureInfo.CurrentCulture, FlowDirection.LeftToRight,
+                        new Typeface(FontFamily, FontStyles.Normal, FontWeights.Normal, FontStretches.Normal),
+                        10, Brushes.BlueViolet, PixelsPerDip),
+                        new Point(word.IsRtl ? word.DrawPoint.X : word.Area.X, (word.IsRtl ? word.DrawPoint.Y : word.Area.Y) - 10));
             }
         }
 

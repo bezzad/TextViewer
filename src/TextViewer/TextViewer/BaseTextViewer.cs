@@ -24,6 +24,10 @@ namespace TextViewer
         public static readonly DependencyProperty IsContentRtlProperty = DependencyProperty.Register(
             "IsContentRtl", typeof(bool), typeof(BaseTextViewer), new PropertyMetadata(default(bool)));
 
+        public static readonly DependencyProperty ShowOffsetProperty = DependencyProperty.Register(
+            "ShowOffset", typeof(bool), typeof(BaseTextViewer), new PropertyMetadata(default(bool)));
+
+        
         public bool IsContentRtl
         {
             get => (bool)GetValue(IsContentRtlProperty);
@@ -38,6 +42,11 @@ namespace TextViewer
         {
             get => (bool)GetValue(ShowWireFrameProperty);
             set => SetValue(ShowWireFrameProperty, value);
+        }
+        public bool ShowOffset
+        {
+            get => (bool)GetValue(ShowOffsetProperty);
+            set => SetValue(ShowOffsetProperty, value);
         }
         public FontFamily FontFamily
         {
