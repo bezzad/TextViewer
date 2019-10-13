@@ -64,19 +64,52 @@ namespace TextViewer
                     while (nonDirectionalWordsStack.TryPop(out var nWord))
                         DrawWords.Add(AddWordToCurrentLine(para, nWord));
 
-                if (justify && lineRemainWidth > 0)
+                if (lineRemainWidth > 0)
                 {
-                    SetStartPoint(ref startPoint, para, 0);
-
-                    var extendSpace = lineRemainWidth / (lineBuffer.Count(w => w.IsInnerWord == false) - 1);
-                    foreach (var word in lineBuffer)
+                    if (justify)
                     {
-                        if (word.IsInnerWord == false)
-                        {
-                            word.SpaceWidth += extendSpace;
-                        }
+                        SetStartPoint(ref startPoint, para, 0);
 
-                        AddWordToCurrentLine(para, word);
+                        var extendSpace = lineRemainWidth / (lineBuffer.Count(w => w.IsInnerWord == false) - 1);
+                        foreach (var word in lineBuffer)
+                        {
+                            if (word.IsInnerWord == false)
+                            {
+                                word.SpaceWidth += extendSpace;
+                            }
+
+                            AddWordToCurrentLine(para, word);
+                        }
+                    }
+                    else if (para.Styles.ContainsKey(StyleType.TextAlign))
+                    {
+                        //if (para.Styles[StyleType.TextAlign] == "left")
+                        //{
+                        //    if (para.IsRtl)
+                        //    {
+                        //        SetStartPoint(ref startPoint, para, 0);
+                        //        startPoint.X -= lineRemainWidth;
+                        //        foreach (var word in lineBuffer)
+                        //            AddWordToCurrentLine(para, word);
+                        //    }
+                        //}
+                        //else if (para.Styles[StyleType.TextAlign] == "center")
+                        //{
+                        //    SetStartPoint(ref startPoint, para, 0);
+                        //    startPoint.X += lineRemainWidth / 2 * (para.IsRtl ? -1 : 1);
+                        //    foreach (var word in lineBuffer)
+                        //        AddWordToCurrentLine(para, word);
+                        //}
+                        //else if (para.Styles[StyleType.TextAlign] == "right")
+                        //{
+                        //    if (para.IsRtl == false)
+                        //    {
+                        //        SetStartPoint(ref startPoint, para, 0);
+                        //        startPoint.X += lineRemainWidth;
+                        //        foreach (var word in lineBuffer)
+                        //            AddWordToCurrentLine(para, word);
+                        //    }
+                        //}
                     }
                 }
 

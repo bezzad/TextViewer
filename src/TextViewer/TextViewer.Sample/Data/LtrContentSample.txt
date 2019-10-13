@@ -1,3 +1,4 @@
-﻿Lorem ipsum dolor i sit a amet, an consectetur adipisicing elit, sed do eiusmod tempor
+﻿<center> In the name of god </center>
+Lorem ipsum dolor i sit a amet, an consectetur adipisicing elit, sed do eiusmod tempor
 -------------------------------------------------------------------------------------------
-ooooooooooooooooooooooooooooooooooooooooooooooo
+<right> Right align test Lorem ipsum dolor i sit a amet, an consectetur adipisicing elit, se Lorem ipsum dolor i sit a amet, an consectetur adipisicing elit, se Lorem ipsum dolor i sit a amet, an consectetur adipisicing elit, se Lorem ipsum dolor i sit a amet, an consectetur adipisicing elit, se </right>
