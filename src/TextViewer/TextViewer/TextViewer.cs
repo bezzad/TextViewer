@@ -39,6 +39,8 @@ namespace TextViewer
     /// </summary>
     public class TextViewer : BaseTextViewer
     {
+        private readonly Stack<WordInfo> _nonDirectionalWordsStack = new Stack<WordInfo>();
+
         protected void SetStartPoint(ref Point startPoint, Paragraph para, double extendedY = 0)
         {
             startPoint.X = para.IsRtl
@@ -48,111 +50,108 @@ namespace TextViewer
             startPoint.Y += extendedY;
         }
 
+        protected WordInfo SetWordPositionInLine(Paragraph para, WordInfo word, ref Point startPoint)
+        {
+            if (para.IsRtl)
+            {
+                //     _____________________________________________
+                //    |                                             |
+                //    |                               __________ +  |  + start position
+                //    |                     <--- ... |__________|   | 
+                //    |                                             |
+                //    |                                             |
+                //    |_____________________________________________| 
+                //
+                word.Area = new Rect(new Point(startPoint.X - word.Width, startPoint.Y), new Size(word.Width, word.Height));
+                word.DrawPoint = word.IsRtl ? startPoint : word.Area.Location;
+                startPoint.X -= word.Width + word.SpaceWidth;
+            }
+            else // ---->
+            {
+                //     _____________________________________________
+                //    |                                             |
+                //    |   +__________                               |  + start position
+                //    |   |__________|  ... --->                    | 
+                //    |                                             |
+                //    |                                             |
+                //    |_____________________________________________| 
+                //
+                word.Area = new Rect(startPoint, new Size(word.Width, word.Height));
+                word.DrawPoint = word.IsRtl ? startPoint : word.Area.Location;
+                startPoint.X += word.Width + word.SpaceWidth;
+            }
+
+            return word;
+        }
+
+        protected void AddLine(Paragraph para, List<WordInfo> lineBuffer, ref Point startPoint, double lineWidth, double lineRemainWidth, bool justify)
+        {
+            if (_nonDirectionalWordsStack.Any())
+                while (_nonDirectionalWordsStack.TryPop(out var nWord))
+                    SetWordPositionInLine(para, nWord, ref startPoint);
+
+            if (lineRemainWidth > 0)
+            {
+                if (justify)
+                {
+                    SetStartPoint(ref startPoint, para, 0);
+
+                    var extendSpace = lineRemainWidth / (lineBuffer.Count(w => w.IsInnerWord == false) - 1);
+                    foreach (var word in lineBuffer)
+                    {
+                        if (word.IsInnerWord == false)
+                        {
+                            word.SpaceWidth += extendSpace;
+                        }
+
+                        SetWordPositionInLine(para, word, ref startPoint);
+                    }
+                }
+                else if (para.Styles.ContainsKey(StyleType.TextAlign))
+                {
+                    if (para.Styles[StyleType.TextAlign] == "left")
+                    {
+                        if (para.IsRtl)
+                        {
+                            SetStartPoint(ref startPoint, para, 0);
+                            startPoint.X -= lineRemainWidth;
+                            foreach (var word in lineBuffer)
+                                SetWordPositionInLine(para, word, ref startPoint);
+                        }
+                    }
+                    else if (para.Styles[StyleType.TextAlign] == "center")
+                    {
+                        SetStartPoint(ref startPoint, para, 0);
+                        startPoint.X += lineRemainWidth / 2 * (para.IsRtl ? -1 : 1);
+                        foreach (var word in lineBuffer)
+                            SetWordPositionInLine(para, word, ref startPoint);
+                    }
+                    else if (para.Styles[StyleType.TextAlign] == "right")
+                    {
+                        if (para.IsRtl == false)
+                        {
+                            SetStartPoint(ref startPoint, para, 0);
+                            startPoint.X += lineRemainWidth;
+                            foreach (var word in lineBuffer)
+                                SetWordPositionInLine(para, word, ref startPoint);
+                        }
+                    }
+                }
+            }
+
+            para.Lines.Add(lineBuffer);
+            SetStartPoint(ref startPoint, para, lineBuffer.Last().Height); // new line
+            _nonDirectionalWordsStack.Clear();
+        }
+
         [Time]
         protected void BuildPage(List<Paragraph> content)
         {
             var startPoint = new Point(content.FirstOrDefault()?.IsRtl == true ? ActualWidth - Padding.Right : Padding.Left, Padding.Top);
-            var nonDirectionalWordsStack = new Stack<WordInfo>();
             var lineWidth = ActualWidth - Padding.Left - Padding.Right;
             var lineRemainWidth = lineWidth;
             var lineBuffer = new List<WordInfo>();
             DrawWords.Clear();
-
-            void AddLine(Paragraph para, bool justify)
-            {
-                if (nonDirectionalWordsStack.Any())
-                    while (nonDirectionalWordsStack.TryPop(out var nWord))
-                        DrawWords.Add(AddWordToCurrentLine(para, nWord));
-
-                if (lineRemainWidth > 0)
-                {
-                    if (justify)
-                    {
-                        SetStartPoint(ref startPoint, para, 0);
-
-                        var extendSpace = lineRemainWidth / (lineBuffer.Count(w => w.IsInnerWord == false) - 1);
-                        foreach (var word in lineBuffer)
-                        {
-                            if (word.IsInnerWord == false)
-                            {
-                                word.SpaceWidth += extendSpace;
-                            }
-
-                            AddWordToCurrentLine(para, word);
-                        }
-                    }
-                    else if (para.Styles.ContainsKey(StyleType.TextAlign))
-                    {
-                        if (para.Styles[StyleType.TextAlign] == "left")
-                        {
-                            if (para.IsRtl)
-                            {
-                                SetStartPoint(ref startPoint, para, 0);
-                                startPoint.X -= lineRemainWidth;
-                                foreach (var word in lineBuffer)
-                                    AddWordToCurrentLine(para, word);
-                            }
-                        }
-                        else if (para.Styles[StyleType.TextAlign] == "center")
-                        {
-                            SetStartPoint(ref startPoint, para, 0);
-                            startPoint.X += lineRemainWidth / 2 * (para.IsRtl ? -1 : 1);
-                            foreach (var word in lineBuffer)
-                                AddWordToCurrentLine(para, word);
-                        }
-                        else if (para.Styles[StyleType.TextAlign] == "right")
-                        {
-                            if (para.IsRtl == false)
-                            {
-                                SetStartPoint(ref startPoint, para, 0);
-                                startPoint.X += lineRemainWidth;
-                                foreach (var word in lineBuffer)
-                                    AddWordToCurrentLine(para, word);
-                            }
-                        }
-                    }
-                }
-
-                para.Lines.Add(lineBuffer);
-                lineRemainWidth = lineWidth;
-                SetStartPoint(ref startPoint, para, lineBuffer.Last().Height); // new line
-                nonDirectionalWordsStack.Clear();
-                lineBuffer = new List<WordInfo>(); // create new line buffer, without cleaning last line
-            }
-
-            WordInfo AddWordToCurrentLine(Paragraph para, WordInfo word)
-            {
-                if (para.IsRtl)
-                {
-                    //     _____________________________________________
-                    //    |                                             |
-                    //    |                               __________ +  |  + start position
-                    //    |                     <--- ... |__________|   | 
-                    //    |                                             |
-                    //    |                                             |
-                    //    |_____________________________________________| 
-                    //
-                    word.Area = new Rect(new Point(startPoint.X - word.Width, startPoint.Y), new Size(word.Width, word.Height));
-                    word.DrawPoint = word.IsRtl ? startPoint : word.Area.Location;
-                    startPoint.X -= word.Width + word.SpaceWidth;
-                }
-                else // ---->
-                {
-                    //     _____________________________________________
-                    //    |                                             |
-                    //    |   +__________                               |  + start position
-                    //    |   |__________|  ... --->                    | 
-                    //    |                                             |
-                    //    |                                             |
-                    //    |_____________________________________________| 
-                    //
-                    word.Area = new Rect(startPoint, new Size(word.Width, word.Height));
-                    word.DrawPoint = word.IsRtl ? startPoint : word.Area.Location;
-                    startPoint.X += word.Width + word.SpaceWidth;
-                }
-
-                return word;
-            }
 
             foreach (var para in content)
             {
@@ -180,7 +179,9 @@ namespace TextViewer
                         if (lineBuffer.Count > 0)
                         {
                             lineRemainWidth += lineBuffer.Last().SpaceWidth; // end of line has no space (important for justify)
-                            AddLine(para, IsJustify);
+                            AddLine(para, lineBuffer, ref startPoint, lineWidth, lineRemainWidth, IsJustify);
+                            lineBuffer = new List<WordInfo>(); // create new line buffer, without cleaning last line
+                            lineRemainWidth = lineWidth;
                         }
                         else // the current word width is more than a line!
                         {
@@ -192,21 +193,25 @@ namespace TextViewer
                     }
 
                     lineBuffer.Add(word);
+                    DrawWords.Add(word);
                     if (para.IsRtl != word.IsRtl)
-                        nonDirectionalWordsStack.Push(word);
+                        _nonDirectionalWordsStack.Push(word);
                     else
                     {
-                        if (nonDirectionalWordsStack.Any())
-                            while (nonDirectionalWordsStack.TryPop(out var nWord))
-                                DrawWords.Add(AddWordToCurrentLine(para, nWord));
+                        if (_nonDirectionalWordsStack.Any())
+                            while (_nonDirectionalWordsStack.TryPop(out var nWord))
+                                SetWordPositionInLine(para, nWord, ref startPoint);
 
-                        DrawWords.Add(AddWordToCurrentLine(para, word));
+                        SetWordPositionInLine(para, word, ref startPoint);
                     }
 
                     lineRemainWidth -= word.Width + word.SpaceWidth;
                 }
 
-                AddLine(para, false); // last line of paragraph
+                AddLine(para, lineBuffer, ref startPoint, lineWidth, lineRemainWidth, false); // last line of paragraph
+                lineBuffer = new List<WordInfo>(); // create new line buffer, without cleaning last line
+                lineRemainWidth = lineWidth;
+
                 // + ParagraphSpace
                 startPoint.Y += ParagraphSpace;
             }
