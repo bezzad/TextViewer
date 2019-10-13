@@ -11,9 +11,11 @@ namespace TextViewer
 
         public List<WordInfo> Words { get; set; }
         public double Width { get; set; }
+        public double Height { get; set; }
         public double RemainWidth { get; set; }
         public Point Location { get; set; }
         public Paragraph CurrentParagraph { get; set; }
+        public int Count => Words.Count;
 
         public Line(double width, Paragraph para, Point lineLocation)
         {
@@ -70,8 +72,9 @@ namespace TextViewer
         public void AddWord(WordInfo word)
         {
             Words.Add(word);
-            if (CurrentParagraph.IsRtl != word.IsRtl)
-                NonDirectionalWordsStack.Push(word);
+            if (word.Height > Height) Height = word.Height;
+
+            if (CurrentParagraph.IsRtl != word.IsRtl) NonDirectionalWordsStack.Push(word);
             else
             {
                 SetNonDirectionalWords();
@@ -141,7 +144,7 @@ namespace TextViewer
                 }
             }
 
-            CurrentParagraph.Lines.Add(Words);
+            CurrentParagraph.Lines.Add(this);
         }
     }
 }
