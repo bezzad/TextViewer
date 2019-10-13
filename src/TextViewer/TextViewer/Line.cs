@@ -62,11 +62,21 @@ namespace TextViewer
             return word;
         }
 
-        protected void SetNonDirectionalWords()
+        protected void PopAllNonDirectionalWords()
         {
             if (NonDirectionalWordsStack.Any())
                 while (NonDirectionalWordsStack.TryPop(out var nonWord))
                     SetWordPositionInLine(nonWord);
+        }
+
+        protected void SetWordPosition(WordInfo word)
+        {
+            if (CurrentParagraph.IsRtl != word.IsRtl) NonDirectionalWordsStack.Push(word);
+            else
+            {
+                PopAllNonDirectionalWords();
+                SetWordPositionInLine(word);
+            }
         }
 
         public void AddWord(WordInfo word)
@@ -74,19 +84,15 @@ namespace TextViewer
             Words.Add(word);
             if (word.Height > Height) Height = word.Height;
 
-            if (CurrentParagraph.IsRtl != word.IsRtl) NonDirectionalWordsStack.Push(word);
-            else
-            {
-                SetNonDirectionalWords();
-                SetWordPositionInLine(word);
-            }
+            SetWordPosition(word);
 
             RemainWidth -= word.Width + word.SpaceWidth;
         }
 
         public void Draw(bool justify = false)
         {
-            SetNonDirectionalWords();
+            // clear non directional words stack
+            PopAllNonDirectionalWords();
 
             if (RemainWidth > 0)
             {
@@ -98,11 +104,9 @@ namespace TextViewer
                     foreach (var word in Words)
                     {
                         if (word.IsInnerWord == false)
-                        {
                             word.SpaceWidth += extendSpace;
-                        }
 
-                        SetWordPositionInLine(word);
+                        SetWordPosition(word);
                     }
                 }
                 else if (CurrentParagraph.Styles.ContainsKey(StyleType.TextAlign))
@@ -115,33 +119,32 @@ namespace TextViewer
                                 {
                                     WordPointOffset -= RemainWidth;
                                     foreach (var word in Words)
-                                        SetWordPositionInLine(word);
+                                        SetWordPosition(word);
                                 }
-
                                 break;
                             }
-
                         case "center":
                             {
                                 WordPointOffset += RemainWidth / 2 * (CurrentParagraph.IsRtl ? -1 : 1);
                                 foreach (var word in Words)
-                                    SetWordPositionInLine(word);
+                                    SetWordPosition(word);
                                 break;
                             }
-
                         case "right":
                             {
                                 if (CurrentParagraph.IsRtl == false)
                                 {
                                     WordPointOffset += RemainWidth;
                                     foreach (var word in Words)
-                                        SetWordPositionInLine(word);
+                                        SetWordPosition(word);
                                 }
-
                                 break;
                             }
                     }
                 }
+
+                // maybe last word is non directional word
+                PopAllNonDirectionalWords();
             }
 
             CurrentParagraph.Lines.Add(this);
