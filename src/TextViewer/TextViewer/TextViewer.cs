@@ -51,13 +51,13 @@ namespace TextViewer
         [Time]
         protected void BuildPage(List<Paragraph> content)
         {
-            var startPoint = new Point(content.FirstOrDefault()?.IsRtl == true ? ActualWidth - Padding.Right : Padding.Left, Padding.Top); 
+            var startPoint = new Point(content.FirstOrDefault()?.IsRtl == true ? ActualWidth - Padding.Right : Padding.Left, Padding.Top);
             var nonDirectionalWordsStack = new Stack<WordInfo>();
             var lineWidth = ActualWidth - Padding.Left - Padding.Right;
             var lineRemainWidth = lineWidth;
             var lineBuffer = new List<WordInfo>();
             DrawWords.Clear();
-            
+
             void AddLine(Paragraph para, bool justify)
             {
                 if (nonDirectionalWordsStack.Any())
@@ -67,7 +67,7 @@ namespace TextViewer
                 if (justify && lineRemainWidth > 0)
                 {
                     SetStartPoint(ref startPoint, para, 0);
-                    
+
                     var extendSpace = lineRemainWidth / (lineBuffer.Count(w => w.IsInnerWord == false) - 1);
                     foreach (var word in lineBuffer)
                     {
@@ -207,6 +207,18 @@ namespace TextViewer
                         new Typeface(FontFamily, FontStyles.Normal, FontWeights.Normal, FontStretches.Normal),
                         10, Brushes.BlueViolet, PixelsPerDip),
                         new Point(word.IsRtl ? word.DrawPoint.X : word.Area.X, (word.IsRtl ? word.DrawPoint.Y : word.Area.Y) - 10));
+            }
+
+            if (ShowWireFrame) // show paragraph area
+            {
+                foreach (var para in PageContent)
+                {
+                    var firstWord = para.Words.First();
+                    dc.DrawRoundedRectangle(null, new Pen(Brushes.Brown, 0.3) { DashStyle = DashStyles.Solid },
+                        new Rect(new Point(Padding.Left, firstWord.DrawPoint.Y),
+                                 new Size(ActualWidth - Padding.Left - Padding.Right, para.Lines.Sum(l => l[0].Height))),
+                                 4, 4);
+                }
             }
         }
 
