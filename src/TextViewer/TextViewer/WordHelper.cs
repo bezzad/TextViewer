@@ -78,7 +78,7 @@ namespace TextViewer
                 var words = new List<WordInfo>();
                 var para = new Paragraph(paraOffset++, words, isParaRtl);
                 var imgTagStarted = false;
-                
+
                 foreach (var word in rawPara.Split(' ', StringSplitOptions.RemoveEmptyEntries))
                 {
                     if (word == @"<img")
@@ -111,6 +111,24 @@ namespace TextViewer
                         {
                             imgTagStarted = false;
                         }
+                        continue;
+                    }
+
+                    if (word == @"<center>" || word == @"</center>")
+                    {
+                        para.Styles[StyleType.TextAlign] = "center";
+                        continue;
+                    }
+
+                    if (word == @"<left>" || word == @"</left>")
+                    {
+                        para.Styles[StyleType.TextAlign] = "left";
+                        continue;;
+                    }
+
+                    if (word == @"<right>" || word == @"</right>")
+                    {
+                        para.Styles[StyleType.TextAlign] = "right";
                         continue;
                     }
 
