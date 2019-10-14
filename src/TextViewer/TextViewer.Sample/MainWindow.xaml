@@ -11,13 +11,13 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="40" />
         </Grid.RowDefinitions>
-        <textViewer:SelectableTextViewer Grid.Row="0" x:Name="Reader" Background="AntiqueWhite" Padding="20" IsSelectable="False"></textViewer:SelectableTextViewer>
+        <textViewer:MagnifyingTextViewer Grid.Row="0" x:Name="Reader" Background="AntiqueWhite" Padding="20" IsSelectable="False"></textViewer:MagnifyingTextViewer>
         <StackPanel Orientation="Horizontal" Grid.Row="1" Background="Azure" >
             <CheckBox Margin="5,10" IsChecked="{Binding ElementName=Reader, Path=ShowOffset, UpdateSourceTrigger=PropertyChanged}">Show Offset</CheckBox>
             <CheckBox Margin="5,10" IsChecked="{Binding ElementName=Reader, Path=ShowWireFrame, UpdateSourceTrigger=PropertyChanged}">Wire Frame</CheckBox>
             <GridSplitter Width="1" Background="Gray"></GridSplitter>
             <CheckBox Margin="5,10" IsChecked="{Binding ElementName=Reader, Path=IsJustify, UpdateSourceTrigger=PropertyChanged}">Justify</CheckBox>
-            <GridSplitter Width="1" Background="Gray"></GridSplitter>
+            <CheckBox Margin="5,10" IsChecked="{Binding ElementName=Reader, Path=MagnifierEnable, UpdateSourceTrigger=PropertyChanged}">Magnifier</CheckBox>
             <Label Margin="5,5,0,5">Font Family:</Label>
             <ComboBox Name="CmbFontFamily" Margin="0,5,10,5" Padding="5" Text="{Binding ElementName=Reader, Path=FontFamily, UpdateSourceTrigger=PropertyChanged}"></ComboBox>
             <GridSplitter Width="1" Background="Gray"></GridSplitter>

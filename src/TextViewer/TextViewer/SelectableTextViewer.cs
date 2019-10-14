@@ -29,14 +29,9 @@ namespace TextViewer
             IsSelectable = true;
             SelectedBrush = new SolidColorBrush(Colors.DarkCyan) { Opacity = 0.5 };
             Cursor = Cursors.IBeam;
-
-            // Add the event handler for Mouse events.
-            MouseLeftButtonUp += TextCanvasMouseLeftButtonUp;
-            MouseLeftButtonDown += TextCanvasMouseLeftButtonDown;
-            MouseMove += TextCanvasMouseMove;
         }
 
-        protected virtual void TextCanvasMouseMove(object sender, MouseEventArgs e)
+        protected override void OnMouseMove(MouseEventArgs e)
         {
             if (IsMouseDown)
             {
@@ -44,22 +39,22 @@ namespace TextViewer
                 Render();
             }
         }
-        protected virtual void TextCanvasMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        protected override void OnMouseLeftButtonDown( MouseButtonEventArgs e)
         {
             // Retrieve the coordinates of the mouse button event.
             IsMouseDown = true;
             ClearSelection();
-            StartSelectionPoint = e.GetPosition((UIElement)sender);
+            StartSelectionPoint = e.GetPosition(this);
             EndSelectionPoint = StartSelectionPoint;
             Render();
         }
-        protected virtual void TextCanvasMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
         {
             // Retrieve the coordinates of the mouse button event.
             if (IsMouseDown)
             {
                 IsMouseDown = false;
-                EndSelectionPoint = e.GetPosition((UIElement)sender);
+                EndSelectionPoint = e.GetPosition(this);
                 Render();
             }
         }

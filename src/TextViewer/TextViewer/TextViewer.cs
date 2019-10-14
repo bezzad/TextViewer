@@ -137,7 +137,7 @@ namespace TextViewer
                     var ft = new FormattedText(word.Offset.ToString(),
                         CultureInfo.CurrentCulture, FlowDirection.LeftToRight,
                         new Typeface(FontFamily, FontStyles.Normal, FontWeights.Normal, FontStretches.Normal),
-                        10, Brushes.BlueViolet, PixelsPerDip);
+                        8, Brushes.BlueViolet, PixelsPerDip);
 
                     dc.DrawText(ft, new Point(word.Paragraph.IsRtl ? word.Area.X + word.Width - ft.Width : word.Area.X, word.Area.Y));
                 }
