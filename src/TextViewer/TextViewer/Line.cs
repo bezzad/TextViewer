@@ -30,50 +30,55 @@ namespace TextViewer
         protected WordInfo SetWordPositionInLine(WordInfo word)
         {
             var startPoint = new Point(WordPointOffset, Location.Y);
-            if (CurrentParagraph.IsRtl)
+            var space = word.NextWord != null ? word.SpaceWidth : 0;
+
+            if (CurrentParagraph.IsRtl) // Left to right paragraph
             {
-                //     _____________________________________________
-                //    |                                             |
-                //    |                               __________ +  |  + start position
-                //    |                     <--- ... |__________|   | 
-                //    |                                             |
-                //    |                                             |
-                //    |_____________________________________________| 
+                //     _______________________________________________________
+                //    |                                                       |
+                //    |                                         __________ +  |  + start position
+                //    |                               <--- ... |__________|   | 
+                //    |                                                       |
+                //    |   __________ _   _____ _   _ _______   _ _________    |
+                //    |  |___LTR____|_| |_LTR_|_| |_|__RTL__| |_|___RTL___|   |
+                //    |                                                       |
+                //    |_______________________________________________________| 
                 //
                 word.Area = new Rect(new Point(startPoint.X - word.Width, startPoint.Y), new Size(word.Width, word.Height));
-                if (word.IsRtl)
+                if (word.IsRtl) // <--x <-- <--- 0
                 {
                     word.DrawPoint = startPoint;
-                    WordPointOffset -= word.Width + word.SpaceWidth;
+                    WordPointOffset -= word.Width + space;
                 }
-                else
+                else // -->x <-- <--- 0
                 {
                     word.DrawPoint = word.Area.Location;
-                    //WordPointOffset -= word.Width + word.PreviousWord?.SpaceWidth ?? 0;
-                    WordPointOffset -= word.Width + word.SpaceWidth;
+                    WordPointOffset -= word.Width + space;
                 }
             }
-            else // ---->
+            else // Left to right paragraph
             {
-                //     _____________________________________________
-                //    |                                             |
-                //    |   +__________                               |  + start position
-                //    |   |__________|  ... --->                    | 
-                //    |                                             |
-                //    |                                             |
-                //    |_____________________________________________| 
+                //     ________________________________________________________
+                //    |                                                        |
+                //    |   +__________                                          |  + start position
+                //    |   |__________|  ... --->                               | 
+                //    |                                                        |
+                //    |    __________ _   _____ _   _ _______   _ _________    |
+                //    |   |___LTR____|_| |_LTR_|_| |_|__RTL__| |_|___RTL___|   |
+                //    |                                                        |
+                //    |________________________________________________________| 
                 //
                 word.Area = new Rect(startPoint, new Size(word.Width, word.Height));
                 if (word.IsRtl)
                 {
-                    word.DrawPoint = new Point(startPoint.X + word.Width, startPoint.Y);
-                    //WordPointOffset += word.Width + word.PreviousWord?.SpaceWidth ?? 0;
-                    WordPointOffset += word.Width + word.SpaceWidth;
+                    WordPointOffset += space;
+                    word.DrawPoint = new Point(WordPointOffset + word.Width, startPoint.Y);
+                    WordPointOffset += word.Width;
                 }
                 else
                 {
                     word.DrawPoint = word.Area.Location;
-                    WordPointOffset += word.Width + word.SpaceWidth;
+                    WordPointOffset += word.Width + space;
                 }
             }
 
