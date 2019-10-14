@@ -41,8 +41,16 @@ namespace TextViewer
                 //    |_____________________________________________| 
                 //
                 word.Area = new Rect(new Point(startPoint.X - word.Width, startPoint.Y), new Size(word.Width, word.Height));
-                word.DrawPoint = word.IsRtl ? startPoint : word.Area.Location;
-                WordPointOffset -= word.Width + word.SpaceWidth;
+                if (word.IsRtl)
+                {
+                    word.DrawPoint = startPoint;
+                    WordPointOffset -= word.Width + word.SpaceWidth;
+                }
+                else
+                {
+                    word.DrawPoint = word.Area.Location;
+                    WordPointOffset -= word.Width + word.SpaceWidth;
+                }
             }
             else // ---->
             {
@@ -55,8 +63,16 @@ namespace TextViewer
                 //    |_____________________________________________| 
                 //
                 word.Area = new Rect(startPoint, new Size(word.Width, word.Height));
-                word.DrawPoint = word.IsRtl ? new Point(startPoint.X + word.Width, startPoint.Y) : word.Area.Location;
-                WordPointOffset += word.Width + word.SpaceWidth;
+                if (word.IsRtl)
+                {
+                    word.DrawPoint = new Point(startPoint.X + word.Width, startPoint.Y);
+                    WordPointOffset += word.Width + word.SpaceWidth;
+                }
+                else
+                {
+                    word.DrawPoint = word.Area.Location;
+                    WordPointOffset += word.Width + word.SpaceWidth;
+                }
             }
 
             return word;
