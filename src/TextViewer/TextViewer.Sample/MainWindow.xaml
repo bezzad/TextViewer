@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:textViewer="clr-namespace:TextViewer;assembly=TextViewer"
         mc:Ignorable="d"
-        Title="MainWindow" Height="800" Width="730">
+        Title="MainWindow" Height="800" Width="900">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
@@ -15,15 +15,13 @@
         <StackPanel Orientation="Horizontal" Grid.Row="1" Background="Azure" >
             <CheckBox Margin="5,10" IsChecked="{Binding ElementName=Reader, Path=ShowOffset, UpdateSourceTrigger=PropertyChanged}">Show Offset</CheckBox>
             <CheckBox Margin="5,10" IsChecked="{Binding ElementName=Reader, Path=ShowWireFrame, UpdateSourceTrigger=PropertyChanged}">Wire Frame</CheckBox>
-            <GridSplitter Width="1" Background="Gray"></GridSplitter>
             <CheckBox Margin="5,10" IsChecked="{Binding ElementName=Reader, Path=IsJustify, UpdateSourceTrigger=PropertyChanged}">Justify</CheckBox>
             <CheckBox Margin="5,10" IsChecked="{Binding ElementName=Reader, Path=MagnifierEnable, UpdateSourceTrigger=PropertyChanged}">Magnifier</CheckBox>
+            <GridSplitter Width="1" Background="Gray"/>
             <Label Margin="5,5,0,5">Font Family:</Label>
             <ComboBox Name="CmbFontFamily" Margin="0,5,10,5" Padding="5" Text="{Binding ElementName=Reader, Path=FontFamily, UpdateSourceTrigger=PropertyChanged}"></ComboBox>
-            <GridSplitter Width="1" Background="Gray"></GridSplitter>
             <Label Margin="5,5,0,5">Font Size:</Label>
             <ComboBox Name="CmbFontSize" Margin="0,5,10,5" Padding="5" Text="{Binding ElementName=Reader, Path=FontSize, UpdateSourceTrigger=PropertyChanged}"></ComboBox>
-            <GridSplitter Width="1" Background="Gray"></GridSplitter>
             <Label Margin="5,5,0,5">Line Height</Label>
             <ComboBox Name="CmbLineHeight" Margin="0,5,10,5" Padding="5" Text="{Binding ElementName=Reader, Path=LineHeight, UpdateSourceTrigger=PropertyChanged}"></ComboBox>
             <GridSplitter Width="1" Background="Gray"></GridSplitter>
