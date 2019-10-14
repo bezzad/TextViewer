@@ -49,6 +49,7 @@ namespace TextViewer
                 else
                 {
                     word.DrawPoint = word.Area.Location;
+                    //WordPointOffset -= word.Width + word.PreviousWord?.SpaceWidth ?? 0;
                     WordPointOffset -= word.Width + word.SpaceWidth;
                 }
             }
@@ -66,6 +67,7 @@ namespace TextViewer
                 if (word.IsRtl)
                 {
                     word.DrawPoint = new Point(startPoint.X + word.Width, startPoint.Y);
+                    //WordPointOffset += word.Width + word.PreviousWord?.SpaceWidth ?? 0;
                     WordPointOffset += word.Width + word.SpaceWidth;
                 }
                 else

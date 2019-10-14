@@ -133,10 +133,14 @@ namespace TextViewer
                     dc.DrawRectangle(null, WireFramePen, word.Area);
 
                 if (ShowOffset)
-                    dc.DrawText(new FormattedText(word.Offset.ToString(), CultureInfo.CurrentCulture, FlowDirection.LeftToRight,
+                {
+                    var ft = new FormattedText(word.Offset.ToString(),
+                        CultureInfo.CurrentCulture, FlowDirection.LeftToRight,
                         new Typeface(FontFamily, FontStyles.Normal, FontWeights.Normal, FontStretches.Normal),
-                        10, Brushes.BlueViolet, PixelsPerDip),
-                        new Point(word.IsRtl ? word.DrawPoint.X : word.Area.X, (word.IsRtl ? word.DrawPoint.Y : word.Area.Y) - 10));
+                        10, Brushes.BlueViolet, PixelsPerDip);
+
+                    dc.DrawText(ft, new Point(word.Paragraph.IsRtl ? word.Area.X + word.Width - ft.Width : word.Area.X + ft.Width, word.Area.Y));
+                }
             }
 
             if (ShowWireFrame) // show paragraph area
