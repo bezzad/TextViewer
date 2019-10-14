@@ -25,6 +25,7 @@ namespace TextViewer
         public Point DrawPoint { get; set; }
         public Rect Area { get; set; }
         public Range OffsetRange { get; set; }
+        public Paragraph Paragraph { get; set; }
         public Dictionary<StyleType, string> Styles { get; set; }
         private double _spaceWidth;
         public double SpaceWidth

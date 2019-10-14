@@ -11,9 +11,10 @@ namespace TextViewer
         public WordInfo PreviousWord { get; set; }
 
 
-        public WordInfo(string text, int offset, bool isRtl)
+        public WordInfo(string text, int offset, bool isRtl, Paragraph para)
             : base(text, offset)
         {
+            Paragraph = para;
             Styles.Add(StyleType.Direction, isRtl ? "rtl" : "ltr");
         }
 

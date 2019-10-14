@@ -31,7 +31,7 @@ namespace TextViewerSample
                     if (word == @"<img")
                     {
                         imgTagStarted = true;
-                        words.Add(new WordInfo("img", offset++, isParaRtl));
+                        words.Add(new WordInfo("img", offset++, para.IsRtl, para));
                         continue;
                     }
                     if (imgTagStarted)
@@ -79,7 +79,7 @@ namespace TextViewerSample
                         continue;
                     }
 
-                    var splitWords = word.ConvertInertCharsToWord(ref offset, isParaRtl);
+                    var splitWords = word.ConvertInertCharsToWord(ref offset, para);
                     if (lastWordPointer != null)
                     {
                         var firstW = splitWords.First();
@@ -97,7 +97,7 @@ namespace TextViewerSample
             return paras;
         }
 
-        public static List<WordInfo> ConvertInertCharsToWord(this string word, ref int offset, bool isContentRtl)
+        public static List<WordInfo> ConvertInertCharsToWord(this string word, ref int offset, Paragraph content)
         {
             var res = new List<WordInfo>();
             var wordBuffer = "";
@@ -125,11 +125,11 @@ namespace TextViewerSample
                     // first, store buffering word and then keep this char as next word
                     if (wordBuffer.Length > 0)
                     {
-                        AddWord(new WordInfo(wordBuffer, offset, wordBuffer.IsRtl()));
+                        AddWord(new WordInfo(wordBuffer, offset, wordBuffer.IsRtl(), content));
                         offset += res.Last().Text.Length;
                     }
                     // inert char as word
-                    AddWord(new WordInfo(c.ToString(), offset++, isContentRtl));
+                    AddWord(new WordInfo(c.ToString(), offset++, content.IsRtl, content));
                 }
                 else
                     wordBuffer += c; // keep real word chars
@@ -138,7 +138,7 @@ namespace TextViewerSample
             // keep last word from buffer
             if (wordBuffer.Length > 0)
             {
-                AddWord(new WordInfo(wordBuffer, offset, wordBuffer.IsRtl()));
+                AddWord(new WordInfo(wordBuffer, offset, wordBuffer.IsRtl(), content));
                 offset += res.Last().Text.Length;
             }
 
