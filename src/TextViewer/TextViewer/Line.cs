@@ -55,7 +55,7 @@ namespace TextViewer
                 //    |_____________________________________________| 
                 //
                 word.Area = new Rect(startPoint, new Size(word.Width, word.Height));
-                word.DrawPoint = word.IsRtl ? startPoint : word.Area.Location;
+                word.DrawPoint = word.IsRtl ? new Point(startPoint.X + word.Width, startPoint.Y) : word.Area.Location;
                 WordPointOffset += word.Width + word.SpaceWidth;
             }
 
