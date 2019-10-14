@@ -52,7 +52,6 @@ namespace TextViewer
             ZoomFactor = 4; // 3x
             Radius = 100;
             Stroke = Brushes.Teal;
-            MagnifierEnable = true;
 
             MagnifierPanel = new Canvas
             {
