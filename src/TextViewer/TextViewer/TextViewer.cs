@@ -139,7 +139,7 @@ namespace TextViewer
                         new Typeface(FontFamily, FontStyles.Normal, FontWeights.Normal, FontStretches.Normal),
                         10, Brushes.BlueViolet, PixelsPerDip);
 
-                    dc.DrawText(ft, new Point(word.Paragraph.IsRtl ? word.Area.X + word.Width - ft.Width : word.Area.X + ft.Width, word.Area.Y));
+                    dc.DrawText(ft, new Point(word.Paragraph.IsRtl ? word.Area.X + word.Width - ft.Width : word.Area.X, word.Area.Y));
                 }
             }
 
