@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -67,7 +68,10 @@ namespace TextViewer
                 case StyleType.FontSize:
                 case StyleType.Width:
                 case StyleType.Height: return double.TryParse(value, out var d) ? d : 0;
-                case StyleType.FontWeight: return Enum.TryParse(value, out FontWeight fw) ? fw : FontWeights.Normal;
+                case StyleType.FontWeight:
+                    return typeof(FontWeights)
+                               .GetProperty(value, BindingFlags.Public | BindingFlags.IgnoreCase | BindingFlags.Static)?
+                               .GetValue(null) ?? FontWeights.Normal;
                 case StyleType.TextAlign: return Enum.TryParse(value, out TextAlignment ta) ? ta : TextAlignment.Justify;
                 case StyleType.Display: return !bool.TryParse(value, out var disp) || disp;
                 case StyleType.VerticalAlign: return Enum.TryParse(value, out VerticalAlignment va) ? va : VerticalAlignment.Center;

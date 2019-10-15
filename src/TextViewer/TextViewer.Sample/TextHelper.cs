@@ -68,15 +68,6 @@ namespace TextViewerSample
                 }
             }
 
-            if (string.IsNullOrEmpty(textLine) == false)
-            { // set test styles
-                var rand = new Random();
-                var r = rand.Next(180);
-                var g = rand.Next(180); 
-                var b = rand.Next(180);
-                para.Styles.Add(StyleType.Color, $"#{r:X2}{g:X2}{b:X2}");
-            }
-
             return textLine;
         }
 

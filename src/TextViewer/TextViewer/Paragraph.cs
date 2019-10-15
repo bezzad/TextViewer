@@ -46,6 +46,15 @@ namespace TextViewer
 
                 w.IsInnerWord = isInnerWord;
                 w.AddStyles(contentStyle);
+
+#if DEBUG
+                // Todo: Just for test
+                if (w.IsRtl != w.Paragraph.IsRtl)
+                {
+                    w.Styles.Add(StyleType.Color, "#5555FF");
+                    w.Styles.Add(StyleType.FontWeight, "bold");
+                }
+#endif
                 Words.Add(w);
                 wordBuffer = ""; // clear buffer
             }
@@ -69,7 +78,7 @@ namespace TextViewer
                         AddWord(new WordInfo(wordBuffer, offset, wordBuffer.IsRtl(), this), true);
 
                     // inert char as word
-                    AddWord(new WordInfo(charPointer.ToString(), contentOffset + i, charPointer.IsRtl() || IsRtl, this), 
+                    AddWord(new WordInfo(charPointer.ToString(), contentOffset + i, charPointer.IsRtl() || IsRtl, this),
                         i + 1 < content.Length && content[i + 1] != ' ');
 
                     offset = contentOffset + i + 1; // set next word offset
