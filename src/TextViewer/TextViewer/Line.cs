@@ -30,7 +30,6 @@ namespace TextViewer
         protected WordInfo SetWordPositionInLine(WordInfo word)
         {
             var startPoint = new Point(WordPointOffset, Location.Y);
-            var space = word.NextWord != null ? word.SpaceWidth : 0;
 
             if (CurrentParagraph.IsRtl) // Left to right paragraph
             {
@@ -48,12 +47,12 @@ namespace TextViewer
                 if (word.IsRtl) // <--x <-- <--- 0
                 {
                     word.DrawPoint = startPoint;
-                    WordPointOffset -= word.Width + space;
+                    WordPointOffset -= word.Width + word.SpaceWidth;
                 }
                 else // -->x <-- <--- 0
                 {
                     word.DrawPoint = word.Area.Location;
-                    WordPointOffset -= word.Width + space;
+                    WordPointOffset -= word.Width + word.SpaceWidth;
                 }
             }
             else // Left to right paragraph
@@ -71,14 +70,13 @@ namespace TextViewer
                 word.Area = new Rect(startPoint, new Size(word.Width, word.Height));
                 if (word.IsRtl)
                 {
-                    WordPointOffset += space;
                     word.DrawPoint = new Point(WordPointOffset + word.Width, startPoint.Y);
-                    WordPointOffset += word.Width;
+                    WordPointOffset += word.Width + word.SpaceWidth;
                 }
                 else
                 {
                     word.DrawPoint = word.Area.Location;
-                    WordPointOffset += word.Width + space;
+                    WordPointOffset += word.Width + word.SpaceWidth;
                 }
             }
 

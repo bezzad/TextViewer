@@ -1,5 +1,5 @@
 # TextViewer
-WPF canvas as text viewer like FlowDocument by more features like lines and word selection.
+WPF canvas as text viewer is similar to FlowDocument with more features like paragraph layout, word selection, magnifier and etc.
 
 ### RTL content sample
 ![rtl sample](https://github.com/bezzad/TextViewer/raw/master/sample1.png)
