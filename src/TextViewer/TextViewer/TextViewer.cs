@@ -53,7 +53,7 @@ namespace TextViewer
         {
             var startPoint = new Point(content.FirstOrDefault()?.IsRtl == true ? ActualWidth - Padding.Right : Padding.Left, Padding.Top);
             var lineWidth = ActualWidth - Padding.Left - Padding.Right;
-            DrawWords.Clear();
+            DrawnWords.Clear();
 
             foreach (var para in content)
             {
@@ -98,7 +98,7 @@ namespace TextViewer
                     }
 
                     lineBuffer.AddWord(word);
-                    DrawWords.Add(word);
+                    DrawnWords.Add(word);
                 }
 
                 lineBuffer.Draw(false);  // last line of paragraph has no justified!
@@ -119,7 +119,7 @@ namespace TextViewer
 
             BuildPage(PageContent);
 
-            foreach (var word in DrawWords)
+            foreach (var word in DrawnWords)
             {
                 if (word.GetAttribute(StyleType.Image) is ImageSource img)
                     dc.DrawImage(img, word.Area);

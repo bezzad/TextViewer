@@ -68,7 +68,7 @@ namespace TextViewer
 
         public Pen WireFramePen { get; set; }
         public List<Paragraph> PageContent { get; set; }
-        public List<WordInfo> DrawWords { get; set; }
+        public List<WordInfo> DrawnWords { get; set; }
         public double PixelsPerDip { get; set; }
 
 
@@ -76,7 +76,7 @@ namespace TextViewer
         {
             TextOptions.SetTextFormattingMode(this, TextFormattingMode.Display);
             WireFramePen = new Pen(Brushes.Red, 0.7) { DashStyle = DashStyles.Dash };
-            DrawWords = new List<WordInfo>();
+            DrawnWords = new List<WordInfo>();
             PixelsPerDip = GraphicsHelper.PixelsPerDip(this);
             ParagraphSpace = 10;
         }
