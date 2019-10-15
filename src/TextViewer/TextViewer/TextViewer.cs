@@ -121,11 +121,8 @@ namespace TextViewer
 
             foreach (var word in DrawWords)
             {
-                if (word.Styles.ContainsKey(StyleType.Image))
-                {
-                    var img = word.Styles[StyleType.Image].BitmapFromBase64();
+                if (word.GetAttribute(StyleType.Image) is ImageSource img)
                     dc.DrawImage(img, word.Area);
-                }
                 else
                     dc.DrawText(word.Format, word.DrawPoint);
 

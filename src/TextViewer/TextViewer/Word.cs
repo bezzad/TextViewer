@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Globalization;
+using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 
@@ -20,13 +22,15 @@ namespace TextViewer
 
         public static CultureInfo RtlCulture { get; set; }
         public static CultureInfo LtrCulture { get; set; }
+        public const string Rtl = "rtl";
+        public const string Ltr = "ltr";
 
         public FormattedText Format { get; set; }
         public Point DrawPoint { get; set; }
         public Rect Area { get; set; }
-        public Range OffsetRange { get; set; }
+        public Range OffsetRange { get; protected set; }
         public Paragraph Paragraph { get; set; }
-        public Dictionary<StyleType, string> Styles { get; set; }
+        public Dictionary<StyleType, string> Styles { get; protected set; }
         private double _spaceWidth;
         public double SpaceWidth
         {
@@ -46,7 +50,7 @@ namespace TextViewer
             : Format?.Height ?? 0;
         public bool IsImage => Text.Equals("img") && Styles.ContainsKey(StyleType.Image);
 
-        public bool IsRtl => Styles[StyleType.Direction] == "rtl";
+        public bool IsRtl => Styles[StyleType.Direction] == Rtl;
         public int Offset => OffsetRange.Start;
     }
 }

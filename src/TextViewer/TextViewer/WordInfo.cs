@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Windows;
 using System.Windows.Media;
@@ -15,7 +16,7 @@ namespace TextViewer
             : base(text, offset)
         {
             Paragraph = para;
-            Styles.Add(StyleType.Direction, isRtl ? "rtl" : "ltr");
+            Styles.Add(StyleType.Direction, isRtl ? Rtl : Ltr);
         }
 
         public int CompareTo([AllowNull] Point other)
@@ -35,23 +36,35 @@ namespace TextViewer
             return 0;
         }
 
+        public object GetAttribute(StyleType style, bool setDefaultValue = false)
+        {
+            // read word style first
+            if (Styles.ContainsKey(style))
+                return style.ConvertStyleType(Styles[style]);
+
+            // if word has not style, then use parent style
+            if (Paragraph.Styles.ContainsKey(style))
+                return style.ConvertStyleType(Paragraph.Styles[style]);
+
+            return style.ConvertStyleType();
+        }
+
         public FormattedText GetFormattedText(FontFamily fontFamily,
             double fontSize,
             double pixelsPerDip,
             double lineHeight)
         {
+            var color = (SolidColorBrush)GetAttribute(StyleType.Color, true);
+            var fontWeight = (FontWeight)GetAttribute(StyleType.FontWeight, true);
+
             // Create the initial formatted text string.
             Format = new FormattedText(
                 Text,
                 IsRtl ? RtlCulture : LtrCulture,
                 IsRtl ? FlowDirection.RightToLeft : FlowDirection.LeftToRight,
-                new Typeface(fontFamily, FontStyles.Normal,
-                    Styles.ContainsKey(StyleType.FontWeight) ? FontWeights.Bold : FontWeights.Normal,
-                    FontStretches.Normal),
+                new Typeface(fontFamily, FontStyles.Normal, fontWeight, FontStretches.Normal),
                 fontSize,
-                Styles.ContainsKey(StyleType.Color)
-                    ? (SolidColorBrush)new BrushConverter().ConvertFromString(Styles[StyleType.Color])
-                    : Brushes.Black,
+                color,
                 pixelsPerDip)
             {
                 LineHeight = lineHeight,
@@ -60,6 +73,12 @@ namespace TextViewer
 
             SpaceWidth = fontSize * 0.3;
             return Format;
+        }
+
+        public void AddStyles(Dictionary<StyleType, string> styles)
+        {
+            foreach (var style in styles)
+                Styles[style.Key] = style.Value;
         }
 
 
