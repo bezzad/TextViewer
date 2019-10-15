@@ -77,7 +77,7 @@ namespace TextViewer
                     if (wordBuffer.Length > 0)
                         AddWord(new WordInfo(wordBuffer, offset, wordBuffer.IsRtl(), this), true);
 
-                    // inert char as word
+                    // add inert char as word
                     AddWord(new WordInfo(charPointer.ToString(), contentOffset + i, charPointer.IsRtl() || IsRtl, this),
                         i + 1 < content.Length && content[i + 1] != ' ');
 

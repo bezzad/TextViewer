@@ -71,7 +71,9 @@ namespace TextViewer
                 Trimming = TextTrimming.None
             };
 
-            SpaceWidth = fontSize * 0.3;
+            // calculating space width by the distinction between this offset and the next word offset.
+            var nextWordOffset = NextWord?.Offset ?? OffsetRange.End + 1;
+            SpaceWidth = fontSize * 0.3 * (nextWordOffset - OffsetRange.End - 1);
             return Format;
         }
 
