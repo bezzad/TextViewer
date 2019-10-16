@@ -2,3 +2,4 @@
 Lorem ipsum dolor i sit a amet, an consectetur adipisicing elit, این محتوای تست می‌باشد. sed do eiusmod tempor
 -------------------------------------------------------------------------------------------
 <right> Right align test Lorem ipsum dolor i sit a amet, an consectetur adipisicing elit, se Lorem ipsum dolor i sit a amet, an consectetur adipisicing elit, se Lorem ipsum dolor i sit a amet, an consectetur adipisicing elit, se Lorem ipsum dolor i sit a amet, an consectetur adipisicing elit, se </right>
+a b سلام بهزاد c d
