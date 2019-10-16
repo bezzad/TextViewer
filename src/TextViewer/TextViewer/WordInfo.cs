@@ -52,17 +52,14 @@ namespace TextViewer
             double pixelsPerDip,
             double lineHeight)
         {
-            var color = (SolidColorBrush)GetAttribute(StyleType.Color);
-            var fontWeight = (FontWeight)GetAttribute(StyleType.FontWeight);
-
             // Create the initial formatted text string.
             Format = new FormattedText(
                 Text,
                 IsRtl ? RtlCulture : LtrCulture,
                 IsRtl ? FlowDirection.RightToLeft : FlowDirection.LeftToRight,
-                new Typeface(fontFamily, FontStyles.Normal, fontWeight, FontStretches.Normal),
+                new Typeface(fontFamily, FontStyles.Normal, (FontWeight)GetAttribute(StyleType.FontWeight), FontStretches.Normal),
                 fontSize,
-                color,
+                (SolidColorBrush)GetAttribute(StyleType.Color),
                 pixelsPerDip)
             {
                 LineHeight = lineHeight,
