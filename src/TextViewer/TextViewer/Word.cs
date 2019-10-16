@@ -42,7 +42,7 @@ namespace TextViewer
         public double ImageScale { get; set; }
         public double Width => IsImage
             ? double.Parse(Styles[StyleType.Width]) * ImageScale
-            : Format?.WidthIncludingTrailingWhitespace ?? 0;
+            : (Format?.WidthIncludingTrailingWhitespace ?? 0) + ExtraWidth;
         public double Height => IsImage
             ? double.Parse(Styles[StyleType.Height]) * ImageScale
             : Format?.Height ?? 0;
