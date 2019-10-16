@@ -72,8 +72,10 @@ namespace TextViewer
 
                     var wordWidth = word.Width;
                     var wordPointer = word;
-
-                    while (word.PreviousWord?.IsInnerWord != true && wordPointer.IsInnerWord)
+                    //
+                    // attached words has one width at all
+                    while (word.PreviousWord?.Type.HasFlag(WordType.Attached) == false && 
+                           wordPointer.Type.HasFlag(WordType.Attached))
                     {
                         wordPointer = wordPointer.NextWord;
                         wordWidth += wordPointer.Width;
@@ -83,7 +85,14 @@ namespace TextViewer
                     {
                         if (lineBuffer.Count > 0)
                         {
-                            lineBuffer.RemainWidth += lineBuffer.Words.Last().SpaceWidth; // end of line has no space (important for justify)
+                            // end of line has no space (important for justify)
+                            var lineLastWord = lineBuffer.Words.Last();
+                            if (lineLastWord.Type.HasFlag(WordType.Space))
+                            {
+                                lineBuffer.RemainWidth += lineLastWord.Width;
+                                //lineBuffer.Words.Remove(lineLastWord);
+                            }
+
                             lineBuffer.Draw(IsJustify);
                             SetStartPoint(ref startPoint, para, lineBuffer.Height); // new line
                             lineBuffer = new Line(lineWidth, para, startPoint); // create new line buffer, without cleaning last line
@@ -136,7 +145,15 @@ namespace TextViewer
                         new Typeface(FontFamily, FontStyles.Normal, FontWeights.Normal, FontStretches.Normal),
                         8, Brushes.BlueViolet, PixelsPerDip);
 
-                    dc.DrawText(ft, new Point(word.Paragraph.IsRtl ? word.Area.X + word.Width - ft.Width : word.Area.X, word.Area.Y));
+                    if (word.Type.HasFlag(WordType.Space) || word.Type.HasFlag(WordType.InertChar)) //rotate 90 degree the offset text at the space area
+                    {
+                        var drawPoint = new Point(word.Area.X + word.Width + 1, word.Area.Y + (word.Type.HasFlag(WordType.Space) ? word.Height / 2 - ft.Width / 2 : 1));
+                        dc.PushTransform(new RotateTransform(90, drawPoint.X, drawPoint.Y));
+                        dc.DrawText(ft, drawPoint);
+                        dc.Pop();
+                    }
+                    else
+                        dc.DrawText(ft, new Point(word.Paragraph.IsRtl ? word.Area.X + word.Width - ft.Width : word.Area.X, word.Area.Y));
                 }
             }
 

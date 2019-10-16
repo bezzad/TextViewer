@@ -22,9 +22,9 @@ namespace TextViewerSample
             CmbFontFamily.ItemsSource = fonts;
             CmbFontFamily.SelectedIndex = fonts.FindIndex(f => f.Source == "Arial");
             CmbFontSize.ItemsSource = sizes;
-            CmbFontSize.SelectedIndex = sizes.IndexOf(16);
+            CmbFontSize.SelectedIndex = sizes.IndexOf(26);
             CmbLineHeight.ItemsSource = sizes;
-            CmbLineHeight.SelectedIndex = sizes.IndexOf(18);
+            CmbLineHeight.SelectedIndex = sizes.IndexOf(36);
 
             BtnRtlSampleChecked(this, null);
 

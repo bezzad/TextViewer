@@ -43,16 +43,16 @@ namespace TextViewer
                 //    |                                                       |
                 //    |_______________________________________________________| 
                 //
-                word.Area = new Rect(new Point(startPoint.X - word.Width, startPoint.Y), new Size(word.Width, word.Height));
+                word.Area = new Rect(new Point(startPoint.X - word.Width - word.ExtraWidth, startPoint.Y), new Size(word.Width + word.ExtraWidth, word.Height));
                 if (word.IsRtl) // <--x <-- <--- 0
                 {
                     word.DrawPoint = startPoint;
-                    WordPointOffset -= word.Width + word.SpaceWidth;
+                    WordPointOffset -= word.Width + word.ExtraWidth;
                 }
                 else // -->x <-- <--- 0
                 {
                     word.DrawPoint = word.Area.Location;
-                    WordPointOffset -= word.Width + word.SpaceWidth;
+                    WordPointOffset -= word.Width + word.ExtraWidth;
                 }
             }
             else // Left to right paragraph
@@ -67,16 +67,16 @@ namespace TextViewer
                 //    |                                                        |
                 //    |________________________________________________________| 
                 //
-                word.Area = new Rect(startPoint, new Size(word.Width, word.Height));
+                word.Area = new Rect(startPoint, new Size(word.Width + word.ExtraWidth, word.Height));
                 if (word.IsRtl)
                 {
-                    word.DrawPoint = new Point(WordPointOffset + word.Width, startPoint.Y);
-                    WordPointOffset += word.Width + word.SpaceWidth;
+                    word.DrawPoint = new Point(WordPointOffset + word.Width + word.ExtraWidth, startPoint.Y);
+                    WordPointOffset += word.Width + word.ExtraWidth;
                 }
                 else
                 {
                     word.DrawPoint = word.Area.Location;
-                    WordPointOffset += word.Width + word.SpaceWidth;
+                    WordPointOffset += word.Width + word.ExtraWidth;
                 }
             }
 
@@ -107,7 +107,7 @@ namespace TextViewer
 
             SetWordPosition(word);
 
-            RemainWidth -= word.Width + word.SpaceWidth;
+            RemainWidth -= word.Width + word.ExtraWidth;
         }
 
         public void Draw(bool justify = false)
@@ -121,12 +121,11 @@ namespace TextViewer
 
                 if (justify)
                 {
-                    var extendSpace = RemainWidth / (Words.Count(w => w.IsInnerWord == false) - 1);
+                    var extendSpace = RemainWidth / Words.Count(w => w.Type.HasFlag(WordType.Space));
                     foreach (var word in Words)
                     {
-                        if (word.IsInnerWord == false)
-                            word.SpaceWidth += extendSpace;
-
+                        if (word.Type.HasFlag(WordType.Space))
+                            word.ExtraWidth = extendSpace;
                         SetWordPosition(word);
                     }
                 }

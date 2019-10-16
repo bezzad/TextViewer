@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Windows;
 using System.Windows.Media;
@@ -12,11 +11,10 @@ namespace TextViewer
         public WordInfo PreviousWord { get; set; }
 
 
-        public WordInfo(string text, int offset, bool isRtl, Paragraph para)
-            : base(text, offset)
+        public WordInfo(string text, int offset, WordType type, bool isRtl)
+            : base(text, offset, type)
         {
-            Paragraph = para;
-            Styles.Add(StyleType.Direction, isRtl ? Rtl : Ltr);
+            SetDirection(isRtl);
         }
 
         public int CompareTo([AllowNull] Point other)
@@ -36,7 +34,7 @@ namespace TextViewer
             return 0;
         }
 
-        public object GetAttribute(StyleType style, bool setDefaultValue = false)
+        public object GetAttribute(StyleType style)
         {
             // read word style first
             if (Styles.ContainsKey(style))
@@ -54,8 +52,8 @@ namespace TextViewer
             double pixelsPerDip,
             double lineHeight)
         {
-            var color = (SolidColorBrush)GetAttribute(StyleType.Color, true);
-            var fontWeight = (FontWeight)GetAttribute(StyleType.FontWeight, true);
+            var color = (SolidColorBrush)GetAttribute(StyleType.Color);
+            var fontWeight = (FontWeight)GetAttribute(StyleType.FontWeight);
 
             // Create the initial formatted text string.
             Format = new FormattedText(
@@ -71,22 +69,10 @@ namespace TextViewer
                 Trimming = TextTrimming.None
             };
 
-            // calculating space width by the distinction between this offset and the next word offset.
-            var nextWordOffset = NextWord?.Offset ?? OffsetRange.End + 1;
-            SpaceWidth = fontSize * 0.3 * (nextWordOffset - OffsetRange.End - 1);
+            ExtraWidth = 0; // reset extra space
             return Format;
         }
 
-        public void AddStyles(Dictionary<StyleType, string> styles)
-        {
-            foreach (var style in styles)
-                Styles[style.Key] = style.Value;
-        }
 
-
-        public override string ToString()
-        {
-            return $"<--{OffsetRange.Start}--\"{Text}\"--{OffsetRange.End}-->";
-        }
     }
 }
