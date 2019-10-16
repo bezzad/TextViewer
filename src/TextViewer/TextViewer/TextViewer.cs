@@ -54,6 +54,18 @@ namespace TextViewer
             var startPoint = new Point(content.FirstOrDefault()?.IsRtl == true ? ActualWidth - Padding.Right : Padding.Left, Padding.Top);
             var lineWidth = ActualWidth - Padding.Left - Padding.Right;
             DrawnWords.Clear();
+            Line lineBuffer;
+
+            void RemoveSpaceFromEndOfLine()
+            {
+                // Note: end of line has no space (important for justify)
+                while (lineBuffer.Words.Last().Type.HasFlag(WordType.Space))
+                {
+                    lineBuffer.RemainWidth += lineBuffer.Words.Last().Width;
+                    lineBuffer.Words.RemoveAt(lineBuffer.Words.Count - 1);
+                    DrawnWords.RemoveAt(DrawnWords.Count - 1);
+                }
+            }
 
             foreach (var para in content)
             {
@@ -61,10 +73,14 @@ namespace TextViewer
                 para.Lines.Clear(); // clear old lines
 
                 // create new line buffer, without cleaning last line
-                var lineBuffer = new Line(lineWidth, para, startPoint);
+                lineBuffer = new Line(lineWidth, para, startPoint);
 
                 foreach (var word in para.Words)
                 {
+                    // Note: The line should not start with space char
+                    if (lineBuffer.Count == 0 && word.Type.HasFlag(WordType.Space))
+                        continue;
+
                     if (word.IsImage)
                         word.ImageScale = 1;
                     else
@@ -74,7 +90,7 @@ namespace TextViewer
                     var wordPointer = word;
                     //
                     // attached words has one width at all
-                    while (word.PreviousWord?.Type.HasFlag(WordType.Attached) == false && 
+                    while (word.PreviousWord?.Type.HasFlag(WordType.Attached) == false &&
                            wordPointer.Type.HasFlag(WordType.Attached))
                     {
                         wordPointer = wordPointer.NextWord;
@@ -85,13 +101,7 @@ namespace TextViewer
                     {
                         if (lineBuffer.Count > 0)
                         {
-                            // end of line has no space (important for justify)
-                            var lineLastWord = lineBuffer.Words.Last();
-                            if (lineLastWord.Type.HasFlag(WordType.Space))
-                            {
-                                lineBuffer.RemainWidth += lineLastWord.Width;
-                                //lineBuffer.Words.Remove(lineLastWord);
-                            }
+                            RemoveSpaceFromEndOfLine();
 
                             lineBuffer.Draw(IsJustify);
                             SetStartPoint(ref startPoint, para, lineBuffer.Height); // new line
@@ -110,6 +120,7 @@ namespace TextViewer
                     DrawnWords.Add(word);
                 }
 
+                RemoveSpaceFromEndOfLine();
                 lineBuffer.Draw(false);  // last line of paragraph has no justified!
                 SetStartPoint(ref startPoint, para, lineBuffer.Height); // new line
 
@@ -161,7 +172,7 @@ namespace TextViewer
             {
                 foreach (var para in PageContent)
                 {
-                    var firstWord = para.Words.First();
+                    var firstWord = para.Lines.First().Words.First();
                     dc.DrawRoundedRectangle(null, new Pen(Brushes.Brown, 0.3) { DashStyle = DashStyles.Solid },
                         new Rect(new Point(Padding.Left, firstWord.DrawPoint.Y),
                                  new Size(ActualWidth - Padding.Left - Padding.Right, para.Lines.Sum(l => l.Height))),

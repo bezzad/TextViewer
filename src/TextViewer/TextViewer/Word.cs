@@ -46,7 +46,7 @@ namespace TextViewer
         public double Height => IsImage
             ? double.Parse(Styles[StyleType.Height]) * ImageScale
             : Format?.Height ?? 0;
-        public bool IsImage => Text.Equals("img") && Styles.ContainsKey(StyleType.Image);
+        public bool IsImage => Type.HasFlag(WordType.Image) && Styles.ContainsKey(StyleType.Image);
         public bool IsRtl => Styles[StyleType.Direction] == Rtl;
         public int Offset => OffsetRange.Start;
 
