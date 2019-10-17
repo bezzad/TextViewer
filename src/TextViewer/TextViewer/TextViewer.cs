@@ -59,7 +59,7 @@ namespace TextViewer
             void RemoveSpaceFromEndOfLine()
             {
                 // Note: end of line has no space (important for justify)
-                while (lineBuffer.Words.Last().Type.HasFlag(WordType.Space))
+                while (lineBuffer.Words.LastOrDefault()?.Type.HasFlag(WordType.Space) == true)
                 {
                     lineBuffer.RemainWidth += lineBuffer.Words.Last().Width;
                     lineBuffer.Words.RemoveAt(lineBuffer.Words.Count - 1);
@@ -77,10 +77,6 @@ namespace TextViewer
 
                 foreach (var word in para.Words)
                 {
-                    // Note: The line should not start with space char
-                    if (lineBuffer.Count == 0 && word.Type.HasFlag(WordType.Space))
-                        continue;
-
                     if (word.IsImage)
                         word.ImageScale = 1;
                     else
@@ -102,7 +98,6 @@ namespace TextViewer
                         if (lineBuffer.Count > 0)
                         {
                             RemoveSpaceFromEndOfLine();
-
                             lineBuffer.Draw(IsJustify);
                             SetStartPoint(ref startPoint, para, lineBuffer.Height); // new line
                             lineBuffer = new Line(lineWidth, para, startPoint); // create new line buffer, without cleaning last line
@@ -116,8 +111,12 @@ namespace TextViewer
                         }
                     }
 
-                    lineBuffer.AddWord(word);
-                    DrawnWords.Add(word);
+                    // Note: The line should not start with space char
+                    if (lineBuffer.Count > 0 || word.Type.HasFlag(WordType.Space) == false)
+                    {
+                        lineBuffer.AddWord(word);
+                        DrawnWords.Add(word);
+                    }
                 }
 
                 RemoveSpaceFromEndOfLine();
