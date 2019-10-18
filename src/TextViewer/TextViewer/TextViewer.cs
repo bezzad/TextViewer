@@ -146,14 +146,14 @@ namespace TextViewer
                     dc.DrawText(word.Format, word.DrawPoint);
 
                 if (ShowWireFrame)
-                    dc.DrawRectangle(null, WireFramePen, word.Area);
+                    dc.DrawRectangle(null, WordWireFramePen, word.Area);
 
                 if (ShowOffset)
                 {
                     var ft = new FormattedText(word.Offset.ToString(),
                         CultureInfo.CurrentCulture, FlowDirection.LeftToRight,
                         new Typeface(FontFamily, FontStyles.Normal, FontWeights.Normal, FontStretches.Normal),
-                        8, Brushes.BlueViolet, PixelsPerDip);
+                        8, word.IsRtl == word.Paragraph.IsRtl ? Brushes.Red : Brushes.Blue, PixelsPerDip);
 
                     if (word.Type.HasFlag(WordType.Space) || word.Type.HasFlag(WordType.InertChar)) //rotate 90 degree the offset text at the space area
                     {
@@ -172,7 +172,7 @@ namespace TextViewer
                 foreach (var para in PageContent)
                 {
                     var firstWord = para.Lines.First().Words.First();
-                    dc.DrawRoundedRectangle(null, new Pen(Brushes.Brown, 0.3) { DashStyle = DashStyles.Solid },
+                    dc.DrawRoundedRectangle(null, ParagraphWireFramePen,
                         new Rect(new Point(Padding.Left, firstWord.DrawPoint.Y),
                                  new Size(ActualWidth - Padding.Left - Padding.Right, para.Lines.Sum(l => l.Height))),
                                  4, 4);
