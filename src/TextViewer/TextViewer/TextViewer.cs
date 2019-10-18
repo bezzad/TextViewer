@@ -153,7 +153,7 @@ namespace TextViewer
                     var ft = new FormattedText(word.Offset.ToString(),
                         CultureInfo.CurrentCulture, FlowDirection.LeftToRight,
                         new Typeface(FontFamily, FontStyles.Normal, FontWeights.Normal, FontStretches.Normal),
-                        8, word.IsRtl == word.Paragraph.IsRtl ? Brushes.Red : Brushes.Blue, PixelsPerDip);
+                        OffsetEmSize, word.IsRtl == word.Paragraph.IsRtl ? Brushes.Red : Brushes.Blue, PixelsPerDip);
 
                     if (word.Type.HasFlag(WordType.Space) || word.Type.HasFlag(WordType.InertChar)) //rotate 90 degree the offset text at the space area
                     {

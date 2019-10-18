@@ -71,6 +71,7 @@ namespace TextViewer
         public List<Paragraph> PageContent { get; set; }
         public List<WordInfo> DrawnWords { get; set; }
         public double PixelsPerDip { get; set; }
+        public double OffsetEmSize { get; set; }
 
 
         protected BaseTextViewer()
@@ -81,6 +82,7 @@ namespace TextViewer
             DrawnWords = new List<WordInfo>();
             PixelsPerDip = GraphicsHelper.PixelsPerDip(this);
             ParagraphSpace = 10;
+            OffsetEmSize = 6;
         }
 
         protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
