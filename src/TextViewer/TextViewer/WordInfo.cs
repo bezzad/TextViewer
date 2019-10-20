@@ -42,6 +42,7 @@ namespace TextViewer
         public string Text { get; set; }
         public WordType Type { get; set; }
         public double ImageScale { get; set; }
+        public bool IsSelected { get; set; }
         public double Width => IsImage
             ? double.Parse(Styles[StyleType.Width]) * ImageScale
             : (Format?.WidthIncludingTrailingWhitespace ?? 0) + ExtraWidth;
@@ -109,6 +110,8 @@ namespace TextViewer
 
             if (GetAttribute(StyleType.Image) is ImageSource img)
                 dc.DrawImage(img, Area);
+            else if (Type == WordType.Space)
+                dc.DrawGeometry(Brushes.Transparent, null, new RectangleGeometry(Area));
             else
                 dc.DrawText(Format, DrawPoint);
 
