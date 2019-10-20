@@ -17,6 +17,14 @@ namespace TextViewer
         public static readonly DependencyProperty MagnifierEnableProperty = DependencyProperty.Register(
             "MagnifierEnable", typeof(bool), typeof(MagnifyingTextViewer), new PropertyMetadata(default(bool)));
 
+        public static readonly DependencyProperty DistanceFromMouseProperty = DependencyProperty.Register(
+            "DistanceFromMouse", typeof(double), typeof(MagnifyingTextViewer), new PropertyMetadata(default(double)));
+
+        public double DistanceFromMouse
+        {
+            get => (double) GetValue(DistanceFromMouseProperty);
+            set => SetValue(DistanceFromMouseProperty, value);
+        }
         public bool MagnifierEnable
         {
             get => (bool) GetValue(MagnifierEnableProperty);
@@ -49,6 +57,7 @@ namespace TextViewer
 
         public MagnifyingTextViewer()
         {
+            DistanceFromMouse = 10;
             ZoomFactor = 4; // 3x
             Radius = 100;
             Stroke = Brushes.Teal;
@@ -89,13 +98,39 @@ namespace TextViewer
         {
             if(MagnifierEnable == false)
                 return;
-            
-            var center = e.GetPosition(this);
+
+            Mouse.SetCursor(Cursors.Cross);
+
+            var currentMousePosition = e.GetPosition(this);
             var length = MagnifierCircle.ActualWidth * (1 / ZoomFactor);
             var radius = length / 2;
-            ViewBox = new Rect(center.X - radius, center.Y - radius, length, length);
-            MagnifierCircle.SetValue(LeftProperty, center.X - MagnifierCircle.ActualWidth / 2);
-            MagnifierCircle.SetValue(TopProperty, center.Y - MagnifierCircle.ActualHeight / 2);
+
+            // Determine whether the magnifying glass should be shown to the
+            // the left or right of the mouse pointer.
+            if (ActualWidth - currentMousePosition.X > MagnifierCircle.Width + DistanceFromMouse)
+            {
+                Canvas.SetLeft(MagnifierCircle, currentMousePosition.X + DistanceFromMouse);
+            }
+            else
+            {
+                Canvas.SetLeft(MagnifierCircle,
+                    currentMousePosition.X - DistanceFromMouse - MagnifierCircle.Width);
+            }
+
+            // Determine whether the magnifying glass should be shown 
+            // above or below the mouse pointer.
+            if (ActualHeight - currentMousePosition.Y > MagnifierCircle.Height + DistanceFromMouse)
+            {
+                Canvas.SetTop(MagnifierCircle, currentMousePosition.Y + DistanceFromMouse);
+            }
+            else
+            {
+                Canvas.SetTop(MagnifierCircle,
+                    currentMousePosition.Y - DistanceFromMouse - MagnifierCircle.Height);
+            }
+            // Update the visual brush's Viewbox to magnify a `length` by `length` rectangle,
+            // centered on the current mouse position.
+            ViewBox = new Rect(currentMousePosition.X - radius, currentMousePosition.Y - radius, length, length);
         }
     }
 }

@@ -8,9 +8,8 @@ namespace TextViewer
         public Paragraph(int offset, bool isRtl)
         {
             Offset = offset;
-            Words = new List<WordInfo>();
             IsRtl = isRtl;
-
+            Words = new List<WordInfo>();
             Lines = new List<Line>();
             Styles = new Dictionary<StyleType, string>();
         }
@@ -35,18 +34,17 @@ namespace TextViewer
             var wordBuffer = "";
             var offset = contentOffset;
 
-            void AddWord(WordInfo w, bool isInnerWord = false)
+            void AddWord(WordInfo w)
             {
+                w.Paragraph = this;
+
                 // set last word to inner word for remove space after word
                 if (Words.Count > 0)
                 {
                     w.PreviousWord = Words.Last();
                     w.PreviousWord.NextWord = w;
                 }
-
-                w.IsInnerWord = isInnerWord;
                 w.AddStyles(contentStyle);
-
 #if DEBUG
                 // Todo: Just for test
                 if (w.IsRtl != w.Paragraph.IsRtl)
@@ -62,10 +60,17 @@ namespace TextViewer
             for (var i = 0; i < content.Length; i++)
             {
                 var charPointer = content[i];
-                if (charPointer == ' ') // end of word!
+                // is current char a space char?
+                if (charPointer == ' ')
                 {
                     if (wordBuffer.Length > 0)
-                        AddWord(new WordInfo(wordBuffer, offset, wordBuffer.IsRtl(), this));
+                        AddWord(new WordInfo(wordBuffer, offset, WordType.Normal, wordBuffer.IsRtl()));
+
+                    // add space char as word
+                    // note: space.IsRtl will complete calculate after adding all words
+                    var spaceIsRtl = IsRtl == Words.LastOrDefault()?.IsRtl;
+                    AddWord(new WordInfo(charPointer.ToString(), contentOffset + i,
+                        WordType.Space, spaceIsRtl));
 
                     // maybe there are exist multiple sequence space, so we set offset outside of the keeping word buffer.
                     offset = contentOffset + i + 1; // set next word offset
@@ -75,11 +80,13 @@ namespace TextViewer
                 if (WordHelper.InertChars.Contains(charPointer))
                 {
                     if (wordBuffer.Length > 0)
-                        AddWord(new WordInfo(wordBuffer, offset, wordBuffer.IsRtl(), this), true);
+                        AddWord(new WordInfo(wordBuffer, offset, WordType.Normal | WordType.Attached, wordBuffer.IsRtl()));
 
                     // add inert char as word
-                    AddWord(new WordInfo(charPointer.ToString(), contentOffset + i, charPointer.IsRtl() || IsRtl, this),
-                        i + 1 < content.Length && content[i + 1] != ' ');
+                    var isInnerWord = i + 1 < content.Length && content[i + 1] != ' ';
+                    AddWord(new WordInfo(charPointer.ToString(), contentOffset + i,
+                            isInnerWord ? WordType.Attached | WordType.InertChar : WordType.InertChar,
+                            charPointer.IsRtl() || IsRtl));
 
                     offset = contentOffset + i + 1; // set next word offset
                     continue;
@@ -91,7 +98,25 @@ namespace TextViewer
             //
             // keep last word from buffer
             if (wordBuffer.Length > 0)
-                AddWord(new WordInfo(wordBuffer, offset, wordBuffer.IsRtl(), this));
+                AddWord(new WordInfo(wordBuffer, offset, WordType.Normal, wordBuffer.IsRtl()));
+            //
+            // calculate all space rtl from last word to first word
+            foreach (var space in Words.Where(w => w.Type.HasFlag(WordType.Space)).Reverse())
+            {
+                //  Paragraph.IsRtl  | Word.IsRtl  | Space.IsRtl 
+                // ------------------|-------------|--------------
+                //        True       |    True     |    True
+                //        True       |    False    | NextWord.IsRtl
+                //        False      |    True     | NextWord.IsRtl
+                //        False      |    False    |    False
+                //
+
+                // space.IsRtl default value is: (Paragraph.IsRtl == Word.IsRtl)
+                if (space.IsRtl || space.NextWord == null)
+                    space.SetDirection(IsRtl);
+                else
+                    space.SetDirection(space.NextWord.IsRtl);
+            }
         }
     }
 }

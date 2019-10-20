@@ -44,16 +44,8 @@ namespace TextViewer
                 //    |_______________________________________________________| 
                 //
                 word.Area = new Rect(new Point(startPoint.X - word.Width, startPoint.Y), new Size(word.Width, word.Height));
-                if (word.IsRtl) // <--x <-- <--- 0
-                {
-                    word.DrawPoint = startPoint;
-                    WordPointOffset -= word.Width + word.SpaceWidth;
-                }
-                else // -->x <-- <--- 0
-                {
-                    word.DrawPoint = word.Area.Location;
-                    WordPointOffset -= word.Width + word.SpaceWidth;
-                }
+                word.DrawPoint = word.IsRtl ? startPoint : word.Area.Location;
+                WordPointOffset -= word.Width;
             }
             else // Left to right paragraph
             {
@@ -68,16 +60,8 @@ namespace TextViewer
                 //    |________________________________________________________| 
                 //
                 word.Area = new Rect(startPoint, new Size(word.Width, word.Height));
-                if (word.IsRtl)
-                {
-                    word.DrawPoint = new Point(WordPointOffset + word.Width, startPoint.Y);
-                    WordPointOffset += word.Width + word.SpaceWidth;
-                }
-                else
-                {
-                    word.DrawPoint = word.Area.Location;
-                    WordPointOffset += word.Width + word.SpaceWidth;
-                }
+                word.DrawPoint = word.IsRtl ? new Point(WordPointOffset + word.Width, startPoint.Y) : word.Area.Location;
+                WordPointOffset += word.Width;
             }
 
             return word;
@@ -106,8 +90,7 @@ namespace TextViewer
             if (word.Height > Height) Height = word.Height;
 
             SetWordPosition(word);
-
-            RemainWidth -= word.Width + word.SpaceWidth;
+            RemainWidth -= word.Width;
         }
 
         public void Draw(bool justify = false)
@@ -121,12 +104,11 @@ namespace TextViewer
 
                 if (justify)
                 {
-                    var extendSpace = RemainWidth / (Words.Count(w => w.IsInnerWord == false) - 1);
+                    var extendSpace = RemainWidth / Words.Count(w => w.Type.HasFlag(WordType.Space));
                     foreach (var word in Words)
                     {
-                        if (word.IsInnerWord == false)
-                            word.SpaceWidth += extendSpace;
-
+                        if (word.Type.HasFlag(WordType.Space))
+                            word.ExtraWidth = extendSpace;
                         SetWordPosition(word);
                     }
                 }

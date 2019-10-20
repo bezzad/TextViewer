@@ -66,19 +66,23 @@ namespace TextViewer
             set => SetValue(PaddingProperty, value);
         }
 
-        public Pen WireFramePen { get; set; }
+        public Pen WordWireFramePen { get; set; }
+        public Pen ParagraphWireFramePen { get; set; }
         public List<Paragraph> PageContent { get; set; }
         public List<WordInfo> DrawnWords { get; set; }
         public double PixelsPerDip { get; set; }
+        public double OffsetEmSize { get; set; }
 
 
         protected BaseTextViewer()
         {
             TextOptions.SetTextFormattingMode(this, TextFormattingMode.Display);
-            WireFramePen = new Pen(Brushes.Red, 0.7) { DashStyle = DashStyles.Dash };
+            WordWireFramePen = new Pen(Brushes.Red, 0.7) { DashStyle = DashStyles.Dash };
+            ParagraphWireFramePen = new Pen(Brushes.Brown, 0.3) { DashStyle = DashStyles.Solid };
             DrawnWords = new List<WordInfo>();
             PixelsPerDip = GraphicsHelper.PixelsPerDip(this);
             ParagraphSpace = 10;
+            OffsetEmSize = 6;
         }
 
         protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)

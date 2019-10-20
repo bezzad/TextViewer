@@ -36,7 +36,7 @@ namespace TextViewerSample
 
                 if (textLine.IndexOf("<img", StringComparison.OrdinalIgnoreCase) >= 0)
                 {
-                    var imgWord = new WordInfo("img", 0, para.IsRtl, para);
+                    var imgWord = new WordInfo("img", 0, WordType.Image, para.IsRtl) { Paragraph = para };
                     para.Words.Add(imgWord);
 
                     foreach (var word in textLine.Split(" ", StringSplitOptions.RemoveEmptyEntries))
