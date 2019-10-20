@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -29,6 +30,14 @@ namespace TextViewer
             HighlightRange = new Range(0, 0);
         }
 
+        private void SetHighlightRange(int index, bool isStart)
+        {
+            if (isStart)
+                HighlightRange.Start = index;
+            else
+                HighlightRange.End = index;
+        }
+
         // If a child visual object is hit.
         public void CatchHitObject(Point position, bool isStartPoint)
         {
@@ -36,11 +45,28 @@ namespace TextViewer
             VisualTreeHelper.HitTest(this, null, result =>
             {
                 if (result.VisualHit is WordInfo word)
+                    SetHighlightRange(DrawnWords.IndexOf(word), isStartPoint);
+                else
                 {
-                    if (isStartPoint)
-                        HighlightRange.Start = DrawnWords.IndexOf(word);
-                    else
-                        HighlightRange.End = DrawnWords.IndexOf(word);
+                    foreach (var para in PageContent)
+                        foreach (var line in para.Lines)
+                        {
+                            var lineFirstWord = line.Words.FirstOrDefault();
+                            if (lineFirstWord != null)
+                            {
+                                if (lineFirstWord.Area.Y <= position.Y &&
+                                    lineFirstWord.Area.Y + lineFirstWord.Area.Height >= position.Y)
+                                {
+                                    var lineLastWord = line.Words.Last();
+                                    if (line.CurrentParagraph.IsRtl && position.X >= lineFirstWord.Area.X ||     // RTL line
+                                        !line.CurrentParagraph.IsRtl && position.X <= lineFirstWord.Area.X)      // LTR line
+                                        SetHighlightRange(DrawnWords.IndexOf(lineFirstWord), isStartPoint);
+                                    else if (line.CurrentParagraph.IsRtl && position.X <= lineLastWord.Area.X || // RTL line
+                                             !line.CurrentParagraph.IsRtl && position.X >= lineLastWord.Area.X)  // LTR line
+                                        SetHighlightRange(DrawnWords.IndexOf(lineLastWord), isStartPoint);
+                                }
+                            }
+                        }
                 }
 
                 // Stop the hit test enumeration of objects in the visual tree.
@@ -99,9 +125,7 @@ namespace TextViewer
                 }
             }
             else
-            {
                 UnSelectWords();
-            }
         }
 
 
