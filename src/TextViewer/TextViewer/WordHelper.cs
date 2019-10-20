@@ -33,7 +33,7 @@ namespace TextViewer
             while (lo <= hi)
             {
                 mid = (lo + hi) / 2;
-                var r = words[mid].CompareTo(value);
+                var r = 0; // words[mid].CompareTo(value);
                 if (r == 0)
                     return mid;
                 if (r < 0)

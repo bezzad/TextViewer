@@ -138,19 +138,18 @@ namespace TextViewer
 
             BuildPage(PageContent);
 
-            foreach (var word in DrawnWords)
+
+            foreach (var visual in DrawnWords)
             {
-                if (word.GetAttribute(StyleType.Image) is ImageSource img)
-                    dc.DrawImage(img, word.Area);
-                else
-                    dc.DrawText(word.Format, word.DrawPoint);
+                var word = (WordInfo)visual;
+                word.Render();
 
                 if (ShowWireFrame)
                     dc.DrawRectangle(null, WordWireFramePen, word.Area);
 
                 if (ShowOffset)
                 {
-                    var ft = new FormattedText(word.Offset.ToString(),
+                    var ft = new FormattedText(word.OffsetRange.Start.ToString(),
                         CultureInfo.CurrentCulture, FlowDirection.LeftToRight,
                         new Typeface(FontFamily, FontStyles.Normal, FontWeights.Normal, FontStretches.Normal),
                         OffsetEmSize, word.IsRtl == word.Paragraph.IsRtl ? Brushes.Red : Brushes.Blue, PixelsPerDip);

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -7,6 +8,9 @@ namespace TextViewer
 {
     public abstract class BaseTextViewer : Canvas
     {
+        // Provide a required override for the VisualChildrenCount property.
+        protected override int VisualChildrenCount => DrawnWords.Count;
+
         public static readonly DependencyProperty FontSizeProperty = DependencyProperty.Register(
             "FontSize", typeof(double), typeof(BaseTextViewer), new PropertyMetadata(default(double)));
         public static readonly DependencyProperty LineHeightProperty = DependencyProperty.Register(
@@ -24,7 +28,7 @@ namespace TextViewer
         public static readonly DependencyProperty ShowOffsetProperty = DependencyProperty.Register(
             "ShowOffset", typeof(bool), typeof(BaseTextViewer), new PropertyMetadata(default(bool)));
 
-        
+
         public double ParagraphSpace
         {
             get => (double)GetValue(ParagraphSpaceProperty);
@@ -66,10 +70,10 @@ namespace TextViewer
             set => SetValue(PaddingProperty, value);
         }
 
+        public readonly VisualCollection DrawnWords;
         public Pen WordWireFramePen { get; set; }
         public Pen ParagraphWireFramePen { get; set; }
         public List<Paragraph> PageContent { get; set; }
-        public List<WordInfo> DrawnWords { get; set; }
         public double PixelsPerDip { get; set; }
         public double OffsetEmSize { get; set; }
 
@@ -79,7 +83,7 @@ namespace TextViewer
             TextOptions.SetTextFormattingMode(this, TextFormattingMode.Display);
             WordWireFramePen = new Pen(Brushes.Red, 0.7) { DashStyle = DashStyles.Dash };
             ParagraphWireFramePen = new Pen(Brushes.Brown, 0.3) { DashStyle = DashStyles.Solid };
-            DrawnWords = new List<WordInfo>();
+            DrawnWords = new VisualCollection(this);
             PixelsPerDip = GraphicsHelper.PixelsPerDip(this);
             ParagraphSpace = 10;
             OffsetEmSize = 6;
@@ -96,5 +100,17 @@ namespace TextViewer
         }
 
         public virtual void Render() { InvalidateVisual(); }
+
+
+        // Provide a required override for the GetVisualChild method.
+        protected override Visual GetVisualChild(int index)
+        {
+            if (index < 0 || index >= DrawnWords.Count)
+            {
+                throw new ArgumentOutOfRangeException();
+            }
+
+            return DrawnWords[index];
+        }
     }
 }
