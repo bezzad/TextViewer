@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -20,14 +19,14 @@ namespace TextViewer
         protected Point StartSelectionPoint { get; set; }
         protected Point EndSelectionPoint { get; set; }
         protected bool IsMouseDown { get; set; }
-        protected Brush SelectedBrush { get; set; }
+        //protected Brush SelectedBrush { get; set; }
         protected Range HighlightRange { get; set; }
 
 
         public SelectableTextViewer()
         {
             IsSelectable = true;
-            SelectedBrush = new SolidColorBrush(Colors.DarkCyan) { Opacity = 0.5 };
+            //SelectedBrush = new SolidColorBrush(Colors.DarkCyan) { Opacity = 0.5 };
             Cursor = Cursors.IBeam;
         }
 
@@ -45,7 +44,7 @@ namespace TextViewer
         {
             if (result.VisualHit is WordInfo word)
             {
-                word.Opacity = word.Opacity == 1.0 ? 0.4 : 1.0;
+                word.Select();
             }
 
             // Stop the hit test enumeration of objects in the visual tree.
@@ -53,7 +52,7 @@ namespace TextViewer
         }
 
 
-        protected override void OnMouseLeftButtonDown( MouseButtonEventArgs e)
+        protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
         {
             // Retrieve the coordinates of the mouse button event.
             IsMouseDown = true;
@@ -63,7 +62,6 @@ namespace TextViewer
 
             // Initiate the hit test by setting up a hit test result callback method.
             VisualTreeHelper.HitTest(this, null, HitCallback, new PointHitTestParameters(StartSelectionPoint));
-            //Render();
         }
         protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
         {
@@ -84,6 +82,11 @@ namespace TextViewer
             {
                 HighlightSelectedText(dc);
             }
+        }
+
+        protected void HighlightSelectedText()
+        {
+
         }
 
         protected void HighlightSelectedText(DrawingContext dc)
@@ -133,12 +136,12 @@ namespace TextViewer
 
 //            for (var w = from; w <= to; w++)
 //            {
-//                var currentWord = DrawnWords[w].Area;
-//                var isFirstOfLineWord = w == from || !DrawnWords[w - 1].DrawPoint.Y.Equals(currentWord.Y);
+//                var currentWord = ((WordInfo)DrawnWords[w]).Area;
+//                var isFirstOfLineWord = w == from || !((WordInfo)DrawnWords[w - 1]).DrawPoint.Y.Equals(currentWord.Y);
 
 //                if (isFirstOfLineWord == false)
 //                {
-//                    var previousWord = DrawnWords[w - 1];
+//                    var previousWord = (WordInfo)DrawnWords[w - 1];
 //                    var startX = previousWord.IsRtl ? previousWord.DrawPoint.X : previousWord.DrawPoint.X + previousWord.Width;
 //                    var width = currentWord.X - startX + currentWord.Width;
 
@@ -152,6 +155,11 @@ namespace TextViewer
         {
             HighlightRange = null;
             EndSelectionPoint = StartSelectionPoint = EmptyPoint;
+            foreach (var visual in DrawnWords)
+            {
+                var word = (WordInfo) visual;
+                word.UnSelect();
+            }
         }
     }
 }

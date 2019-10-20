@@ -16,12 +16,14 @@ namespace TextViewer
             Styles = new Dictionary<StyleType, string>();
             RtlCulture ??= CultureInfo.GetCultureInfo("fa-ir");
             LtrCulture ??= CultureInfo.GetCultureInfo("en-us");
+            SelectedBrush ??= new SolidColorBrush(Colors.DarkCyan) { Opacity = 0.5 };
 
             SetDirection(isRtl);
         }
 
         public static CultureInfo RtlCulture { get; set; }
         public static CultureInfo LtrCulture { get; set; }
+        public static Brush SelectedBrush { get; set; }
         public const string Rtl = "rtl";
         public const string Ltr = "ltr";
 
@@ -115,9 +117,27 @@ namespace TextViewer
             else
                 dc.DrawText(Format, DrawPoint);
 
+            if (IsSelected)
+                dc.DrawRectangle(SelectedBrush, null, Area);
+
             dc.Close();
 
             return this;
+        }
+
+        public void Select()
+        {
+            IsSelected = true;
+            Render();
+        }
+
+        public void UnSelect()
+        {
+            if (IsSelected)
+            {
+                IsSelected = false;
+                Render();
+            }
         }
     }
 }
