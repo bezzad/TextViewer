@@ -15,7 +15,7 @@ namespace TextViewer
             Type = type;
             ImageScale = 1;
             OffsetRange = new Range(offset, offset + text.Length - 1);
-            ImpressivePaddingPercent = 1; // 20% of word length
+            ImpressivePaddingPercent = 1; // 100% //20% of word length
             Styles = new Dictionary<StyleType, string>();
             RtlCulture ??= CultureInfo.GetCultureInfo("fa-ir");
             LtrCulture ??= CultureInfo.GetCultureInfo("en-us");
@@ -69,9 +69,9 @@ namespace TextViewer
 
         public int CompareTo([AllowNull] Point other)
         {
-            var impressivePadding = ImpressivePaddingPercent * Area.Width;
-            var wordX = Area.Location.X + impressivePadding;
-            var wordXw = Area.Location.X + Area.Width - impressivePadding;
+            //var impressivePadding = ImpressivePaddingPercent * Area.Width;
+            var wordX = Area.Location.X;
+            var wordXw = Area.Location.X + Area.Width;
             var wordY = Area.Location.Y;
             var wordYh = Area.Location.Y + Area.Height;
             var mouseX = other.X;

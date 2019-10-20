@@ -47,12 +47,6 @@ namespace TextViewer.Test
                 Words[i - 1].NextWord = Words[i];
                 Words[i].PreviousWord = Words[i - 1];
             }
-
-            //var fontFamily = new FontFamily("Arial");
-            //foreach (var word in Words)
-            //{
-            //    Assert.IsNotNull(word.GetFormattedText(fontFamily, 16, 1, 20));
-            //}
         }
 
         [TestMethod]
@@ -61,6 +55,19 @@ namespace TextViewer.Test
             foreach (var word in Words)
             {
                 Assert.AreEqual(word.GetAttribute(StyleType.Color), Brushes.Black);
+                Assert.AreEqual(word.GetAttribute(StyleType.VerticalAlign), VerticalAlignment.Center);
+                Assert.AreEqual(word.GetAttribute(StyleType.FontWeight), FontWeights.Normal);
+                Assert.AreEqual(word.GetAttribute(StyleType.MarginBottom), 0);
+                Assert.AreEqual(word.GetAttribute(StyleType.MarginTop), 0);
+                Assert.AreEqual(word.GetAttribute(StyleType.MarginLeft), 0);
+                Assert.AreEqual(word.GetAttribute(StyleType.MarginRight), 0);
+                Assert.AreEqual(word.GetAttribute(StyleType.Height), 0);
+                Assert.AreEqual(word.GetAttribute(StyleType.Width), 0);
+                Assert.AreEqual(word.GetAttribute(StyleType.FontSize), 0);
+                Assert.AreEqual(word.GetAttribute(StyleType.TextAlign), TextAlignment.Justify);
+                Assert.AreEqual(word.GetAttribute(StyleType.Display), true);
+                Assert.IsNull(word.GetAttribute(StyleType.Image));
+
                 var dir = word.GetAttribute(StyleType.Direction);
                 Assert.IsInstanceOfType(dir, typeof(FlowDirection));
                 Assert.AreEqual((FlowDirection)dir == FlowDirection.RightToLeft, word.IsRtl);
@@ -70,49 +77,116 @@ namespace TextViewer.Test
         [TestMethod]
         public void SetDirectionTest()
         {
+            var word = new WordInfo("test", 0, WordType.Normal, true);
+            Assert.AreEqual(word.GetAttribute(StyleType.Direction), FlowDirection.RightToLeft);
+            Assert.IsTrue(word.IsRtl);
+
+            word.SetDirection(false);
+            Assert.AreEqual(word.GetAttribute(StyleType.Direction), FlowDirection.LeftToRight);
+            Assert.IsFalse(word.IsRtl);
+
+            word.SetDirection(true);
+            Assert.AreEqual(word.GetAttribute(StyleType.Direction), FlowDirection.RightToLeft);
+            Assert.IsTrue(word.IsRtl);
+        }
+
+        [TestMethod]
+        public void GetFormattedTextTest()
+        {
             var fontFamily = new FontFamily("Arial");
             foreach (var word in Words)
             {
                 Assert.IsNotNull(word.GetFormattedText(fontFamily, 16, 1, 20));
+                Assert.IsNotNull(word.Format);
+                Assert.IsTrue(word.Width > 0);
+                Assert.IsTrue(word.Height > 0);
             }
         }
 
         [TestMethod]
         public void AddStylesTest()
         {
+            var styles = new Dictionary<StyleType, string>
+            {
+                [StyleType.Display] = "false",
+                [StyleType.Color] = "red",
+                [StyleType.MarginBottom] = "11"
+            };
+
+            foreach (var word in Words)
+            {
+                word.AddStyles(styles);
+                Assert.AreEqual(word.GetAttribute(StyleType.Color), Brushes.Red);
+                Assert.AreEqual(word.GetAttribute(StyleType.VerticalAlign), VerticalAlignment.Center);
+                Assert.AreEqual(word.GetAttribute(StyleType.FontWeight), FontWeights.Normal);
+                Assert.AreEqual(word.GetAttribute(StyleType.MarginBottom), 11.0);
+                Assert.AreEqual(word.GetAttribute(StyleType.MarginTop), 0);
+                Assert.AreEqual(word.GetAttribute(StyleType.MarginLeft), 0);
+                Assert.AreEqual(word.GetAttribute(StyleType.MarginRight), 0);
+                Assert.AreEqual(word.GetAttribute(StyleType.Height), 0);
+                Assert.AreEqual(word.GetAttribute(StyleType.Width), 0);
+                Assert.AreEqual(word.GetAttribute(StyleType.FontSize), 0);
+                Assert.AreEqual(word.GetAttribute(StyleType.TextAlign), TextAlignment.Justify);
+                Assert.AreEqual(word.GetAttribute(StyleType.Display), false);
+                Assert.IsNull(word.GetAttribute(StyleType.Image));
+            }
         }
 
         [TestMethod]
         public void CompareToTest()
         {
+            var fontFamily = new FontFamily("Arial");
+            var x = 0.0;
+            var y = 0.0;
+            var lineHeight = 20;
+            var paraWidth = 200;
+
+            foreach (var word in Words)
+            {
+                word.GetFormattedText(fontFamily, 16, 1, lineHeight);
+                word.Area = new Rect(x, y, word.Width, word.Height);
+                x += word.Width;
+                if (x > paraWidth)
+                {
+                    x = 0;
+                    y += lineHeight;
+                }
+            }
+
+            foreach (var word in Words)
+            {
+                Assert.IsTrue(word.CompareTo(word.Area.Location) == 0); // word draw point
+                Assert.IsTrue(word.CompareTo(new Point(word.Area.X + word.Width / 2, word.Area.Y + word.Height / 2)) == 0); // word center
+                Assert.IsTrue(word.CompareTo(new Point(word.Area.X + word.Width, word.Area.Y + word.Height)) == 0); // word end point
+
+
+                Assert.IsTrue(word.CompareTo(new Point(word.Area.X + word.Width + 1, word.Area.Y)) > 0);
+                Assert.IsTrue(word.CompareTo(new Point(word.Area.X + word.Width + 1, word.Area.Y + word.Height / 2)) > 0);
+                Assert.IsTrue(word.CompareTo(new Point(word.Area.X + word.Width + 1, word.Area.Y + word.Height)) > 0);
+                Assert.IsTrue(word.CompareTo(new Point(word.Area.X, word.Area.Y + word.Height + 1)) > 0);
+                Assert.IsTrue(word.CompareTo(new Point(word.Area.X + word.Width / 2, word.Area.Y + word.Height + 1)) > 0);
+                Assert.IsTrue(word.CompareTo(new Point(word.Area.X + word.Width, word.Area.Y + word.Height + 1)) > 0);
+                Assert.IsTrue(word.CompareTo(new Point(word.Area.X - 1, word.Area.Y + word.Height + 1)) > 0);
+
+                Assert.IsTrue(word.CompareTo(new Point(word.Area.X - 1, word.Area.Y)) < 0);
+                Assert.IsTrue(word.CompareTo(new Point(word.Area.X - 1, word.Area.Y + word.Height / 2)) < 0);
+                Assert.IsTrue(word.CompareTo(new Point(word.Area.X - 1, word.Area.Y + word.Height)) < 0);
+                Assert.IsTrue(word.CompareTo(new Point(word.Area.X, word.Area.Y - 1)) < 0);
+                Assert.IsTrue(word.CompareTo(new Point(word.Area.X + word.Width / 2, word.Area.Y - 1)) < 0);
+                Assert.IsTrue(word.CompareTo(new Point(word.Area.X + word.Width, word.Area.Y - 1)) < 0);
+                Assert.IsTrue(word.CompareTo(new Point(word.Area.X + word.Width + 1, word.Area.Y - 1)) < 0);
+            }
         }
 
 
 
-        [TestMethod]
-        public void GetFormattedTextTest()
-        {
-        }
+
 
         [TestMethod]
         public void IsImageTest()
         {
         }
 
-        [TestMethod]
-        public void IsRtlTest()
-        {
-        }
-
-        [TestMethod]
-        public void HeightTest()
-        {
-        }
-
-        [TestMethod]
-        public void WidthTest()
-        {
-        }
 
         [TestMethod]
         public void ExtraWidthTest()

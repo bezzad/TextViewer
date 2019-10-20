@@ -56,6 +56,8 @@ namespace TextViewer
                     case StyleType.FontWeight: return FontWeights.Normal;
                     case StyleType.VerticalAlign: return VerticalAlignment.Center;
                     case StyleType.Color: return Brushes.Black;
+                    case StyleType.TextAlign: return TextAlignment.Justify;
+                    case StyleType.Display: return true;
                     default: return null;
                 }
 
