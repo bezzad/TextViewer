@@ -87,11 +87,11 @@ namespace TextViewer
         public object GetAttribute(StyleType style)
         {
             // read word style first
-            if (Styles.ContainsKey(style))
+            if (Styles?.ContainsKey(style) == true)
                 return style.ConvertStyleType(Styles[style]);
 
             // if word has not style, then use parent style
-            if (Paragraph.Styles.ContainsKey(style))
+            if (Paragraph?.Styles?.ContainsKey(style) == true)
                 return style.ConvertStyleType(Paragraph.Styles[style]);
 
             return style.ConvertStyleType();
