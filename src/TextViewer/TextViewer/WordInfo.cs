@@ -1,20 +1,70 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Media;
 
 namespace TextViewer
 {
-    public class WordInfo : Word, IComparable<Point>
+    public class WordInfo : IComparable<Point>
     {
+        public WordInfo(string text, int offset, WordType type, bool isRtl)
+        {
+            Text = text;
+            Type = type;
+            ImageScale = 1;
+            OffsetRange = new Range(offset, offset + text.Length - 1);
+            ImpressivePaddingPercent = 1; // 20% of word length
+            Styles = new Dictionary<StyleType, string>();
+            RtlCulture ??= CultureInfo.GetCultureInfo("fa-ir");
+            LtrCulture ??= CultureInfo.GetCultureInfo("en-us");
+
+            SetDirection(isRtl);
+        }
+
+        public static CultureInfo RtlCulture { get; set; }
+        public static CultureInfo LtrCulture { get; set; }
+        public const string Rtl = "rtl";
+        public const string Ltr = "ltr";
+
         public WordInfo NextWord { get; set; }
         public WordInfo PreviousWord { get; set; }
-
-
-        public WordInfo(string text, int offset, WordType type, bool isRtl)
-            : base(text, offset, type)
+        public FormattedText Format { get; set; }
+        public Point DrawPoint { get; set; }
+        public Rect Area { get; set; }
+        public Range OffsetRange { get; protected set; }
+        public Paragraph Paragraph { get; set; }
+        public Dictionary<StyleType, string> Styles { get; protected set; }
+        private double _extraWidth;
+        public double ExtraWidth
         {
-            SetDirection(isRtl);
+            get => Type.HasFlag(WordType.Attached) ? 0 : _extraWidth;
+            set => _extraWidth = value;
+        }
+        public double ImpressivePaddingPercent { get; set; }
+        public string Text { get; set; }
+        public WordType Type { get; set; }
+        public double ImageScale { get; set; }
+        public double Width => IsImage
+            ? double.Parse(Styles[StyleType.Width]) * ImageScale
+            : (Format?.WidthIncludingTrailingWhitespace ?? 0) + ExtraWidth;
+        public double Height => IsImage
+            ? double.Parse(Styles[StyleType.Height]) * ImageScale
+            : Format?.Height ?? 0;
+        public bool IsImage => Type.HasFlag(WordType.Image) && Styles.ContainsKey(StyleType.Image);
+        public bool IsRtl => Styles[StyleType.Direction] == Rtl;
+        public int Offset => OffsetRange.Start;
+
+
+        public void SetDirection(bool isRtl)
+        {
+            Styles[StyleType.Direction] = isRtl ? Rtl : Ltr;
+        }
+        public void AddStyles(Dictionary<StyleType, string> styles)
+        {
+            foreach (var (key, value) in styles)
+                Styles[key] = value;
         }
 
         public int CompareTo([AllowNull] Point other)
@@ -70,6 +120,9 @@ namespace TextViewer
             return Format;
         }
 
-
+        public override string ToString()
+        {
+            return $"<-- {OffsetRange.Start} \"{Text}\"  {OffsetRange.End} -->";
+        }
     }
 }

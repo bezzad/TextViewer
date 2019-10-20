@@ -75,7 +75,7 @@ namespace TextViewer
                 case StyleType.TextAlign: return Enum.TryParse(value, out TextAlignment ta) ? ta : TextAlignment.Justify;
                 case StyleType.Display: return !bool.TryParse(value, out var disp) || disp;
                 case StyleType.VerticalAlign: return Enum.TryParse(value, out VerticalAlignment va) ? va : VerticalAlignment.Center;
-                case StyleType.Direction: return value.Equals(Word.Ltr, StringComparison.OrdinalIgnoreCase) ? FlowDirection.LeftToRight : FlowDirection.RightToLeft;
+                case StyleType.Direction: return value.Equals(WordInfo.Ltr, StringComparison.OrdinalIgnoreCase) ? FlowDirection.LeftToRight : FlowDirection.RightToLeft;
                 case StyleType.Color: return new BrushConverter().ConvertFromString(value);
                 case StyleType.Image: return value.BitmapFromBase64();
                 case StyleType.Href: return value;
