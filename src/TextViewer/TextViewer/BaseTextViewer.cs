@@ -23,17 +23,10 @@ namespace TextViewer
             "FontFamily", typeof(FontFamily), typeof(BaseTextViewer), new PropertyMetadata(default(FontFamily)));
         public static readonly DependencyProperty ShowWireFrameProperty = DependencyProperty.Register(
             "ShowWireFrame", typeof(bool), typeof(BaseTextViewer), new PropertyMetadata(default(bool)));
-        public static readonly DependencyProperty ParagraphSpaceProperty = DependencyProperty.Register(
-            "ParagraphSpace", typeof(double), typeof(BaseTextViewer), new PropertyMetadata(default(double)));
         public static readonly DependencyProperty ShowOffsetProperty = DependencyProperty.Register(
             "ShowOffset", typeof(bool), typeof(BaseTextViewer), new PropertyMetadata(default(bool)));
 
 
-        public double ParagraphSpace
-        {
-            get => (double)GetValue(ParagraphSpaceProperty);
-            set => SetValue(ParagraphSpaceProperty, value);
-        }
         public bool ShowWireFrame
         {
             get => (bool)GetValue(ShowWireFrameProperty);
@@ -76,6 +69,7 @@ namespace TextViewer
         public List<Paragraph> PageContent { get; set; }
         public double PixelsPerDip { get; set; }
         public double OffsetEmSize { get; set; }
+        public double ParagraphSpace => LineHeight * 0.4;
 
 
         protected BaseTextViewer()
@@ -85,7 +79,6 @@ namespace TextViewer
             ParagraphWireFramePen = new Pen(Brushes.Brown, 0.3) { DashStyle = DashStyles.Solid };
             DrawnWords = new VisualCollection(this);
             PixelsPerDip = GraphicsHelper.PixelsPerDip(this);
-            ParagraphSpace = 10;
             OffsetEmSize = 6;
         }
 

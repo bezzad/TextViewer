@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
@@ -44,29 +45,57 @@ namespace TextViewer
             // Initiate the hit test by setting up a hit test result callback method.
             VisualTreeHelper.HitTest(this, null, result =>
             {
+                var selectionFound = false;
                 if (result.VisualHit is WordInfo word)
+                {
                     SetHighlightRange(DrawnWords.IndexOf(word), isStartPoint);
+                    selectionFound = true;
+                }
                 else
                 {
                     foreach (var para in PageContent)
                         foreach (var line in para.Lines)
                         {
-                            var lineFirstWord = line.Words.FirstOrDefault();
-                            if (lineFirstWord != null)
+                            if (line.Location.Y <= position.Y && line.Location.Y + line.Height >= position.Y)
                             {
-                                if (lineFirstWord.Area.Y <= position.Y &&
-                                    lineFirstWord.Area.Y + lineFirstWord.Area.Height >= position.Y)
+                                selectionFound = true;
+                                var firstWord = line.Words.FirstOrDefault();
+                                var lastWord = line.Words.LastOrDefault();
+                                if (firstWord != null && lastWord != null)
                                 {
-                                    var lineLastWord = line.Words.Last();
-                                    if (line.CurrentParagraph.IsRtl && position.X >= lineFirstWord.Area.X ||     // RTL line
-                                        !line.CurrentParagraph.IsRtl && position.X <= lineFirstWord.Area.X)      // LTR line
-                                        SetHighlightRange(DrawnWords.IndexOf(lineFirstWord), isStartPoint);
-                                    else if (line.CurrentParagraph.IsRtl && position.X <= lineLastWord.Area.X || // RTL line
-                                             !line.CurrentParagraph.IsRtl && position.X >= lineLastWord.Area.X)  // LTR line
-                                        SetHighlightRange(DrawnWords.IndexOf(lineLastWord), isStartPoint);
+                                    Debug.WriteLine("Selected Line: " + line.Location);
+                                    if (line.CurrentParagraph.IsRtl && position.X >= firstWord.Area.X || // RTL line
+                                        !line.CurrentParagraph.IsRtl && position.X <= firstWord.Area.X) // LTR line
+                                    {
+                                        SetHighlightRange(DrawnWords.IndexOf(firstWord), isStartPoint);
+                                        Debug.WriteLine($"1 Selected Word Index: {DrawnWords.IndexOf(firstWord)}  isStartPoint: {isStartPoint}");
+                                    }
+                                    else if (line.CurrentParagraph.IsRtl &&
+                                             position.X <= lastWord.Area.X || // RTL line
+                                             !line.CurrentParagraph.IsRtl &&
+                                             position.X >= lastWord.Area.X) // LTR line
+                                    {
+                                        SetHighlightRange(DrawnWords.IndexOf(lastWord), isStartPoint);
+                                        Debug.WriteLine($"2 Selected Word Index: {DrawnWords.IndexOf(firstWord)}  isStartPoint: {isStartPoint}");
+                                    }
+                                    else
+                                    {
+                                        SetHighlightRange(DrawnWords.IndexOf(firstWord), isStartPoint);
+                                        Debug.WriteLine($"3 Selected Word Index: {DrawnWords.IndexOf(firstWord)}  isStartPoint: {isStartPoint}");
+                                    }
+                                }
+                                else // There are no lines! Be sure to click on the space between paragraphs.
+                                {
+                                    Debugger.Break();
                                 }
                             }
                         }
+                }
+
+                if (selectionFound == false)
+                {
+                    //Debugger.Break();
+                    return HitTestResultBehavior.Continue;
                 }
 
                 // Stop the hit test enumeration of objects in the visual tree.
@@ -90,7 +119,6 @@ namespace TextViewer
             IsMouseDown = true;
             ClearSelection();
             StartSelectionPoint = e.GetPosition(this);
-            EndSelectionPoint = StartSelectionPoint;
             CatchHitObject(StartSelectionPoint, true);
         }
 
