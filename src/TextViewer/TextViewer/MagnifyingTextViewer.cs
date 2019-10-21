@@ -52,7 +52,7 @@ namespace TextViewer
             set => MagnifierBrush.Viewbox = value;
         }
         protected VisualBrush MagnifierBrush { get; set; }
-        protected Shape MagnifierCircle { get; set; }
+        protected Shape MagnifierShape { get; set; }
         protected Canvas MagnifierPanel { get; set; }
         protected double Radius => MagnifierLength / 2;
 
@@ -82,7 +82,7 @@ namespace TextViewer
                 };
 
                 if (MagnifierType == MagnifierType.Circle)
-                    MagnifierCircle = new Ellipse
+                    MagnifierShape = new Ellipse
                     {
                         Stroke = MagnifierStroke,
                         Width = MagnifierLength,
@@ -90,9 +90,9 @@ namespace TextViewer
                         Visibility = Visibility.Hidden,
                         Fill = MagnifierBrush
                     };
-                else if(MagnifierType == MagnifierType.Rectangle)
+                else if (MagnifierType == MagnifierType.Rectangle)
                 {
-                    MagnifierCircle = new Rectangle
+                    MagnifierShape = new Rectangle
                     {
                         Stroke = MagnifierStroke,
                         Width = MagnifierLength,
@@ -103,7 +103,7 @@ namespace TextViewer
                 }
                 else if (MagnifierType == MagnifierType.Sticker)
                 {
-                    MagnifierCircle = new Rectangle
+                    MagnifierShape = new Rectangle
                     {
                         Stroke = MagnifierStroke,
                         Width = ActualWidth,
@@ -112,10 +112,10 @@ namespace TextViewer
                         Fill = MagnifierBrush
                     };
                 }
-                MagnifierPanel.Children.Add(MagnifierCircle);
+                MagnifierPanel.Children.Add(MagnifierShape);
                 container.Children.Add(MagnifierPanel);
-                MouseEnter += delegate { if (MagnifierEnable) MagnifierCircle.Visibility = Visibility.Visible; };
-                MouseLeave += delegate { MagnifierCircle.Visibility = Visibility.Hidden; };
+                MouseEnter += delegate { if (MagnifierEnable) MagnifierShape.Visibility = Visibility.Visible; };
+                MouseLeave += delegate { MagnifierShape.Visibility = Visibility.Hidden; };
                 MouseMove += ContentPanelOnMouseMove;
             }
         }
@@ -128,25 +128,55 @@ namespace TextViewer
             Mouse.SetCursor(Cursors.Cross);
 
             var currentMousePosition = e.GetPosition(this);
-            var length = MagnifierCircle.ActualWidth * (1 / MagnifierZoomFactor);
 
-            // Determine whether the magnifying glass should be shown to the
-            // the left or right of the mouse pointer.
-            if (ActualWidth - currentMousePosition.X > MagnifierCircle.Width + MagnifierDistanceFromMouse - Radius)
-                SetLeft(MagnifierCircle, currentMousePosition.X + MagnifierDistanceFromMouse - Radius);
-            else
-                SetLeft(MagnifierCircle, currentMousePosition.X - MagnifierDistanceFromMouse - Radius);
+            if (MagnifierType != MagnifierType.Sticker)
+            {
+                // Determine whether the magnifying glass should be shown to the
+                // the left or right of the mouse pointer.
+                if (ActualWidth - currentMousePosition.X > MagnifierShape.Width + MagnifierDistanceFromMouse - Radius)
+                    SetLeft(MagnifierShape, currentMousePosition.X + MagnifierDistanceFromMouse - Radius);
+                else
+                    SetLeft(MagnifierShape, currentMousePosition.X - MagnifierDistanceFromMouse - Radius);
 
-            // Determine whether the magnifying glass should be shown 
-            // above or below the mouse pointer.
-            if (ActualHeight - currentMousePosition.Y > MagnifierCircle.Height + MagnifierDistanceFromMouse - Radius)
-                SetTop(MagnifierCircle, currentMousePosition.Y + MagnifierDistanceFromMouse - Radius);
+                // Determine whether the magnifying glass should be shown 
+                // above or below the mouse pointer.
+                if (ActualHeight - currentMousePosition.Y > MagnifierShape.Height + MagnifierDistanceFromMouse - Radius)
+                    SetTop(MagnifierShape, currentMousePosition.Y + MagnifierDistanceFromMouse - Radius);
+                else
+                    SetTop(MagnifierShape, currentMousePosition.Y - MagnifierDistanceFromMouse - Radius);
+
+            }
             else
-                SetTop(MagnifierCircle, currentMousePosition.Y - MagnifierDistanceFromMouse - Radius);
+            {
+                SetLeft(MagnifierShape, 0);
+                SetTop(MagnifierShape, 0);
+            }
 
             // Update the visual brush's View-box to magnify a `length` by `length` rectangle,
             // centered on the current mouse position.
-            ViewBox = new Rect(currentMousePosition.X - length / 2, currentMousePosition.Y - length / 2, length, length);
+            var xLength = MagnifierShape.ActualWidth * (1 / MagnifierZoomFactor);
+            var yLength = MagnifierShape.ActualHeight * (1 / MagnifierZoomFactor);
+            ViewBox = new Rect(currentMousePosition.X - xLength / 2, currentMousePosition.Y - yLength / 2, xLength, yLength);
+        }
+
+        protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
+        {
+            base.OnPropertyChanged(e);
+
+            if (e.Property.Name == nameof(MagnifierEnable) && MagnifierType == MagnifierType.Sticker)
+            {
+                Padding = new Thickness(Padding.Left,
+                    Padding.Top + (MagnifierEnable ? MagnifierLength : -MagnifierLength), Padding.Right,
+                    Padding.Bottom);
+            }
+        }
+
+        protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo)
+        {
+            base.OnRenderSizeChanged(sizeInfo);
+
+            if (MagnifierEnable && MagnifierType == MagnifierType.Sticker)
+                MagnifierShape.Width = ActualWidth;
         }
     }
 }
