@@ -93,7 +93,7 @@ namespace TextViewer
             RemainWidth -= word.Width;
         }
 
-        public void Draw(bool justify = false)
+        public void Render(bool justify = false)
         {
             // clear non directional words stack
             PopAllNonDirectionalWords();

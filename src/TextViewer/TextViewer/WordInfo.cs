@@ -53,7 +53,7 @@ namespace TextViewer
             : Format?.Height ?? 0;
         public bool IsImage => Type.HasFlag(WordType.Image) && Styles.ContainsKey(StyleType.Image);
         public bool IsRtl => Styles[StyleType.Direction] == Rtl;
-
+        public new int Offset => OffsetRange.Start;
 
         public void SetDirection(bool isRtl)
         {
@@ -103,7 +103,7 @@ namespace TextViewer
 
         public override string ToString()
         {
-            return $"<-- {OffsetRange.Start} \"{Text}\"  {OffsetRange.End} -->";
+            return $"<-- {Offset} \"{Text}\"  {OffsetRange.End} -->";
         }
 
         public DrawingVisual Render()

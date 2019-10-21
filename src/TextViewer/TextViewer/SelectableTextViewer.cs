@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
@@ -17,9 +16,6 @@ namespace TextViewer
             get => (bool)GetValue(IsSelectableProperty);
             set => SetValue(IsSelectableProperty, value);
         }
-        protected Point EmptyPoint { get; set; } = new Point(0, 0);
-        protected Point StartSelectionPoint { get; set; }
-        protected Point EndSelectionPoint { get; set; }
         protected bool IsMouseDown { get; set; }
         protected Range HighlightRange { get; set; }
 
@@ -31,13 +27,6 @@ namespace TextViewer
             HighlightRange = new Range(0, 0);
         }
 
-        private void SetHighlightRange(int index, bool isStart)
-        {
-            if (isStart)
-                HighlightRange.Start = index;
-            else
-                HighlightRange.End = index;
-        }
 
         // If a child visual object is hit.
         public void CatchHitObject(Point position, bool isStartPoint)
@@ -45,56 +34,51 @@ namespace TextViewer
             // Initiate the hit test by setting up a hit test result callback method.
             VisualTreeHelper.HitTest(this, null, result =>
             {
-                var selectionFound = false;
+                var selectedWordIndex = -1;
                 if (result.VisualHit is WordInfo word)
+                    selectedWordIndex = DrawnWords.IndexOf(word);
+                else if (result.VisualHit is Paragraph para)
                 {
-                    SetHighlightRange(DrawnWords.IndexOf(word), isStartPoint);
-                    selectionFound = true;
-                }
-                else
-                {
-                    foreach (var para in PageContent)
-                        foreach (var line in para.Lines)
+                    foreach (var line in para.Lines)
+                    {
+                        if (line.Location.Y <= position.Y && line.Location.Y + line.Height >= position.Y)
                         {
-                            if (line.Location.Y <= position.Y && line.Location.Y + line.Height >= position.Y)
+                            var lastWord = line.Words.LastOrDefault();
+                            if (lastWord != null)
                             {
-                                selectionFound = true;
-                                var firstWord = line.Words.FirstOrDefault();
-                                var lastWord = line.Words.LastOrDefault();
-                                if (firstWord != null && lastWord != null)
-                                {
-                                    Debug.WriteLine("Selected Line: " + line.Location);
-                                    if (line.CurrentParagraph.IsRtl && position.X >= firstWord.Area.X || // RTL line
-                                        !line.CurrentParagraph.IsRtl && position.X <= firstWord.Area.X) // LTR line
-                                    {
-                                        SetHighlightRange(DrawnWords.IndexOf(firstWord), isStartPoint);
-                                        Debug.WriteLine($"1 Selected Word Index: {DrawnWords.IndexOf(firstWord)}  isStartPoint: {isStartPoint}");
-                                    }
-                                    else if (line.CurrentParagraph.IsRtl &&
-                                             position.X <= lastWord.Area.X || // RTL line
-                                             !line.CurrentParagraph.IsRtl &&
-                                             position.X >= lastWord.Area.X) // LTR line
-                                    {
-                                        SetHighlightRange(DrawnWords.IndexOf(lastWord), isStartPoint);
-                                        Debug.WriteLine($"2 Selected Word Index: {DrawnWords.IndexOf(firstWord)}  isStartPoint: {isStartPoint}");
-                                    }
-                                    else
-                                    {
-                                        SetHighlightRange(DrawnWords.IndexOf(firstWord), isStartPoint);
-                                        Debug.WriteLine($"3 Selected Word Index: {DrawnWords.IndexOf(firstWord)}  isStartPoint: {isStartPoint}");
-                                    }
-                                }
-                                else // There are no lines! Be sure to click on the space between paragraphs.
-                                {
-                                    Debugger.Break();
-                                }
+                                if (line.CurrentParagraph.IsRtl && position.X <= lastWord.Area.X || // RTL line
+                                    !line.CurrentParagraph.IsRtl && position.X >= lastWord.Area.X)  // LTR line
+                                    selectedWordIndex = DrawnWords.IndexOf(lastWord);
+                                else
+                                    selectedWordIndex = DrawnWords.IndexOf(line.Words.FirstOrDefault());
+
+                                break;
                             }
                         }
+                    }
+                }
+                else // There are no lines! Be sure to click on the space between paragraphs.
+                {
+                    foreach (var paragraph in PageContent)
+                    {
+                        if (position.Y < paragraph.Location.Y)
+                        {
+                            selectedWordIndex = DrawnWords.IndexOf(paragraph.Lines.FirstOrDefault()?.Words.FirstOrDefault());
+                            break;
+                        }
+                    }
+
+                    if (selectedWordIndex < 0)
+                        selectedWordIndex = DrawnWords.IndexOf(PageContent.LastOrDefault()?.Lines.LastOrDefault()?.Words.LastOrDefault());
                 }
 
-                if (selectionFound == false)
+                // Set Highlight Range 
+                if (selectedWordIndex >= 0)
                 {
-                    Debugger.Break();
+                    if (isStartPoint)
+                        HighlightRange.Start = selectedWordIndex;
+                    else
+                        HighlightRange.End = selectedWordIndex;
                 }
 
                 // Stop the hit test enumeration of objects in the visual tree.
@@ -106,8 +90,7 @@ namespace TextViewer
         {
             if (IsSelectable && IsMouseDown)
             {
-                EndSelectionPoint = e.GetPosition(this);
-                CatchHitObject(EndSelectionPoint, false);
+                CatchHitObject(e.GetPosition(this), false);
                 HighlightSelectedText();
             }
         }
@@ -117,8 +100,7 @@ namespace TextViewer
             // Retrieve the coordinates of the mouse button event.
             IsMouseDown = true;
             ClearSelection();
-            StartSelectionPoint = e.GetPosition(this);
-            CatchHitObject(StartSelectionPoint, true);
+            CatchHitObject(e.GetPosition(this), true);
         }
 
         protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
@@ -127,8 +109,7 @@ namespace TextViewer
             if (IsSelectable && IsMouseDown)
             {
                 IsMouseDown = false;
-                EndSelectionPoint = e.GetPosition(this);
-                CatchHitObject(EndSelectionPoint, false);
+                CatchHitObject(e.GetPosition(this), false);
                 HighlightSelectedText();
             }
         }
@@ -144,11 +125,13 @@ namespace TextViewer
 
                 for (var i = 0; i < DrawnWords.Count; i++)
                 {
-                    var word = (WordInfo)DrawnWords[i];
-                    if (i >= from && i <= to)
-                        word.Select();
-                    else
-                        word.UnSelect();
+                    if (DrawnWords[i] is WordInfo word)
+                    {
+                        if (i >= from && i <= to)
+                            word.Select();
+                        else
+                            word.UnSelect();
+                    }
                 }
             }
             else
@@ -159,14 +142,14 @@ namespace TextViewer
         public void ClearSelection()
         {
             HighlightRange.Start = HighlightRange.End = 0;
-            EndSelectionPoint = StartSelectionPoint = EmptyPoint;
             UnSelectWords();
         }
 
         public void UnSelectWords()
         {
             foreach (var visual in DrawnWords)
-                ((WordInfo)visual).UnSelect();
+                if (visual is WordInfo word)
+                    word.UnSelect();
         }
     }
 }
