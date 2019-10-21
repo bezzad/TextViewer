@@ -94,8 +94,7 @@ namespace TextViewer
 
                 if (selectionFound == false)
                 {
-                    //Debugger.Break();
-                    return HitTestResultBehavior.Continue;
+                    Debugger.Break();
                 }
 
                 // Stop the hit test enumeration of objects in the visual tree.

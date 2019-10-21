@@ -69,7 +69,12 @@ namespace TextViewer
         public List<Paragraph> PageContent { get; set; }
         public double PixelsPerDip { get; set; }
         public double OffsetEmSize { get; set; }
-        public double ParagraphSpace => LineHeight * 0.4;
+
+        /// <summary>
+        /// Note: A margin based on the line-height has been used before this paragraph space.
+        /// Default value is 1.6x of line spacing.
+        /// </summary>
+        public double ParagraphSpace => LineHeight * 0.66;
 
 
         protected BaseTextViewer()
