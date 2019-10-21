@@ -28,7 +28,7 @@ namespace TextViewer
             CurrentParagraph = para;
         }
 
-        
+
         public void AddWord(WordInfo word)
         {
             Words.Add(word);
@@ -64,28 +64,21 @@ namespace TextViewer
                         case "left":
                             {
                                 if (CurrentParagraph.IsRtl)
-                                {
                                     WordPointOffset -= RemainWidth;
-                                    foreach (var word in Words)
-                                        SetWordPosition(word);
-                                }
+                                SetWordsPosition();
                                 break;
                             }
                         case "center":
                             {
                                 WordPointOffset += RemainWidth / 2 * (CurrentParagraph.IsRtl ? -1 : 1);
-                                foreach (var word in Words)
-                                    SetWordPosition(word);
+                                SetWordsPosition();
                                 break;
                             }
                         case "right":
                             {
                                 if (CurrentParagraph.IsRtl == false)
-                                {
                                     WordPointOffset += RemainWidth;
-                                    foreach (var word in Words)
-                                        SetWordPosition(word);
-                                }
+                                SetWordsPosition();
                                 break;
                             }
                     }
@@ -98,6 +91,11 @@ namespace TextViewer
             CurrentParagraph.Lines.Add(this);
         }
 
+        protected void SetWordsPosition()
+        {
+            foreach (var word in Words)
+                SetWordPosition(word);
+        }
 
         protected WordInfo SetWordPositionInLine(WordInfo word)
         {

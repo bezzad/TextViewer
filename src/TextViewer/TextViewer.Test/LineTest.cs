@@ -13,6 +13,11 @@ namespace TextViewer.Test
         /// <summary>An observable dictionary to which a mock will be subscribed</summary>
         private List<WordInfo> Words { get; set; }
         private Paragraph Parent { get; set; }
+        private double _lineHeight = 22.0;
+        private readonly double _fontSize = 20.0;
+        private readonly Point _startPoint = new Point(1, 1);
+        private double _width = 200.0;
+        private readonly FontFamily _arial = new FontFamily("Arial");
 
         /// <summary>Initialization routine executed before each test is run</summary>
         [TestInitialize]
@@ -23,24 +28,24 @@ namespace TextViewer.Test
             Words = new List<WordInfo>()
             {
                 new WordInfo("Test1", 0, WordType.Normal, false) {Paragraph = Parent}, // 0
-                new WordInfo(" ", 5, WordType.Space, false) {Paragraph = Parent},      // 1
-                new WordInfo("Test2", 6, WordType.Normal, false) {Paragraph = Parent},
-                new WordInfo(" ", 11, WordType.Space, false) {Paragraph = Parent},
-                new WordInfo("Test3", 12, WordType.Normal, false) {Paragraph = Parent},
-                new WordInfo(" ", 17, WordType.Space, false) {Paragraph = Parent},
-                new WordInfo("Test4", 18, WordType.Normal, false) {Paragraph = Parent},
-                new WordInfo(" ", 23, WordType.Space, false) {Paragraph = Parent},
-                new WordInfo("Test", 24, WordType.Normal | WordType.Attached, false) {Paragraph = Parent},
+                new WordInfo(" ", 5, WordType.Space, false) {Paragraph = Parent}, // 1
+                new WordInfo("Test2", 6, WordType.Normal, false) {Paragraph = Parent}, // 2
+                new WordInfo(" ", 11, WordType.Space, false) {Paragraph = Parent}, // 3
+                new WordInfo("Test3", 12, WordType.Normal, false) {Paragraph = Parent}, // 4
+                new WordInfo(" ", 17, WordType.Space, false) {Paragraph = Parent}, // 5
+                new WordInfo("Test4", 18, WordType.Normal, false) {Paragraph = Parent}, // 6
+                new WordInfo(" ", 23, WordType.Space, false) {Paragraph = Parent}, // 7
+                new WordInfo("Test", 24, WordType.Normal | WordType.Attached, false) {Paragraph = Parent}, // 8
                 new WordInfo(".", 25, WordType.InertChar | WordType.Attached, false) {Paragraph = Parent}, // 9
-                new WordInfo("5", 26, WordType.Normal, false) {Paragraph = Parent},
-                new WordInfo(" ", 29, WordType.Space, false) {Paragraph = Parent},
-                new WordInfo("Test6", 30, WordType.Normal, false) {Paragraph = Parent},
-                new WordInfo(" ", 33, WordType.Space, false) {Paragraph = Parent},
-                new WordInfo("تست۱", 36, WordType.Normal, true), // test without parent paragraph
-                new WordInfo(" ", 41, WordType.Space, true), // test without parent paragraph
-                new WordInfo("تست۲", 42, WordType.Normal, true), // test without parent paragraph
-                new WordInfo(" ", 47, WordType.Space, true), // test without parent paragraph
-                new WordInfo("تست۳", 48, WordType.Normal, true), // test without parent paragraph
+                new WordInfo("5", 26, WordType.Normal, false) {Paragraph = Parent}, // 10
+                new WordInfo(" ", 29, WordType.Space, false) {Paragraph = Parent}, // 11
+                new WordInfo("Test6", 30, WordType.Normal, false) {Paragraph = Parent}, // 12
+                new WordInfo(" ", 33, WordType.Space, false) {Paragraph = Parent}, // 13
+                new WordInfo("تست۱", 36, WordType.Normal, true) {Paragraph = Parent}, // 14
+                new WordInfo(" ", 41, WordType.Space, true) {Paragraph = Parent}, // 15
+                new WordInfo("تست۲", 42, WordType.Normal, true) {Paragraph = Parent}, // 16
+                new WordInfo(" ", 47, WordType.Space, true) {Paragraph = Parent}, // 17
+                new WordInfo("تست۳", 48, WordType.Normal, true) {Paragraph = Parent}, // 18
                 new WordInfo("img", 55, WordType.Image, false) {Paragraph = Parent} // 19
             };
 
@@ -49,121 +54,125 @@ namespace TextViewer.Test
                 Words[i - 1].NextWord = Words[i];
                 Words[i].PreviousWord = Words[i - 1];
             }
+
+            // set image width and height
+            Words.Last().Styles.Add(StyleType.Width, "100");
+            Words.Last().Styles.Add(StyleType.Height, "100");
         }
 
         [TestMethod]
-        public void GetAttributeTest()
+        public void AddWordTest()
         {
-            foreach (var word in Words)
-            {
-                Assert.AreEqual(word.GetAttribute(StyleType.Color), Brushes.Black);
-                Assert.AreEqual(word.GetAttribute(StyleType.VerticalAlign), VerticalAlignment.Center);
-                Assert.AreEqual(word.GetAttribute(StyleType.FontWeight), FontWeights.Normal);
-                Assert.AreEqual(word.GetAttribute(StyleType.MarginBottom), 0);
-                Assert.AreEqual(word.GetAttribute(StyleType.MarginTop), 0);
-                Assert.AreEqual(word.GetAttribute(StyleType.MarginLeft), 0);
-                Assert.AreEqual(word.GetAttribute(StyleType.MarginRight), 0);
-                Assert.AreEqual(word.GetAttribute(StyleType.Height), 0);
-                Assert.AreEqual(word.GetAttribute(StyleType.Width), 0);
-                Assert.AreEqual(word.GetAttribute(StyleType.FontSize), 0);
-                Assert.AreEqual(word.GetAttribute(StyleType.TextAlign), TextAlignment.Justify);
-                Assert.AreEqual(word.GetAttribute(StyleType.Display), true);
-                Assert.IsNull(word.GetAttribute(StyleType.Image));
+            var line = new Line(_width, Parent, _startPoint);
 
-                var dir = word.GetAttribute(StyleType.Direction);
-                Assert.IsInstanceOfType(dir, typeof(FlowDirection));
-                Assert.AreEqual((FlowDirection)dir == FlowDirection.RightToLeft, word.IsRtl);
-            }
-        }
+            Assert.IsTrue(line.Height.Equals(0));
+            Assert.IsTrue(line.RemainWidth.Equals(_width));
 
-        [TestMethod]
-        public void SetDirectionTest()
-        {
-            var word = new WordInfo("test", 0, WordType.Normal, true);
-            Assert.AreEqual(word.GetAttribute(StyleType.Direction), FlowDirection.RightToLeft);
-            Assert.IsTrue(word.IsRtl);
-
-            word.SetDirection(false);
-            Assert.AreEqual(word.GetAttribute(StyleType.Direction), FlowDirection.LeftToRight);
-            Assert.IsFalse(word.IsRtl);
-
-            word.SetDirection(true);
-            Assert.AreEqual(word.GetAttribute(StyleType.Direction), FlowDirection.RightToLeft);
-            Assert.IsTrue(word.IsRtl);
-        }
-
-        [TestMethod]
-        public void GetFormattedTextTest()
-        {
-            var fontFamily = new FontFamily("Arial");
-            foreach (var word in Words)
-            {
-                Assert.IsNotNull(word.GetFormattedText(fontFamily, 16, 1, 20));
-                Assert.IsNotNull(word.Format);
-                Assert.IsTrue(word.Width > 0);
-                Assert.IsTrue(word.Height > 0);
-            }
-        }
-
-        [TestMethod]
-        public void AddStylesTest()
-        {
-            var styles = new Dictionary<StyleType, string>
-            {
-                [StyleType.Display] = "false",
-                [StyleType.Color] = "red",
-                [StyleType.MarginBottom] = "11"
-            };
-
-            foreach (var word in Words)
-            {
-                word.AddStyles(styles);
-                Assert.AreEqual(word.GetAttribute(StyleType.Color), Brushes.Red);
-                Assert.AreEqual(word.GetAttribute(StyleType.VerticalAlign), VerticalAlignment.Center);
-                Assert.AreEqual(word.GetAttribute(StyleType.FontWeight), FontWeights.Normal);
-                Assert.AreEqual(word.GetAttribute(StyleType.MarginBottom), 11.0);
-                Assert.AreEqual(word.GetAttribute(StyleType.MarginTop), 0);
-                Assert.AreEqual(word.GetAttribute(StyleType.MarginLeft), 0);
-                Assert.AreEqual(word.GetAttribute(StyleType.MarginRight), 0);
-                Assert.AreEqual(word.GetAttribute(StyleType.Height), 0);
-                Assert.AreEqual(word.GetAttribute(StyleType.Width), 0);
-                Assert.AreEqual(word.GetAttribute(StyleType.FontSize), 0);
-                Assert.AreEqual(word.GetAttribute(StyleType.TextAlign), TextAlignment.Justify);
-                Assert.AreEqual(word.GetAttribute(StyleType.Display), false);
-                Assert.IsNull(word.GetAttribute(StyleType.Image));
-            }
-        }
-
-        [TestMethod]
-        public void IsImageTest()
-        {
-            Assert.IsFalse(Words.First().IsImage);
-            Assert.IsTrue(Words.Last().IsImage);
-        }
-
-
-        [TestMethod]
-        public void ExtraWidthTest()
-        {
-            var extendedPad = 5;
-            for (int i = 0; i < Words.Count; i++)
+            for (var i = 0; i < Words.Count; i++)
             {
                 var word = Words[i];
                 Debug.WriteLine($"Word {i}");
-                var wordWidth = word.Width;
-                Assert.IsTrue(word.ExtraWidth.Equals(0));
-                word.ExtraWidth = extendedPad;
-                if (word.Type.HasFlag(WordType.Attached))
+
+                word.GetFormattedText(_arial, _fontSize, 1, _lineHeight);
+                Assert.IsNotNull(word.Format);
+                Assert.IsTrue(word.Width > 0);
+                line.AddWord(word);
+                _width -= word.Width;
+                Assert.IsTrue(line.Height >= word.Height); // check change line height
+                Assert.IsTrue(line.RemainWidth.Equals(_width)); // check remain width
+                Assert.IsTrue(true);
+                Assert.IsTrue(line.Words.Contains(word));
+
+                if (Parent.IsRtl != word.IsRtl)
                 {
-                    Assert.IsTrue(word.ExtraWidth.Equals(0));
-                    Assert.IsTrue(word.Width.Equals(wordWidth));
+                    Assert.IsTrue(word.DrawPoint.X.Equals(0));
+                    Assert.IsTrue(word.DrawPoint.Y.Equals(0));
                 }
                 else
                 {
-                    Assert.IsTrue(word.ExtraWidth.Equals(5));
-                    Assert.IsTrue(word.Width.Equals(wordWidth + extendedPad));
+                    Assert.IsTrue(word.DrawPoint.X > 0);
+                    Assert.IsTrue(word.DrawPoint.Y > 0);
+
+                    if (i > 0)
+                    {
+                        if (Parent.IsRtl)
+                            Assert.IsTrue(word.DrawPoint.CompareTo(Words[i - 1].DrawPoint) < 0);
+                        else
+                            Assert.IsTrue(word.DrawPoint.CompareTo(Words[i - 1].DrawPoint) > 0);
+                    }
                 }
+
+                if (i > 0) Assert.IsTrue(word.CompareTo(Words[i - 1]) > 0);
             }
         }
+
+        [TestMethod]
+        public void RenderTest()
+        {
+            var line = new Line(_width, Parent, _startPoint);
+            var lineCounter = 0;
+            Assert.IsTrue(line.CurrentParagraph.Lines.Count == lineCounter++);
+
+            for (var i = 0; i < Words.Count; i++)
+            {
+                var word = Words[i];
+                Debug.WriteLine($"Word {i}");
+
+                word.GetFormattedText(_arial, _fontSize, 1, _lineHeight);
+                line.AddWord(word);
+            }
+
+            line.Render(); // test after line rendering
+            Assert.IsTrue(line.CurrentParagraph.Lines.Count == lineCounter++);
+
+            Debug.WriteLine(line.RemainWidth);
+            Assert.IsTrue(line.RemainWidth < 0);
+
+            for (var i = 0; i < Words.Count; i++)
+            {
+                var word = Words[i];
+                Debug.WriteLine($"Word {i}");
+
+                Assert.IsTrue(word.DrawPoint.X > 0);
+                Assert.IsTrue(word.DrawPoint.Y > 0);
+                Assert.IsTrue(word.Area.Width.Equals(word.Width));
+            }
+
+            line.RemainWidth = 100; // change real remain with to test text-align
+
+            // Test justify text-align
+            line.Render(true);
+            Assert.IsTrue(line.CurrentParagraph.Lines.Count == lineCounter++);
+
+            for (var i = 0; i < Words.Count; i++)
+            {
+                var word = Words[i];
+                Debug.WriteLine($"Justify Word {i}");
+
+                if (word.Type == WordType.Space)
+                    Assert.IsTrue(word.ExtraWidth > 0);
+                else
+                    Assert.IsTrue(word.ExtraWidth.Equals(0));
+            }
+
+            // Test center text-align
+            Parent.Styles[StyleType.TextAlign] = "center";
+            line.Render();
+            Assert.IsTrue(line.CurrentParagraph.Lines.Count == lineCounter++);
+            Assert.IsTrue(line.Words.First().Area.Location.X.Equals(line.RemainWidth / 2 + _startPoint.X));
+
+            // Test left text-align
+            Parent.Styles[StyleType.TextAlign] = "left";
+            line.Render();
+            Assert.IsTrue(line.CurrentParagraph.Lines.Count == lineCounter++);
+            Assert.IsTrue(line.Words.First().Area.Location.X.Equals(line.Location.X));
+
+            // Test right text-align
+            Parent.Styles[StyleType.TextAlign] = "right";
+            line.Render();
+            Assert.IsTrue(line.CurrentParagraph.Lines.Count == lineCounter);
+            Assert.IsTrue(line.Words.First().Area.Location.X.Equals(line.RemainWidth + _startPoint.X));
+        }
+
     }
 }
