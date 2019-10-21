@@ -52,7 +52,7 @@ namespace TextViewer
                     case StyleType.MarginTop:
                     case StyleType.FontSize:
                     case StyleType.Width:
-                    case StyleType.Height: return 0;
+                    case StyleType.Height: return 0.0;
                     case StyleType.FontWeight: return FontWeights.Normal;
                     case StyleType.VerticalAlign: return VerticalAlignment.Center;
                     case StyleType.Color: return Brushes.Black;
@@ -69,7 +69,7 @@ namespace TextViewer
                 case StyleType.MarginTop:
                 case StyleType.FontSize:
                 case StyleType.Width:
-                case StyleType.Height: return double.TryParse(value, out var d) ? d : 0;
+                case StyleType.Height: return double.TryParse(value, out var d) ? d : 0.0;
                 case StyleType.FontWeight:
                     return typeof(FontWeights)
                                .GetProperty(value, BindingFlags.Public | BindingFlags.IgnoreCase | BindingFlags.Static)?

@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -20,8 +22,8 @@ namespace TextViewer.Test
 
             Words = new List<WordInfo>()
             {
-                new WordInfo("Test1", 0, WordType.Normal, false) {Paragraph = Parent},
-                new WordInfo(" ", 5, WordType.Space, false) {Paragraph = Parent},
+                new WordInfo("Test1", 0, WordType.Normal, false) {Paragraph = Parent}, // 0
+                new WordInfo(" ", 5, WordType.Space, false) {Paragraph = Parent},      // 1
                 new WordInfo("Test2", 6, WordType.Normal, false) {Paragraph = Parent},
                 new WordInfo(" ", 11, WordType.Space, false) {Paragraph = Parent},
                 new WordInfo("Test3", 12, WordType.Normal, false) {Paragraph = Parent},
@@ -29,7 +31,7 @@ namespace TextViewer.Test
                 new WordInfo("Test4", 18, WordType.Normal, false) {Paragraph = Parent},
                 new WordInfo(" ", 23, WordType.Space, false) {Paragraph = Parent},
                 new WordInfo("Test", 24, WordType.Normal | WordType.Attached, false) {Paragraph = Parent},
-                new WordInfo(".", 25, WordType.InertChar | WordType.Attached, false) {Paragraph = Parent},
+                new WordInfo(".", 25, WordType.InertChar | WordType.Attached, false) {Paragraph = Parent}, // 9
                 new WordInfo("5", 26, WordType.Normal, false) {Paragraph = Parent},
                 new WordInfo(" ", 29, WordType.Space, false) {Paragraph = Parent},
                 new WordInfo("Test6", 30, WordType.Normal, false) {Paragraph = Parent},
@@ -39,7 +41,7 @@ namespace TextViewer.Test
                 new WordInfo("تست۲", 42, WordType.Normal, true), // test without parent paragraph
                 new WordInfo(" ", 47, WordType.Space, true), // test without parent paragraph
                 new WordInfo("تست۳", 48, WordType.Normal, true), // test without parent paragraph
-                new WordInfo("img", 55, WordType.Image, false) {Paragraph = Parent}
+                new WordInfo("img", 55, WordType.Image, false) {Paragraph = Parent} // 19
             };
 
             for (var i = 1; i < Words.Count; i++)
@@ -135,12 +137,33 @@ namespace TextViewer.Test
         [TestMethod]
         public void IsImageTest()
         {
+            Assert.IsFalse(Words.First().IsImage);
+            Assert.IsTrue(Words.Last().IsImage);
         }
 
 
         [TestMethod]
         public void ExtraWidthTest()
         {
+            var extendedPad = 5;
+            for (int i = 0; i < Words.Count; i++)
+            {
+                var word = Words[i];
+                Debug.WriteLine($"Word {i}");
+                var wordWidth = word.Width;
+                Assert.IsTrue(word.ExtraWidth.Equals(0));
+                word.ExtraWidth = extendedPad;
+                if (word.Type.HasFlag(WordType.Attached))
+                {
+                    Assert.IsTrue(word.ExtraWidth.Equals(0));
+                    Assert.IsTrue(word.Width.Equals(wordWidth));
+                }
+                else
+                {
+                    Assert.IsTrue(word.ExtraWidth.Equals(5));
+                    Assert.IsTrue(word.Width.Equals(wordWidth + extendedPad));
+                }
+            }
         }
     }
 }
