@@ -1,11 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Media;
 
 namespace TextViewer
 {
-    public class WordInfo : DrawingVisual
+    public class WordInfo : DrawingVisual, IComparer<WordInfo>, IComparable, IComparable<WordInfo>
     {
         public WordInfo(string text, int offset, WordType type, bool isRtl)
         {
@@ -131,6 +133,30 @@ namespace TextViewer
                 IsSelected = false;
                 Render();
             }
+        }
+
+        public int Compare(WordInfo x, WordInfo y)
+        {
+            if (x == null || y == null) throw new ArgumentNullException(x == null ? nameof(x) : nameof(y));
+
+            if (x.Paragraph.Offset > y.Paragraph.Offset) return 1;
+            if (x.Paragraph.Offset < y.Paragraph.Offset) return -1;
+            if (x.Offset > y.Offset) return 1;
+            if (x.Offset < y.Offset) return -1;
+            return 0;
+        }
+
+        public int CompareTo(object obj)
+        {
+            if (obj is WordInfo word)
+                return CompareTo(word);
+
+            return -1;
+        }
+
+        public int CompareTo([AllowNull] WordInfo other)
+        {
+            return Compare(this, other);
         }
 
         public override string ToString()

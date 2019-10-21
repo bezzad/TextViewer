@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -17,14 +16,14 @@ namespace TextViewer
             set => SetValue(IsSelectableProperty, value);
         }
         protected bool IsMouseDown { get; set; }
-        protected Range HighlightRange { get; set; }
+        protected WordInfo HighlightFirstWord { get; set; }
+        protected WordInfo HighlightLastWord { get; set; }
 
 
         public SelectableTextViewer()
         {
             IsSelectable = true;
             Cursor = Cursors.IBeam;
-            HighlightRange = new Range(0, 0);
         }
 
 
@@ -34,9 +33,10 @@ namespace TextViewer
             // Initiate the hit test by setting up a hit test result callback method.
             VisualTreeHelper.HitTest(this, null, result =>
             {
-                var selectedWordIndex = -1;
+                WordInfo selectedWord = null;
+
                 if (result.VisualHit is WordInfo word)
-                    selectedWordIndex = DrawnWords.IndexOf(word);
+                    selectedWord = word;
                 else if (result.VisualHit is Paragraph para)
                 {
                     foreach (var line in para.Lines)
@@ -47,10 +47,10 @@ namespace TextViewer
                             if (lastWord != null)
                             {
                                 if (line.CurrentParagraph.IsRtl && position.X <= lastWord.Area.X || // RTL line
-                                    !line.CurrentParagraph.IsRtl && position.X >= lastWord.Area.X)  // LTR line
-                                    selectedWordIndex = DrawnWords.IndexOf(lastWord);
+                                    !line.CurrentParagraph.IsRtl && position.X >= lastWord.Area.X) // LTR line
+                                    selectedWord = lastWord;
                                 else
-                                    selectedWordIndex = DrawnWords.IndexOf(line.Words.FirstOrDefault());
+                                    selectedWord = line.Words.FirstOrDefault();
 
                                 break;
                             }
@@ -63,22 +63,22 @@ namespace TextViewer
                     {
                         if (position.Y < paragraph.Location.Y)
                         {
-                            selectedWordIndex = DrawnWords.IndexOf(paragraph.Lines.FirstOrDefault()?.Words.FirstOrDefault());
+                            selectedWord = paragraph.Lines.FirstOrDefault()?.Words.FirstOrDefault();
                             break;
                         }
                     }
 
-                    if (selectedWordIndex < 0)
-                        selectedWordIndex = DrawnWords.IndexOf(PageContent.LastOrDefault()?.Lines.LastOrDefault()?.Words.LastOrDefault());
+                    if (selectedWord == null)
+                        selectedWord = PageContent.LastOrDefault()?.Lines.LastOrDefault()?.Words.LastOrDefault();
                 }
 
                 // Set Highlight Range 
-                if (selectedWordIndex >= 0)
+                if (selectedWord != null)
                 {
                     if (isStartPoint)
-                        HighlightRange.Start = selectedWordIndex;
+                        HighlightFirstWord = selectedWord;
                     else
-                        HighlightRange.End = selectedWordIndex;
+                        HighlightLastWord = selectedWord;
                 }
 
                 // Stop the hit test enumeration of objects in the visual tree.
@@ -114,42 +114,56 @@ namespace TextViewer
             }
         }
 
-
         protected void HighlightSelectedText()
         {
-            // select words which are within range
-            if (HighlightRange.Start != HighlightRange.End)
+            if (DrawnWords?.Count > 0)
             {
-                var from = Math.Min(HighlightRange.Start, HighlightRange.End);
-                var to = Math.Max(HighlightRange.Start, HighlightRange.End);
-
-                for (var i = 0; i < DrawnWords.Count; i++)
+                // select words which are within range
+                if (HighlightFirstWord != HighlightLastWord)
                 {
-                    if (DrawnWords[i] is WordInfo word)
+                    var isFirstWordBeginOfHighlight = HighlightLastWord.CompareTo(HighlightFirstWord) > 0;
+                    var from = isFirstWordBeginOfHighlight ? HighlightFirstWord : HighlightLastWord;
+                    var to = isFirstWordBeginOfHighlight ? HighlightLastWord : HighlightFirstWord;
+
+                    foreach (var visual in DrawnWords)
                     {
-                        if (i >= from && i <= to)
-                            word.Select();
-                        else
-                            word.UnSelect();
+                        if (visual is WordInfo word)
+                        {
+                            if (word.CompareTo(from) >= 0 && word.CompareTo(to) <= 0)
+                                word.Select();
+                            else
+                                word.UnSelect();
+                        }
                     }
                 }
+                else
+                    UnSelectWords();
             }
-            else
-                UnSelectWords();
         }
 
 
         public void ClearSelection()
         {
-            HighlightRange.Start = HighlightRange.End = 0;
+            HighlightFirstWord = HighlightLastWord = null;
             UnSelectWords();
         }
 
         public void UnSelectWords()
         {
-            foreach (var visual in DrawnWords)
-                if (visual is WordInfo word)
-                    word.UnSelect();
+            if (DrawnWords?.Count > 0)
+            {
+                foreach (var visual in DrawnWords)
+                    if (visual is WordInfo word)
+                        word.UnSelect();
+            }
+        }
+
+        public override void Render()
+        {
+            base.Render();
+
+            UnSelectWords();
+            HighlightSelectedText();
         }
     }
 }

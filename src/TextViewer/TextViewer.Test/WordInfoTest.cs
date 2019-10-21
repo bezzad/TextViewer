@@ -12,6 +12,7 @@ namespace TextViewer.Test
     {
         /// <summary>An observable dictionary to which a mock will be subscribed</summary>
         private List<WordInfo> Words { get; set; }
+
         private Paragraph Parent { get; set; }
 
         /// <summary>Initialization routine executed before each test is run</summary>
@@ -23,25 +24,25 @@ namespace TextViewer.Test
             Words = new List<WordInfo>()
             {
                 new WordInfo("Test1", 0, WordType.Normal, false) {Paragraph = Parent}, // 0
-                new WordInfo(" ", 5, WordType.Space, false) {Paragraph = Parent},      // 1
-                new WordInfo("Test2", 6, WordType.Normal, false) {Paragraph = Parent},
-                new WordInfo(" ", 11, WordType.Space, false) {Paragraph = Parent},
-                new WordInfo("Test3", 12, WordType.Normal, false) {Paragraph = Parent},
-                new WordInfo(" ", 17, WordType.Space, false) {Paragraph = Parent},
-                new WordInfo("Test4", 18, WordType.Normal, false) {Paragraph = Parent},
-                new WordInfo(" ", 23, WordType.Space, false) {Paragraph = Parent},
-                new WordInfo("Test", 24, WordType.Normal | WordType.Attached, false) {Paragraph = Parent},
+                new WordInfo(" ", 5, WordType.Space, false) {Paragraph = Parent}, // 1
+                new WordInfo("Test2", 6, WordType.Normal, false) {Paragraph = Parent}, // 2
+                new WordInfo(" ", 11, WordType.Space, false) {Paragraph = Parent}, // 3
+                new WordInfo("Test3", 12, WordType.Normal, false) {Paragraph = Parent}, // 4
+                new WordInfo(" ", 17, WordType.Space, false) {Paragraph = Parent}, // 5
+                new WordInfo("Test4", 18, WordType.Normal, false) {Paragraph = Parent}, // 6
+                new WordInfo(" ", 23, WordType.Space, false) {Paragraph = Parent}, // 7
+                new WordInfo("Test", 24, WordType.Normal | WordType.Attached, false) {Paragraph = Parent}, // 8
                 new WordInfo(".", 25, WordType.InertChar | WordType.Attached, false) {Paragraph = Parent}, // 9
-                new WordInfo("5", 26, WordType.Normal, false) {Paragraph = Parent},
-                new WordInfo(" ", 29, WordType.Space, false) {Paragraph = Parent},
-                new WordInfo("Test6", 30, WordType.Normal, false) {Paragraph = Parent},
-                new WordInfo(" ", 33, WordType.Space, false) {Paragraph = Parent},
-                new WordInfo("تست۱", 36, WordType.Normal, true), // test without parent paragraph
-                new WordInfo(" ", 41, WordType.Space, true), // test without parent paragraph
-                new WordInfo("تست۲", 42, WordType.Normal, true), // test without parent paragraph
-                new WordInfo(" ", 47, WordType.Space, true), // test without parent paragraph
-                new WordInfo("تست۳", 48, WordType.Normal, true), // test without parent paragraph
-                new WordInfo("img", 55, WordType.Image, false) {Paragraph = Parent} // 19
+                new WordInfo("5", 26, WordType.Normal, false) {Paragraph = Parent}, // 10
+                new WordInfo(" ", 29, WordType.Space, false) {Paragraph = Parent}, // 11
+                new WordInfo("Test6", 30, WordType.Normal, false) {Paragraph = Parent}, // 12
+                new WordInfo(" ", 33, WordType.Space, false) {Paragraph = Parent}, // 13
+                new WordInfo("تست۱", 36, WordType.Normal, true){Paragraph = Parent},  // 14
+                new WordInfo(" ", 41, WordType.Space, true){Paragraph = Parent},  // 15
+                new WordInfo("تست۲", 42, WordType.Normal, true){Paragraph = Parent},  // 16
+                new WordInfo(" ", 47, WordType.Space, true){Paragraph = Parent},  // 17
+                new WordInfo("تست۳", 48, WordType.Normal, true){Paragraph = Parent},  // 18
+                new WordInfo("img", 55, WordType.Image, false) {Paragraph = new Paragraph(1, true)} // 19
             };
 
             for (var i = 1; i < Words.Count; i++)
@@ -69,7 +70,7 @@ namespace TextViewer.Test
                 Assert.AreEqual(word.GetAttribute(StyleType.MarginTop), 0.0);
                 Assert.AreEqual(word.GetAttribute(StyleType.MarginLeft), 0.0);
                 Assert.AreEqual(word.GetAttribute(StyleType.MarginRight), 0.0);
-                Assert.AreEqual(word.GetAttribute(StyleType.Height),  word.Type == WordType.Image ? 100 : 0.0);
+                Assert.AreEqual(word.GetAttribute(StyleType.Height), word.Type == WordType.Image ? 100 : 0.0);
                 Assert.AreEqual(word.GetAttribute(StyleType.Width), word.Type == WordType.Image ? 100 : 0.0);
                 Assert.AreEqual(word.GetAttribute(StyleType.FontSize), 0.0);
                 Assert.AreEqual(word.GetAttribute(StyleType.TextAlign), TextAlignment.Justify);
@@ -78,7 +79,7 @@ namespace TextViewer.Test
 
                 var dir = word.GetAttribute(StyleType.Direction);
                 Assert.IsInstanceOfType(dir, typeof(FlowDirection));
-                Assert.AreEqual((FlowDirection)dir == FlowDirection.RightToLeft, word.IsRtl);
+                Assert.AreEqual((FlowDirection) dir == FlowDirection.RightToLeft, word.IsRtl);
             }
         }
 
@@ -175,6 +176,19 @@ namespace TextViewer.Test
                     Assert.IsTrue(word.ExtraWidth.Equals(5));
                     Assert.IsTrue(word.Width.Equals(wordWidth + extendedPad));
                 }
+            }
+        }
+
+        [TestMethod]
+        public void CompareTest()
+        {
+            for (var i = 1; i < Words.Count; i++)
+            {
+                var word = Words[i];
+                var beforeW = Words[i - 1];
+                Assert.IsTrue(word.CompareTo(beforeW) > 0);
+                Assert.IsTrue(word.CompareTo(word) == 0);
+                Assert.IsTrue(beforeW.CompareTo(word) < 0);
             }
         }
     }
