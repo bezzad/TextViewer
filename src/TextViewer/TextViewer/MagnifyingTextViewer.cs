@@ -6,45 +6,53 @@ using System.Windows.Shapes;
 
 namespace TextViewer
 {
+    public enum MagnifierType
+    {
+        Circle,
+        Rectangle,
+        Window
+    }
+
     public class MagnifyingTextViewer : SelectableTextViewer
     {
-        public static readonly DependencyProperty ZoomFactorProperty = DependencyProperty.Register(
-            "ZoomFactor", typeof(double), typeof(MagnifyingTextViewer), new PropertyMetadata(default(double)));
-        public static readonly DependencyProperty RadiusProperty = DependencyProperty.Register(
-            "Radius", typeof(double), typeof(MagnifyingTextViewer), new PropertyMetadata(default(double)));
-        public static readonly DependencyProperty StrokeProperty = DependencyProperty.Register(
-            "Stroke", typeof(SolidColorBrush), typeof(MagnifyingTextViewer), new PropertyMetadata(default(SolidColorBrush)));
-        public static readonly DependencyProperty MagnifierEnableProperty = DependencyProperty.Register(
-            "MagnifierEnable", typeof(bool), typeof(MagnifyingTextViewer), new PropertyMetadata(default(bool)));
+        public static readonly DependencyProperty ZoomFactorProperty = DependencyProperty.Register(nameof(MagnifierZoomFactor), typeof(double), typeof(MagnifyingTextViewer), new PropertyMetadata(default(double)));
+        public static readonly DependencyProperty RadiusProperty = DependencyProperty.Register(nameof(MagnifierRadius), typeof(double), typeof(MagnifyingTextViewer), new PropertyMetadata(default(double)));
+        public static readonly DependencyProperty StrokeProperty = DependencyProperty.Register(nameof(MagnifierStroke), typeof(SolidColorBrush), typeof(MagnifyingTextViewer), new PropertyMetadata(default(SolidColorBrush)));
+        public static readonly DependencyProperty MagnifierEnableProperty = DependencyProperty.Register(nameof(MagnifierEnable), typeof(bool), typeof(MagnifyingTextViewer), new PropertyMetadata(default(bool)));
+        public static readonly DependencyProperty DistanceFromMouseProperty = DependencyProperty.Register(nameof(MagnifierDistanceFromMouse), typeof(double), typeof(MagnifyingTextViewer), new PropertyMetadata(default(double)));
+        public static readonly DependencyProperty MagnifierTypeProperty = DependencyProperty.Register(nameof(MagnifierType), typeof(MagnifierType), typeof(MagnifyingTextViewer), new PropertyMetadata(default(MagnifierType)));
 
-        public static readonly DependencyProperty DistanceFromMouseProperty = DependencyProperty.Register(
-            "DistanceFromMouse", typeof(double), typeof(MagnifyingTextViewer), new PropertyMetadata(default(double)));
-
-        public double DistanceFromMouse
+        public MagnifierType MagnifierType
         {
-            get => (double) GetValue(DistanceFromMouseProperty);
+            get => (MagnifierType)GetValue(MagnifierTypeProperty);
+            set => SetValue(MagnifierTypeProperty, value);
+        }
+        public double MagnifierDistanceFromMouse
+        {
+            get => (double)GetValue(DistanceFromMouseProperty);
             set => SetValue(DistanceFromMouseProperty, value);
         }
         public bool MagnifierEnable
         {
-            get => (bool) GetValue(MagnifierEnableProperty);
+            get => (bool)GetValue(MagnifierEnableProperty);
             set => SetValue(MagnifierEnableProperty, value);
         }
-        public SolidColorBrush Stroke
+        public SolidColorBrush MagnifierStroke
         {
             get => (SolidColorBrush)GetValue(StrokeProperty);
             set => SetValue(StrokeProperty, value);
         }
-        public double Radius
+        public double MagnifierRadius
         {
             get => (double)GetValue(RadiusProperty);
             set => SetValue(RadiusProperty, value);
         }
-        public double ZoomFactor
+        public double MagnifierZoomFactor
         {
             get => (double)GetValue(ZoomFactorProperty);
             set => SetValue(ZoomFactorProperty, value);
         }
+
         protected Rect ViewBox
         {
             get => MagnifierBrush.Viewbox;
@@ -57,10 +65,10 @@ namespace TextViewer
 
         public MagnifyingTextViewer()
         {
-            DistanceFromMouse = 10;
-            ZoomFactor = 4; // 3x
-            Radius = 100;
-            Stroke = Brushes.Teal;
+            MagnifierZoomFactor = 4; // 4x
+            MagnifierRadius = 100;
+            MagnifierDistanceFromMouse = MagnifierRadius;
+            MagnifierStroke = Brushes.Teal;
 
             MagnifierPanel = new Canvas
             {
@@ -78,9 +86,9 @@ namespace TextViewer
 
                     MagnifierCircle = new Ellipse
                     {
-                        Stroke = Stroke,
-                        Width = 2 * Radius,
-                        Height = 2 * Radius,
+                        Stroke = MagnifierStroke,
+                        Width = 2 * MagnifierRadius,
+                        Height = 2 * MagnifierRadius,
                         Visibility = Visibility.Hidden,
                         Fill = MagnifierBrush
                     };
@@ -94,43 +102,34 @@ namespace TextViewer
             };
         }
 
+
         protected void ContentPanelOnMouseMove(object sender, MouseEventArgs e)
         {
-            if(MagnifierEnable == false)
+            if (MagnifierEnable == false)
                 return;
 
             Mouse.SetCursor(Cursors.Cross);
 
             var currentMousePosition = e.GetPosition(this);
-            var length = MagnifierCircle.ActualWidth * (1 / ZoomFactor);
-            var radius = length / 2;
+            var length = MagnifierCircle.ActualWidth * (1 / MagnifierZoomFactor);
 
             // Determine whether the magnifying glass should be shown to the
             // the left or right of the mouse pointer.
-            if (ActualWidth - currentMousePosition.X > MagnifierCircle.Width + DistanceFromMouse)
-            {
-                Canvas.SetLeft(MagnifierCircle, currentMousePosition.X + DistanceFromMouse);
-            }
+            if (ActualWidth - currentMousePosition.X > MagnifierCircle.Width + MagnifierDistanceFromMouse - MagnifierRadius)
+                SetLeft(MagnifierCircle, currentMousePosition.X + MagnifierDistanceFromMouse - MagnifierRadius);
             else
-            {
-                Canvas.SetLeft(MagnifierCircle,
-                    currentMousePosition.X - DistanceFromMouse - MagnifierCircle.Width);
-            }
+                SetLeft(MagnifierCircle, currentMousePosition.X - MagnifierDistanceFromMouse - MagnifierRadius);
 
             // Determine whether the magnifying glass should be shown 
             // above or below the mouse pointer.
-            if (ActualHeight - currentMousePosition.Y > MagnifierCircle.Height + DistanceFromMouse)
-            {
-                Canvas.SetTop(MagnifierCircle, currentMousePosition.Y + DistanceFromMouse);
-            }
+            if (ActualHeight - currentMousePosition.Y > MagnifierCircle.Height + MagnifierDistanceFromMouse - MagnifierRadius)
+                SetTop(MagnifierCircle, currentMousePosition.Y + MagnifierDistanceFromMouse - MagnifierRadius);
             else
-            {
-                Canvas.SetTop(MagnifierCircle,
-                    currentMousePosition.Y - DistanceFromMouse - MagnifierCircle.Height);
-            }
-            // Update the visual brush's Viewbox to magnify a `length` by `length` rectangle,
+                SetTop(MagnifierCircle, currentMousePosition.Y - MagnifierDistanceFromMouse - MagnifierRadius);
+
+            // Update the visual brush's View-box to magnify a `length` by `length` rectangle,
             // centered on the current mouse position.
-            ViewBox = new Rect(currentMousePosition.X - radius, currentMousePosition.Y - radius, length, length);
+            ViewBox = new Rect(currentMousePosition.X - length / 2, currentMousePosition.Y - length / 2, length, length);
         }
     }
 }
