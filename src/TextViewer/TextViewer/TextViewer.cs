@@ -71,6 +71,9 @@ namespace TextViewer
             {
                 // todo: clear lines if the style of page changed!
                 para.Lines.Clear(); // clear old lines
+                para.Location = new Point(Padding.Left, startPoint.Y);
+                para.Size = new Size(0, 0);
+                DrawnWords.Add(para);
 
                 // create new line buffer, without cleaning last line
                 lineBuffer = new Line(lineWidth, para, startPoint);
@@ -98,7 +101,7 @@ namespace TextViewer
                         if (lineBuffer.Count > 0)
                         {
                             RemoveSpaceFromEndOfLine();
-                            lineBuffer.Draw(IsJustify);
+                            lineBuffer.Render(IsJustify);
                             SetStartPoint(ref startPoint, para, lineBuffer.Height); // new line
                             lineBuffer = new Line(lineWidth, para, startPoint); // create new line buffer, without cleaning last line
                         }
@@ -120,8 +123,10 @@ namespace TextViewer
                 }
 
                 RemoveSpaceFromEndOfLine();
-                lineBuffer.Draw(false);  // last line of paragraph has no justified!
+                lineBuffer.Render(false);  // last line of paragraph has no justified!
                 SetStartPoint(ref startPoint, para, lineBuffer.Height); // new line
+                para.Size = new Size(lineWidth, startPoint.Y - para.Location.Y);
+                
 
                 // + ParagraphSpace
                 startPoint.Y += ParagraphSpace;
@@ -138,44 +143,46 @@ namespace TextViewer
 
             BuildPage(PageContent);
 
-            foreach (var word in DrawnWords)
+            foreach (var visual in DrawnWords)
             {
-                if (word.GetAttribute(StyleType.Image) is ImageSource img)
-                    dc.DrawImage(img, word.Area);
-                else
-                    dc.DrawText(word.Format, word.DrawPoint);
-
-                if (ShowWireFrame)
-                    dc.DrawRectangle(null, WordWireFramePen, word.Area);
-
-                if (ShowOffset)
+                if (visual is WordInfo word)
                 {
-                    var ft = new FormattedText(word.Offset.ToString(),
-                        CultureInfo.CurrentCulture, FlowDirection.LeftToRight,
-                        new Typeface(FontFamily, FontStyles.Normal, FontWeights.Normal, FontStretches.Normal),
-                        OffsetEmSize, word.IsRtl == word.Paragraph.IsRtl ? Brushes.Red : Brushes.Blue, PixelsPerDip);
+                    word.Render();
 
-                    if (word.Type.HasFlag(WordType.Space) || word.Type.HasFlag(WordType.InertChar)) //rotate 90 degree the offset text at the space area
+                    if (ShowWireFrame)
+                        dc.DrawRectangle(null, WordWireFramePen, word.Area);
+
+                    if (ShowOffset)
                     {
-                        var drawPoint = new Point(word.Area.X + word.Width + 1, word.Area.Y + (word.Type.HasFlag(WordType.Space) ? word.Height / 2 - ft.Width / 2 : 1));
-                        dc.PushTransform(new RotateTransform(90, drawPoint.X, drawPoint.Y));
-                        dc.DrawText(ft, drawPoint);
-                        dc.Pop();
-                    }
-                    else
-                        dc.DrawText(ft, new Point(word.Paragraph.IsRtl ? word.Area.X + word.Width - ft.Width : word.Area.X, word.Area.Y));
-                }
-            }
+                        var ft = new FormattedText(word.Offset.ToString(),
+                            CultureInfo.CurrentCulture, FlowDirection.LeftToRight,
+                            new Typeface(FontFamily, FontStyles.Normal, FontWeights.Normal, FontStretches.Normal),
+                            OffsetEmSize, word.IsRtl == word.Paragraph.IsRtl ? Brushes.Red : Brushes.Blue,
+                            PixelsPerDip);
 
-            if (ShowWireFrame) // show paragraph area
-            {
-                foreach (var para in PageContent)
+                        if (word.Type.HasFlag(WordType.Space) || word.Type.HasFlag(WordType.InertChar)
+                        ) //rotate 90 degree the offset text at the space area
+                        {
+                            var drawPoint = new Point(word.Area.X + word.Width + 1,
+                                word.Area.Y + (word.Type.HasFlag(WordType.Space) ? word.Height / 2 - ft.Width / 2 : 1));
+                            dc.PushTransform(new RotateTransform(90, drawPoint.X, drawPoint.Y));
+                            dc.DrawText(ft, drawPoint);
+                            dc.Pop();
+                        }
+                        else
+                            dc.DrawText(ft,
+                                new Point(word.Paragraph.IsRtl ? word.Area.X + word.Width - ft.Width : word.Area.X,
+                                    word.Area.Y));
+                    }
+                }
+                else if (visual is Paragraph para)
                 {
-                    var firstWord = para.Lines.First().Words.First();
-                    dc.DrawRoundedRectangle(null, ParagraphWireFramePen,
-                        new Rect(new Point(Padding.Left, firstWord.DrawPoint.Y),
-                                 new Size(ActualWidth - Padding.Left - Padding.Right, para.Lines.Sum(l => l.Height))),
-                                 4, 4);
+                    para.Render();
+                    if (ShowWireFrame) // show paragraph area
+                    {
+                        dc.DrawRoundedRectangle(null, ParagraphWireFramePen,
+                            new Rect(para.Location, para.Size), 4, 4);
+                    }
                 }
             }
         }

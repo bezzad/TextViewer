@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Windows;
+using System.Windows.Media;
 
 namespace TextViewer
 {
-    public class Paragraph
+    public class Paragraph : DrawingVisual
     {
         public Paragraph(int offset, bool isRtl)
         {
@@ -15,11 +17,13 @@ namespace TextViewer
         }
 
 
-        public int Offset { get; set; }
+        public new int Offset { get; set; }
         public List<WordInfo> Words { get; protected set; }
         public List<Line> Lines { get; protected set; }
         public Dictionary<StyleType, string> Styles { get; protected set; }
         public bool IsRtl { get; set; }
+        public Size Size { get; set; }
+        public Point Location { get; set; }
 
 
 
@@ -117,6 +121,15 @@ namespace TextViewer
                 else
                     space.SetDirection(space.NextWord.IsRtl);
             }
+        }
+
+        public DrawingVisual Render()
+        {
+            var dc = RenderOpen();
+            dc.DrawGeometry(Brushes.Transparent, null, new RectangleGeometry(new Rect(Location, Size)));
+            dc.Close();
+
+            return this;
         }
     }
 }

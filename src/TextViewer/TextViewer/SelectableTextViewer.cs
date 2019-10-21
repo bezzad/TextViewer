@@ -16,125 +16,140 @@ namespace TextViewer
             get => (bool)GetValue(IsSelectableProperty);
             set => SetValue(IsSelectableProperty, value);
         }
-        protected Point EmptyPoint { get; set; } = new Point(0, 0);
-        protected Point StartSelectionPoint { get; set; }
-        protected Point EndSelectionPoint { get; set; }
         protected bool IsMouseDown { get; set; }
-        protected Brush SelectedBrush { get; set; }
         protected Range HighlightRange { get; set; }
 
 
         public SelectableTextViewer()
         {
             IsSelectable = true;
-            SelectedBrush = new SolidColorBrush(Colors.DarkCyan) { Opacity = 0.5 };
             Cursor = Cursors.IBeam;
+            HighlightRange = new Range(0, 0);
+        }
+
+
+        // If a child visual object is hit.
+        public void CatchHitObject(Point position, bool isStartPoint)
+        {
+            // Initiate the hit test by setting up a hit test result callback method.
+            VisualTreeHelper.HitTest(this, null, result =>
+            {
+                var selectedWordIndex = -1;
+                if (result.VisualHit is WordInfo word)
+                    selectedWordIndex = DrawnWords.IndexOf(word);
+                else if (result.VisualHit is Paragraph para)
+                {
+                    foreach (var line in para.Lines)
+                    {
+                        if (line.Location.Y <= position.Y && line.Location.Y + line.Height >= position.Y)
+                        {
+                            var lastWord = line.Words.LastOrDefault();
+                            if (lastWord != null)
+                            {
+                                if (line.CurrentParagraph.IsRtl && position.X <= lastWord.Area.X || // RTL line
+                                    !line.CurrentParagraph.IsRtl && position.X >= lastWord.Area.X)  // LTR line
+                                    selectedWordIndex = DrawnWords.IndexOf(lastWord);
+                                else
+                                    selectedWordIndex = DrawnWords.IndexOf(line.Words.FirstOrDefault());
+
+                                break;
+                            }
+                        }
+                    }
+                }
+                else // There are no lines! Be sure to click on the space between paragraphs.
+                {
+                    foreach (var paragraph in PageContent)
+                    {
+                        if (position.Y < paragraph.Location.Y)
+                        {
+                            selectedWordIndex = DrawnWords.IndexOf(paragraph.Lines.FirstOrDefault()?.Words.FirstOrDefault());
+                            break;
+                        }
+                    }
+
+                    if (selectedWordIndex < 0)
+                        selectedWordIndex = DrawnWords.IndexOf(PageContent.LastOrDefault()?.Lines.LastOrDefault()?.Words.LastOrDefault());
+                }
+
+                // Set Highlight Range 
+                if (selectedWordIndex >= 0)
+                {
+                    if (isStartPoint)
+                        HighlightRange.Start = selectedWordIndex;
+                    else
+                        HighlightRange.End = selectedWordIndex;
+                }
+
+                // Stop the hit test enumeration of objects in the visual tree.
+                return HitTestResultBehavior.Stop;
+            }, new PointHitTestParameters(position));
         }
 
         protected override void OnMouseMove(MouseEventArgs e)
         {
-            if (IsMouseDown)
+            if (IsSelectable && IsMouseDown)
             {
-                EndSelectionPoint = e.GetPosition(this);
-                Render();
+                CatchHitObject(e.GetPosition(this), false);
+                HighlightSelectedText();
             }
         }
-        protected override void OnMouseLeftButtonDown( MouseButtonEventArgs e)
+
+        protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
         {
             // Retrieve the coordinates of the mouse button event.
             IsMouseDown = true;
             ClearSelection();
-            StartSelectionPoint = e.GetPosition(this);
-            EndSelectionPoint = StartSelectionPoint;
-            Render();
+            CatchHitObject(e.GetPosition(this), true);
         }
+
         protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
         {
             // Retrieve the coordinates of the mouse button event.
-            if (IsMouseDown)
+            if (IsSelectable && IsMouseDown)
             {
                 IsMouseDown = false;
-                EndSelectionPoint = e.GetPosition(this);
-                Render();
+                CatchHitObject(e.GetPosition(this), false);
+                HighlightSelectedText();
             }
         }
 
-        protected override void OnRender(DrawingContext dc)
+
+        protected void HighlightSelectedText()
         {
-            base.OnRender(dc);
-
-            if (IsSelectable && (IsMouseDown || HighlightRange != null))
+            // select words which are within range
+            if (HighlightRange.Start != HighlightRange.End)
             {
-                HighlightSelectedText(dc);
-            }
-        }
+                var from = Math.Min(HighlightRange.Start, HighlightRange.End);
+                var to = Math.Max(HighlightRange.Start, HighlightRange.End);
 
-        protected void HighlightSelectedText(DrawingContext dc)
-        {
-            int GetCorrectWordIndex(Point selectedPoint)
-            {
-                var result = -1;
-
-                if (DrawnWords.LastOrDefault()?.CompareTo(selectedPoint) < 0)
-                    result = DrawnWords.Count - 1;
-                else if (DrawnWords.FirstOrDefault()?.CompareTo(selectedPoint) > 0)
-                    result = 0;
-                else
-                    result = DrawnWords.BinarySearch(selectedPoint); // DrawnWords.FindIndex(w => w.CompareTo(selectedPoint) == 0); 
-#if DEBUG
-                if (result < 0)
-                    dc.DrawEllipse(Brushes.Red, null, selectedPoint, 5, 5);
-#endif
-
-                return result;
-            }
-
-            if (StartSelectionPoint.CompareTo(EndSelectionPoint) != 0)
-            {
-                //var forceToFind = StartSelectionPoint.Value.CompareTo(EndSelectionPoint.Value) > 0;
-                var startWord = GetCorrectWordIndex(StartSelectionPoint);
-                var endWord = GetCorrectWordIndex(EndSelectionPoint);
-
-                if (startWord < 0 && endWord >= 0) // startWord is out of word bound but endWord is in correct range
-                    startWord = GetCorrectWordIndex(StartSelectionPoint);
-
-                if (endWord < 0 && startWord >= 0) // endWord is out of word bound but startWord is in correct range
-                    endWord = GetCorrectWordIndex(EndSelectionPoint);
-
-                if ((startWord < 0 || endWord < 0) == false)
-                    HighlightRange = new Range(startWord, endWord);
-
-                if (IsMouseDown == false)
-                    StartSelectionPoint = EndSelectionPoint = EmptyPoint;
-            }
-
-            if (HighlightRange == null)
-                return;
-
-            var from = Math.Min(HighlightRange.Start, HighlightRange.End);
-            var to = Math.Max(HighlightRange.Start, HighlightRange.End);
-
-            for (var w = from; w <= to; w++)
-            {
-                var currentWord = DrawnWords[w].Area;
-                var isFirstOfLineWord = w == from || !DrawnWords[w - 1].DrawPoint.Y.Equals(currentWord.Y);
-
-                if (isFirstOfLineWord == false)
+                for (var i = 0; i < DrawnWords.Count; i++)
                 {
-                    var previousWord = DrawnWords[w - 1];
-                    var startX = previousWord.IsRtl ? previousWord.DrawPoint.X : previousWord.DrawPoint.X + previousWord.Width;
-                    var width = currentWord.X - startX + currentWord.Width;
-
-                    currentWord = new Rect(new Point(startX, currentWord.Y), new Size(width, currentWord.Height));
+                    if (DrawnWords[i] is WordInfo word)
+                    {
+                        if (i >= from && i <= to)
+                            word.Select();
+                        else
+                            word.UnSelect();
+                    }
                 }
-                dc.DrawRectangle(SelectedBrush, null, currentWord);
             }
+            else
+                UnSelectWords();
         }
+
 
         public void ClearSelection()
         {
-            HighlightRange = null;
-            EndSelectionPoint = StartSelectionPoint = EmptyPoint;
+            HighlightRange.Start = HighlightRange.End = 0;
+            UnSelectWords();
+        }
+
+        public void UnSelectWords()
+        {
+            foreach (var visual in DrawnWords)
+                if (visual is WordInfo word)
+                    word.UnSelect();
         }
     }
 }

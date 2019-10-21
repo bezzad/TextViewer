@@ -133,56 +133,6 @@ namespace TextViewer.Test
         }
 
         [TestMethod]
-        public void CompareToTest()
-        {
-            var fontFamily = new FontFamily("Arial");
-            var x = 0.0;
-            var y = 0.0;
-            var lineHeight = 20;
-            var paraWidth = 200;
-
-            foreach (var word in Words)
-            {
-                word.GetFormattedText(fontFamily, 16, 1, lineHeight);
-                word.Area = new Rect(x, y, word.Width, word.Height);
-                x += word.Width;
-                if (x > paraWidth)
-                {
-                    x = 0;
-                    y += lineHeight;
-                }
-            }
-
-            foreach (var word in Words)
-            {
-                Assert.IsTrue(word.CompareTo(word.Area.Location) == 0); // word draw point
-                Assert.IsTrue(word.CompareTo(new Point(word.Area.X + word.Width / 2, word.Area.Y + word.Height / 2)) == 0); // word center
-                Assert.IsTrue(word.CompareTo(new Point(word.Area.X + word.Width, word.Area.Y + word.Height)) == 0); // word end point
-
-
-                Assert.IsTrue(word.CompareTo(new Point(word.Area.X + word.Width + 1, word.Area.Y)) > 0);
-                Assert.IsTrue(word.CompareTo(new Point(word.Area.X + word.Width + 1, word.Area.Y + word.Height / 2)) > 0);
-                Assert.IsTrue(word.CompareTo(new Point(word.Area.X + word.Width + 1, word.Area.Y + word.Height)) > 0);
-                Assert.IsTrue(word.CompareTo(new Point(word.Area.X, word.Area.Y + word.Height + 1)) > 0);
-                Assert.IsTrue(word.CompareTo(new Point(word.Area.X + word.Width / 2, word.Area.Y + word.Height + 1)) > 0);
-                Assert.IsTrue(word.CompareTo(new Point(word.Area.X + word.Width, word.Area.Y + word.Height + 1)) > 0);
-                Assert.IsTrue(word.CompareTo(new Point(word.Area.X - 1, word.Area.Y + word.Height + 1)) > 0);
-
-                Assert.IsTrue(word.CompareTo(new Point(word.Area.X - 1, word.Area.Y)) < 0);
-                Assert.IsTrue(word.CompareTo(new Point(word.Area.X - 1, word.Area.Y + word.Height / 2)) < 0);
-                Assert.IsTrue(word.CompareTo(new Point(word.Area.X - 1, word.Area.Y + word.Height)) < 0);
-                Assert.IsTrue(word.CompareTo(new Point(word.Area.X, word.Area.Y - 1)) < 0);
-                Assert.IsTrue(word.CompareTo(new Point(word.Area.X + word.Width / 2, word.Area.Y - 1)) < 0);
-                Assert.IsTrue(word.CompareTo(new Point(word.Area.X + word.Width, word.Area.Y - 1)) < 0);
-                Assert.IsTrue(word.CompareTo(new Point(word.Area.X + word.Width + 1, word.Area.Y - 1)) < 0);
-            }
-        }
-
-
-
-
-
-        [TestMethod]
         public void IsImageTest()
         {
         }

@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Collections.Generic;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Media;
 
 namespace TextViewer
 {
-    public class WordInfo : IComparable<Point>
+    public class WordInfo : DrawingVisual
     {
         public WordInfo(string text, int offset, WordType type, bool isRtl)
         {
@@ -15,16 +13,17 @@ namespace TextViewer
             Type = type;
             ImageScale = 1;
             OffsetRange = new Range(offset, offset + text.Length - 1);
-            ImpressivePaddingPercent = 1; // 100% //20% of word length
             Styles = new Dictionary<StyleType, string>();
             RtlCulture ??= CultureInfo.GetCultureInfo("fa-ir");
             LtrCulture ??= CultureInfo.GetCultureInfo("en-us");
+            SelectedBrush ??= new SolidColorBrush(Colors.DarkCyan) { Opacity = 0.5 };
 
             SetDirection(isRtl);
         }
 
         public static CultureInfo RtlCulture { get; set; }
         public static CultureInfo LtrCulture { get; set; }
+        public static Brush SelectedBrush { get; set; }
         public const string Rtl = "rtl";
         public const string Ltr = "ltr";
 
@@ -42,10 +41,10 @@ namespace TextViewer
             get => Type.HasFlag(WordType.Attached) ? 0 : _extraWidth;
             set => _extraWidth = value;
         }
-        public double ImpressivePaddingPercent { get; set; }
         public string Text { get; set; }
         public WordType Type { get; set; }
         public double ImageScale { get; set; }
+        public bool IsSelected { get; set; }
         public double Width => IsImage
             ? double.Parse(Styles[StyleType.Width]) * ImageScale
             : (Format?.WidthIncludingTrailingWhitespace ?? 0) + ExtraWidth;
@@ -54,8 +53,7 @@ namespace TextViewer
             : Format?.Height ?? 0;
         public bool IsImage => Type.HasFlag(WordType.Image) && Styles.ContainsKey(StyleType.Image);
         public bool IsRtl => Styles[StyleType.Direction] == Rtl;
-        public int Offset => OffsetRange.Start;
-
+        public new int Offset => OffsetRange.Start;
 
         public void SetDirection(bool isRtl)
         {
@@ -65,23 +63,6 @@ namespace TextViewer
         {
             foreach (var (key, value) in styles)
                 Styles[key] = value;
-        }
-
-        public int CompareTo([AllowNull] Point other)
-        {
-            //var impressivePadding = ImpressivePaddingPercent * Area.Width;
-            var wordX = Area.Location.X;
-            var wordXw = Area.Location.X + Area.Width;
-            var wordY = Area.Location.Y;
-            var wordYh = Area.Location.Y + Area.Height;
-            var mouseX = other.X;
-            var mouseY = other.Y;
-
-            if (wordYh < mouseY) return -1;
-            if (mouseY < wordY) return 1;
-            if (wordXw < mouseX) return -1;
-            if (mouseX < wordX) return 1;
-            return 0;
         }
 
         public object GetAttribute(StyleType style)
@@ -122,7 +103,41 @@ namespace TextViewer
 
         public override string ToString()
         {
-            return $"<-- {OffsetRange.Start} \"{Text}\"  {OffsetRange.End} -->";
+            return $"<-- {Offset} \"{Text}\"  {OffsetRange.End} -->";
+        }
+
+        public DrawingVisual Render()
+        {
+            var dc = RenderOpen();
+
+            if (GetAttribute(StyleType.Image) is ImageSource img)
+                dc.DrawImage(img, Area);
+            else if (Type == WordType.Space)
+                dc.DrawGeometry(Brushes.Transparent, null, new RectangleGeometry(Area));
+            else
+                dc.DrawText(Format, DrawPoint);
+
+            if (IsSelected)
+                dc.DrawRectangle(SelectedBrush, null, Area);
+
+            dc.Close();
+
+            return this;
+        }
+
+        public void Select()
+        {
+            IsSelected = true;
+            Render();
+        }
+
+        public void UnSelect()
+        {
+            if (IsSelected)
+            {
+                IsSelected = false;
+                Render();
+            }
         }
     }
 }
