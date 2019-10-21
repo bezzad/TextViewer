@@ -8,7 +8,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace TextViewer.Test
 {
     [TestClass]
-    public class WordInfoTest
+    public class LineTest
     {
         /// <summary>An observable dictionary to which a mock will be subscribed</summary>
         private List<WordInfo> Words { get; set; }
@@ -49,29 +49,23 @@ namespace TextViewer.Test
                 Words[i - 1].NextWord = Words[i];
                 Words[i].PreviousWord = Words[i - 1];
             }
-
-            // set image width and height
-            Words.Last().Styles.Add(StyleType.Width, "100");
-            Words.Last().Styles.Add(StyleType.Height, "100");
         }
 
         [TestMethod]
         public void GetAttributeTest()
         {
-            for (var i = 0; i < Words.Count; i++)
+            foreach (var word in Words)
             {
-                var word = Words[i];
-                Debug.WriteLine($"Word {i}");
                 Assert.AreEqual(word.GetAttribute(StyleType.Color), Brushes.Black);
                 Assert.AreEqual(word.GetAttribute(StyleType.VerticalAlign), VerticalAlignment.Center);
                 Assert.AreEqual(word.GetAttribute(StyleType.FontWeight), FontWeights.Normal);
-                Assert.AreEqual(word.GetAttribute(StyleType.MarginBottom), 0.0);
-                Assert.AreEqual(word.GetAttribute(StyleType.MarginTop), 0.0);
-                Assert.AreEqual(word.GetAttribute(StyleType.MarginLeft), 0.0);
-                Assert.AreEqual(word.GetAttribute(StyleType.MarginRight), 0.0);
-                Assert.AreEqual(word.GetAttribute(StyleType.Height),  word.Type == WordType.Image ? 100 : 0.0);
-                Assert.AreEqual(word.GetAttribute(StyleType.Width), word.Type == WordType.Image ? 100 : 0.0);
-                Assert.AreEqual(word.GetAttribute(StyleType.FontSize), 0.0);
+                Assert.AreEqual(word.GetAttribute(StyleType.MarginBottom), 0);
+                Assert.AreEqual(word.GetAttribute(StyleType.MarginTop), 0);
+                Assert.AreEqual(word.GetAttribute(StyleType.MarginLeft), 0);
+                Assert.AreEqual(word.GetAttribute(StyleType.MarginRight), 0);
+                Assert.AreEqual(word.GetAttribute(StyleType.Height), 0);
+                Assert.AreEqual(word.GetAttribute(StyleType.Width), 0);
+                Assert.AreEqual(word.GetAttribute(StyleType.FontSize), 0);
                 Assert.AreEqual(word.GetAttribute(StyleType.TextAlign), TextAlignment.Justify);
                 Assert.AreEqual(word.GetAttribute(StyleType.Display), true);
                 Assert.IsNull(word.GetAttribute(StyleType.Image));
@@ -102,10 +96,8 @@ namespace TextViewer.Test
         public void GetFormattedTextTest()
         {
             var fontFamily = new FontFamily("Arial");
-            for (var i = 0; i < Words.Count; i++)
+            foreach (var word in Words)
             {
-                var word = Words[i];
-                Debug.WriteLine($"Word {i}");
                 Assert.IsNotNull(word.GetFormattedText(fontFamily, 16, 1, 20));
                 Assert.IsNotNull(word.Format);
                 Assert.IsTrue(word.Width > 0);
@@ -120,26 +112,22 @@ namespace TextViewer.Test
             {
                 [StyleType.Display] = "false",
                 [StyleType.Color] = "red",
-                [StyleType.MarginBottom] = "11",
-                [StyleType.Width] = "12",
-                [StyleType.Height] = "13",
+                [StyleType.MarginBottom] = "11"
             };
 
-            for (var i = 0; i < Words.Count; i++)
+            foreach (var word in Words)
             {
-                var word = Words[i];
-                Debug.WriteLine($"Word {i}");
                 word.AddStyles(styles);
                 Assert.AreEqual(word.GetAttribute(StyleType.Color), Brushes.Red);
                 Assert.AreEqual(word.GetAttribute(StyleType.VerticalAlign), VerticalAlignment.Center);
                 Assert.AreEqual(word.GetAttribute(StyleType.FontWeight), FontWeights.Normal);
                 Assert.AreEqual(word.GetAttribute(StyleType.MarginBottom), 11.0);
-                Assert.AreEqual(word.GetAttribute(StyleType.MarginTop), 0.0);
-                Assert.AreEqual(word.GetAttribute(StyleType.MarginLeft), 0.0);
-                Assert.AreEqual(word.GetAttribute(StyleType.MarginRight), 0.0);
-                Assert.AreEqual(word.GetAttribute(StyleType.Height), 13.0);
-                Assert.AreEqual(word.GetAttribute(StyleType.Width), 12.0);
-                Assert.AreEqual(word.GetAttribute(StyleType.FontSize), 0.0);
+                Assert.AreEqual(word.GetAttribute(StyleType.MarginTop), 0);
+                Assert.AreEqual(word.GetAttribute(StyleType.MarginLeft), 0);
+                Assert.AreEqual(word.GetAttribute(StyleType.MarginRight), 0);
+                Assert.AreEqual(word.GetAttribute(StyleType.Height), 0);
+                Assert.AreEqual(word.GetAttribute(StyleType.Width), 0);
+                Assert.AreEqual(word.GetAttribute(StyleType.FontSize), 0);
                 Assert.AreEqual(word.GetAttribute(StyleType.TextAlign), TextAlignment.Justify);
                 Assert.AreEqual(word.GetAttribute(StyleType.Display), false);
                 Assert.IsNull(word.GetAttribute(StyleType.Image));
@@ -158,7 +146,7 @@ namespace TextViewer.Test
         public void ExtraWidthTest()
         {
             var extendedPad = 5;
-            for (var i = 0; i < Words.Count; i++)
+            for (int i = 0; i < Words.Count; i++)
             {
                 var word = Words[i];
                 Debug.WriteLine($"Word {i}");
