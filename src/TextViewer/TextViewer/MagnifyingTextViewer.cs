@@ -11,7 +11,6 @@ namespace TextViewer
         public static readonly DependencyProperty ZoomFactorProperty = DependencyProperty.Register(nameof(MagnifierZoomFactor), typeof(double), typeof(MagnifyingTextViewer), new PropertyMetadata(default(double)));
         public static readonly DependencyProperty RadiusProperty = DependencyProperty.Register(nameof(MagnifierLength), typeof(double), typeof(MagnifyingTextViewer), new PropertyMetadata(default(double)));
         public static readonly DependencyProperty StrokeProperty = DependencyProperty.Register(nameof(MagnifierStroke), typeof(SolidColorBrush), typeof(MagnifyingTextViewer), new PropertyMetadata(default(SolidColorBrush)));
-        public static readonly DependencyProperty MagnifierEnableProperty = DependencyProperty.Register(nameof(MagnifierEnable), typeof(bool), typeof(MagnifyingTextViewer), new PropertyMetadata(default(bool)));
         public static readonly DependencyProperty DistanceFromMouseProperty = DependencyProperty.Register(nameof(MagnifierDistanceFromMouse), typeof(double), typeof(MagnifyingTextViewer), new PropertyMetadata(default(double)));
         public static readonly DependencyProperty MagnifierTypeProperty = DependencyProperty.Register(nameof(MagnifierType), typeof(MagnifierType), typeof(MagnifyingTextViewer), new PropertyMetadata(default(MagnifierType)));
 
@@ -24,11 +23,6 @@ namespace TextViewer
         {
             get => (double)GetValue(DistanceFromMouseProperty);
             set => SetValue(DistanceFromMouseProperty, value);
-        }
-        public bool MagnifierEnable
-        {
-            get => (bool)GetValue(MagnifierEnableProperty);
-            set => SetValue(MagnifierEnableProperty, value);
         }
         public SolidColorBrush MagnifierStroke
         {
@@ -55,6 +49,7 @@ namespace TextViewer
         protected Shape MagnifierShape { get; set; }
         protected Canvas MagnifierPanel { get; set; }
         protected double Radius => MagnifierLength / 2;
+        protected bool MagnifierEnable => MagnifierType != MagnifierType.None;
 
         public MagnifyingTextViewer()
         {
@@ -62,19 +57,24 @@ namespace TextViewer
             MagnifierLength = 200;
             MagnifierDistanceFromMouse = MagnifierLength;
             MagnifierStroke = Brushes.Teal;
-            MagnifierType = MagnifierType.Circle;
-
+            MagnifierType = MagnifierType.None;
             MagnifierPanel = new Canvas
             {
                 IsHitTestVisible = false
             };
 
-            Loaded += delegate { Initial(); };
+            Loaded += delegate
+            {
+                if (VisualTreeHelper.GetParent(this) is Panel container)
+                    container.Children.Add(MagnifierPanel);
+
+                Initial();
+            };
         }
 
         protected void Initial()
         {
-            if (VisualTreeHelper.GetParent(this) is Panel container)
+            if (MagnifierEnable)
             {
                 MagnifierBrush = new VisualBrush(this)
                 {
@@ -113,7 +113,7 @@ namespace TextViewer
                     };
                 }
                 MagnifierPanel.Children.Add(MagnifierShape);
-                container.Children.Add(MagnifierPanel);
+
                 MouseEnter += delegate { if (MagnifierEnable) MagnifierShape.Visibility = Visibility.Visible; };
                 MouseLeave += delegate { MagnifierShape.Visibility = Visibility.Hidden; };
                 MouseMove += ContentPanelOnMouseMove;
@@ -163,11 +163,13 @@ namespace TextViewer
         {
             base.OnPropertyChanged(e);
 
-            if (e.Property.Name == nameof(MagnifierEnable) && MagnifierType == MagnifierType.Sticker)
+            if (e.Property.Name == nameof(MagnifierType))
             {
-                Padding = new Thickness(Padding.Left,
-                    Padding.Top + (MagnifierEnable ? MagnifierLength : -MagnifierLength), Padding.Right,
-                    Padding.Bottom);
+                Initial();
+                if (e.OldValue is MagnifierType omt && omt == MagnifierType.Sticker)
+                    Padding = new Thickness(Padding.Left, Padding.Top - MagnifierLength, Padding.Right, Padding.Bottom);
+                else if(e.NewValue is MagnifierType nmt && nmt == MagnifierType.Sticker)
+                    Padding = new Thickness(Padding.Left, Padding.Top + MagnifierLength, Padding.Right, Padding.Bottom);
             }
         }
 
@@ -175,7 +177,7 @@ namespace TextViewer
         {
             base.OnRenderSizeChanged(sizeInfo);
 
-            if (MagnifierEnable && MagnifierType == MagnifierType.Sticker)
+            if (MagnifierType == MagnifierType.Sticker)
                 MagnifierShape.Width = ActualWidth;
         }
     }
