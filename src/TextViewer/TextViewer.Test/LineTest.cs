@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows;
@@ -16,9 +17,10 @@ namespace TextViewer.Test
         private Paragraph LtrParent { get; set; }
         private Paragraph RtlParent { get; set; }
         private double _lineHeight = 22.0;
-        private readonly double _fontSize = 20.0;
-        private readonly Point _startPoint = new Point(1, 1);
         private double _width = 200.0;
+        private readonly double _fontSize = 20.0;
+        private readonly Point _ltrStartPoint = new Point(1, 1);
+        private readonly Point _rtlStartPoint = new Point(199, 1);
         private readonly FontFamily _arial = new FontFamily("Arial");
 
         /// <summary>Initialization routine executed before each test is run</summary>
@@ -102,117 +104,167 @@ namespace TextViewer.Test
         [TestMethod]
         public void AddWordTest()
         {
-            var line = new Line(_width, LtrParent, _startPoint);
+            var ltrLine = new Line(_width, LtrParent, _ltrStartPoint);
+            var rtlLine = new Line(_width, RtlParent, _rtlStartPoint);
 
-            Assert.IsTrue(line.Height.Equals(0));
-            Assert.IsTrue(line.RemainWidth.Equals(_width));
+            Assert.IsTrue(ltrLine.Height.Equals(0));
+            Assert.IsTrue(rtlLine.Height.Equals(0));
+            Assert.IsTrue(ltrLine.RemainWidth.Equals(_width));
+            Assert.IsTrue(rtlLine.RemainWidth.Equals(_width));
 
             for (var i = 0; i < LtrWords.Count; i++)
             {
-                var word = LtrWords[i];
+                var ltrWord = LtrWords[i];
+                var rtlWord = RtlWords[i];
                 Debug.WriteLine($"Word {i}");
 
-                word.GetFormattedText(_arial, _fontSize, 1, _lineHeight);
-                Assert.IsNotNull(word.Format);
-                Assert.IsTrue(word.Width > 0);
-                line.AddWord(word);
-                _width -= word.Width;
-                Assert.IsTrue(line.Height >= word.Height); // check change line height
-                Assert.IsTrue(line.RemainWidth.Equals(_width)); // check remain width
-                Assert.IsTrue(true);
-                Assert.IsTrue(line.Words.Contains(word));
+                ltrWord.GetFormattedText(_arial, _fontSize, 1, _lineHeight);
+                rtlWord.GetFormattedText(_arial, _fontSize, 1, _lineHeight);
+                Assert.IsNotNull(ltrWord.Format);
+                Assert.IsNotNull(rtlWord.Format);
+                Assert.IsTrue(ltrWord.Width > 0);
+                Assert.IsTrue(rtlWord.Width > 0);
+                ltrLine.AddWord(ltrWord);
+                rtlLine.AddWord(rtlWord);
+                _width -= ltrWord.Width;
+                Assert.IsTrue(ltrLine.Height >= ltrWord.Height); // check change line height
+                Assert.IsTrue(rtlLine.Height >= rtlWord.Height); // check change line height
+                Assert.IsTrue(ltrLine.RemainWidth.Equals(_width)); // check remain width
+                Assert.IsTrue(ltrLine.Words.Contains(ltrWord));
+                Assert.IsTrue(rtlLine.Words.Contains(rtlWord));
 
-                if (LtrParent.IsRtl != word.IsRtl)
+                if (LtrParent.IsRtl != ltrWord.IsRtl)
                 {
-                    Assert.IsTrue(word.DrawPoint.X.Equals(0));
-                    Assert.IsTrue(word.DrawPoint.Y.Equals(0));
+                    Assert.IsTrue(ltrWord.DrawPoint.X.Equals(0));
+                    Assert.IsTrue(ltrWord.DrawPoint.Y.Equals(0));
                 }
                 else
                 {
-                    Assert.IsTrue(word.DrawPoint.X > 0);
-                    Assert.IsTrue(word.DrawPoint.Y > 0);
+                    Assert.IsTrue(ltrWord.DrawPoint.X > 0); // ltr
+                    Assert.IsTrue(ltrWord.DrawPoint.Y > 0);
 
                     if (i > 0)
-                    {
-                        if (LtrParent.IsRtl)
-                            Assert.IsTrue(CompareTo(word.DrawPoint, LtrWords[i - 1].DrawPoint) < 0);
-                        else
-                            Assert.IsTrue(CompareTo(word.DrawPoint, LtrWords[i - 1].DrawPoint) > 0);
-                    }
+                        Assert.IsTrue(CompareTo(ltrWord.DrawPoint, LtrWords[i - 1].DrawPoint) > 0); // ltr
                 }
 
-                if (i > 0) Assert.IsTrue(word.CompareTo(LtrWords[i - 1]) > 0);
+                if (RtlParent.IsRtl != rtlWord.IsRtl)
+                {
+                    Assert.IsTrue(rtlWord.DrawPoint.X.Equals(0));
+                    Assert.IsTrue(rtlWord.DrawPoint.Y.Equals(0));
+                }
+                else
+                {
+                    Assert.IsTrue(rtlWord.DrawPoint.X < 200); // rtl
+                    Assert.IsTrue(rtlWord.DrawPoint.Y > 0);
+
+                    if (i > 0)
+                        Assert.IsTrue(CompareTo(rtlWord.DrawPoint, RtlWords[i - 1].DrawPoint) < 0); // rtl
+                }
+
+                if (i > 0)
+                {
+                    Assert.IsTrue(ltrWord.CompareTo(LtrWords[i - 1]) > 0);
+                    Assert.IsTrue(rtlWord.CompareTo(RtlWords[i - 1]) > 0);
+                }
             }
 
-            Assert.AreEqual(line.Count, LtrWords.Count);
+            Assert.AreEqual(ltrLine.Count, LtrWords.Count);
+            Assert.AreEqual(rtlLine.Count, RtlWords.Count);
         }
+
 
         [TestMethod]
         public void RenderTest()
         {
-            var line = new Line(_width, LtrParent, _startPoint);
+            var ltrLine = new Line(_width, LtrParent, _ltrStartPoint);
+            var rtlLine = new Line(_width, RtlParent, _rtlStartPoint);
             var lineCounter = 0;
-            Assert.IsTrue(line.CurrentParagraph.Lines.Count == lineCounter++);
+            Assert.IsTrue(ltrLine.CurrentParagraph.Lines.Count == lineCounter);
+            Assert.IsTrue(rtlLine.CurrentParagraph.Lines.Count == lineCounter++);
 
             for (var i = 0; i < LtrWords.Count; i++)
             {
-                var word = LtrWords[i];
+                var ltrWord = LtrWords[i];
+                var rtlWord = RtlWords[i];
                 Debug.WriteLine($"Word {i}");
 
-                word.GetFormattedText(_arial, _fontSize, 1, _lineHeight);
-                line.AddWord(word);
+                ltrWord.GetFormattedText(_arial, _fontSize, 1, _lineHeight);
+                rtlWord.GetFormattedText(_arial, _fontSize, 1, _lineHeight);
+                ltrLine.AddWord(ltrWord);
+                rtlLine.AddWord(rtlWord);
             }
 
-            line.Render(); // test after line rendering
-            Assert.IsTrue(line.CurrentParagraph.Lines.Count == lineCounter++);
-
-            Debug.WriteLine(line.RemainWidth);
-            Assert.IsTrue(line.RemainWidth < 0);
+            ltrLine.Render(); // test after line rendering
+            rtlLine.Render(); // test after line rendering
+            Assert.IsTrue(ltrLine.CurrentParagraph.Lines.Count == lineCounter);
+            Assert.IsTrue(rtlLine.CurrentParagraph.Lines.Count == lineCounter++);
+            Assert.IsTrue(ltrLine.RemainWidth < 0);
+            Assert.IsTrue(rtlLine.RemainWidth < 0);
 
             for (var i = 0; i < LtrWords.Count; i++)
             {
-                var word = LtrWords[i];
+                var ltrWord = LtrWords[i];
+                var rtlWord = RtlWords[i];
                 Debug.WriteLine($"Word {i}");
 
-                Assert.IsTrue(word.DrawPoint.X > 0);
-                Assert.IsTrue(word.DrawPoint.Y > 0);
-                Assert.IsTrue(word.Area.Width.Equals(word.Width));
+                Assert.IsTrue(ltrWord.DrawPoint.X > 0);
+                Assert.IsTrue(rtlWord.DrawPoint.X < 200);
+                Assert.IsTrue(ltrWord.DrawPoint.Y > 0);
+                Assert.IsTrue(rtlWord.DrawPoint.Y > 0);
+                Assert.IsTrue(ltrWord.Area.Width.Equals(ltrWord.Width));
+                Assert.IsTrue(rtlWord.Area.Width.Equals(rtlWord.Width));
             }
 
-            line.RemainWidth = 100; // change real remain with to test text-align
+            ltrLine.RemainWidth = 100; // change real remain with to test text-align
+            rtlLine.RemainWidth = 100; // change real remain with to test text-align
 
             // Test justify text-align
-            line.Render(true);
-            Assert.IsTrue(line.CurrentParagraph.Lines.Count == lineCounter++);
-
+            ltrLine.Render(true);
+            rtlLine.Render(true);
+            Assert.IsTrue(ltrLine.CurrentParagraph.Lines.Count == lineCounter);
+            Assert.IsTrue(rtlLine.CurrentParagraph.Lines.Count == lineCounter++);
             for (var i = 0; i < LtrWords.Count; i++)
             {
-                var word = LtrWords[i];
+                var ltrWord = LtrWords[i];
+                var rtlWord = RtlWords[i];
                 Debug.WriteLine($"Justify Word {i}");
 
-                if (word.Type == WordType.Space)
-                    Assert.IsTrue(word.ExtraWidth > 0);
-                else
-                    Assert.IsTrue(word.ExtraWidth.Equals(0));
-            }
+                if (ltrWord.Type == WordType.Space) Assert.IsTrue(ltrWord.ExtraWidth > 0);
+                else Assert.IsTrue(ltrWord.ExtraWidth.Equals(0));
 
+                if (rtlWord.Type == WordType.Space) Assert.IsTrue(rtlWord.ExtraWidth > 0);
+                else Assert.IsTrue(rtlWord.ExtraWidth.Equals(0));
+            }
+            //
             // Test center text-align
             LtrParent.Styles[StyleType.TextAlign] = "center";
-            line.Render();
-            Assert.IsTrue(line.CurrentParagraph.Lines.Count == lineCounter++);
-            Assert.IsTrue(line.Words.First().Area.Location.X.Equals(line.RemainWidth / 2 + _startPoint.X));
-
+            RtlParent.Styles[StyleType.TextAlign] = "center";
+            ltrLine.Render();
+            rtlLine.Render();
+            Assert.IsTrue(ltrLine.CurrentParagraph.Lines.Count == lineCounter);
+            Assert.IsTrue(rtlLine.CurrentParagraph.Lines.Count == lineCounter++);
+            Assert.IsTrue(ltrLine.Words.First().Area.Location.X.Equals(ltrLine.RemainWidth / 2 + _ltrStartPoint.X));
+            Assert.IsTrue(rtlLine.Words.First().DrawPoint.X.Equals(_rtlStartPoint.X - rtlLine.RemainWidth / 2));
+            //
             // Test left text-align
             LtrParent.Styles[StyleType.TextAlign] = "left";
-            line.Render();
-            Assert.IsTrue(line.CurrentParagraph.Lines.Count == lineCounter++);
-            Assert.IsTrue(line.Words.First().Area.Location.X.Equals(line.Location.X));
-
+            RtlParent.Styles[StyleType.TextAlign] = "left";
+            ltrLine.Render();
+            rtlLine.Render();
+            Assert.IsTrue(ltrLine.CurrentParagraph.Lines.Count == lineCounter);
+            Assert.IsTrue(rtlLine.CurrentParagraph.Lines.Count == lineCounter++);
+            Assert.IsTrue(ltrLine.Words.First().Area.Location.X.Equals(ltrLine.Location.X));
+            Assert.IsTrue(Math.Abs(rtlLine.Words.Last().Area.Location.X) - Math.Abs(rtlLine.RemainWidth - rtlLine.ActualWidth - 200 + rtlLine.Location.X) < 0.00000000001);
+            //
             // Test right text-align
             LtrParent.Styles[StyleType.TextAlign] = "right";
-            line.Render();
-            Assert.IsTrue(line.CurrentParagraph.Lines.Count == lineCounter);
-            Assert.IsTrue(line.Words.First().Area.Location.X.Equals(line.RemainWidth + _startPoint.X));
+            RtlParent.Styles[StyleType.TextAlign] = "right";
+            ltrLine.Render();
+            rtlLine.Render();
+            Assert.IsTrue(ltrLine.CurrentParagraph.Lines.Count == lineCounter);
+            Assert.IsTrue(rtlLine.CurrentParagraph.Lines.Count == lineCounter);
+            Assert.IsTrue(ltrLine.Words.First().Area.Location.X.Equals(ltrLine.RemainWidth + _ltrStartPoint.X));
+            Assert.IsTrue(rtlLine.Words.First().DrawPoint.X.Equals(rtlLine.Location.X));
         }
 
 

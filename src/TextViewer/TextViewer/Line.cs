@@ -16,6 +16,7 @@ namespace TextViewer
         public Point Location { get; set; }
         public Paragraph CurrentParagraph { get; set; }
         public int Count => Words.Count;
+        public double ActualWidth => Words.Sum(w => w.Width);
 
 
         public Line(double width, Paragraph para, Point lineLocation)
