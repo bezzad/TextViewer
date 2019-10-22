@@ -14,7 +14,7 @@ namespace TextViewer
             Text = text;
             Type = type;
             ImageScale = 1;
-            OffsetRange = new Range(offset, offset + text.Length - 1);
+            Offset = offset;
             Styles = new Dictionary<StyleType, string>();
             SetDirection(isRtl);
         }
@@ -36,7 +36,6 @@ namespace TextViewer
         public FormattedText Format { get; set; }
         public Point DrawPoint { get; set; }
         public Rect Area { get; set; }
-        public Range OffsetRange { get; protected set; }
         public Paragraph Paragraph { get; set; }
         public Dictionary<StyleType, string> Styles { get; protected set; }
         public string Text { get; set; }
@@ -51,7 +50,7 @@ namespace TextViewer
             : Format?.Height ?? 0;
         public bool IsImage => Type.HasFlag(WordType.Image);
         public bool IsRtl => Styles[StyleType.Direction] == Rtl;
-        public new int Offset => OffsetRange.Start;
+        public new int Offset { get; }
 
 
         public void SetDirection(bool isRtl)
@@ -147,7 +146,7 @@ namespace TextViewer
 
         public override string ToString()
         {
-            return $"{Offset}/`{Text}`/{OffsetRange.End}";
+            return $"{Offset}/`{Text}`/{Offset + Text.Length - 1}";
         }
     }
 }

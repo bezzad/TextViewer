@@ -222,7 +222,7 @@ namespace TextViewer.Test
             for (var i = 1; i < Words.Count; i++)
             {
                 var word = Words[i];
-                Assert.AreEqual(word.ToString(), $"{word.OffsetRange.Start}/`{word.Text}`/{word.OffsetRange.End}");
+                Assert.AreEqual(word.ToString(), $"{word.Offset}/`{word.Text}`/{word.Offset + word.Text.Length - 1}");
             }
         }
     }

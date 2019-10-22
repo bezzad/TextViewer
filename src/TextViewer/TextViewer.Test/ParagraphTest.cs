@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System.Linq;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace TextViewer.Test
 {
@@ -14,7 +15,7 @@ namespace TextViewer.Test
         [TestInitialize]
         public void Setup()
         {
-            _rtlContent = "این محتوا برای تست می‌باشد. این content برای تست می‌باشد. this content is for testing. این متن تست پاراگراف می‌باشد";
+            _rtlContent = "این محتوا برای تست می‌باشد. این content برای تست می‌باشد. this content is for testing. این متن تست3 پاراگراف می‌باشد";
             _ltrContent = "This is the test content, for test paragraph and text parsing. این متن is for testing";
             _rtlWords = _rtlContent.Split(' ');
             _ltrWords = _ltrContent.Split(' ');
@@ -33,7 +34,15 @@ namespace TextViewer.Test
             Assert.IsTrue(rtlPara.Words.Count > _rtlWords.Length * 2);
             Assert.IsTrue(ltrPara.Words.Count > _ltrWords.Length * 2);
 
+            Assert.AreEqual(rtlPara.Words.Count(w => w.Type.HasFlag(WordType.InertChar)), 3);
+            Assert.AreEqual(rtlPara.Words.Count(w => w.Type.HasFlag(WordType.Attached)), 3);
+            Assert.AreEqual(rtlPara.Words.Count(w => w.Type.HasFlag(WordType.Normal)), _rtlWords.Length);
+            Assert.AreEqual(rtlPara.Words.Count(w => w.Type.HasFlag(WordType.Normal)), _rtlWords.Length);
 
+
+            Assert.AreEqual(ltrPara.Words.Count(w => w.Type.HasFlag(WordType.InertChar)), 2);
+            Assert.AreEqual(ltrPara.Words.Count(w => w.Type.HasFlag(WordType.Attached)), 2);
+            Assert.AreEqual(ltrPara.Words.Count(w => w.Type.HasFlag(WordType.Normal)), _ltrWords.Length);
         }
     }
 }
