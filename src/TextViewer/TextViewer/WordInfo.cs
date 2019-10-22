@@ -7,7 +7,7 @@ using System.Windows.Media;
 
 namespace TextViewer
 {
-    public class WordInfo : DrawingVisual, IComparer<WordInfo>, IComparable, IComparable<WordInfo>
+    public class WordInfo : DrawingVisual, IComparable<WordInfo>
     {
         public WordInfo(string text, int offset, WordType type, bool isRtl)
         {
@@ -44,7 +44,7 @@ namespace TextViewer
         public double ImageScale { get; set; }
         public bool IsSelected { get; set; }
         public double Width => IsImage
-            ? ((double)GetAttribute(StyleType.Width) * ImageScale) + ExtraWidth
+            ? (double)GetAttribute(StyleType.Width) * ImageScale + ExtraWidth
             : (Format?.WidthIncludingTrailingWhitespace ?? 0) + ExtraWidth;
         public double Height => IsImage
             ? (double)GetAttribute(StyleType.Height) * ImageScale
@@ -105,7 +105,7 @@ namespace TextViewer
         {
             var dc = RenderOpen();
 
-            if (GetAttribute(StyleType.Image) is ImageSource img)
+            if (IsImage && GetAttribute(StyleType.Image) is ImageSource img)
                 dc.DrawImage(img, Area);
             else if (Type == WordType.Space)
                 dc.DrawGeometry(Brushes.Transparent, null, new RectangleGeometry(Area));
@@ -134,29 +134,17 @@ namespace TextViewer
                 Render();
             }
         }
-
-        public int Compare(WordInfo x, WordInfo y)
-        {
-            if (x == null || y == null) throw new ArgumentNullException(x == null ? nameof(x) : nameof(y));
-
-            if (x.Paragraph.Offset > y.Paragraph.Offset) return 1;
-            if (x.Paragraph.Offset < y.Paragraph.Offset) return -1;
-            if (x.Offset > y.Offset) return 1;
-            if (x.Offset < y.Offset) return -1;
-            return 0;
-        }
-
-        public int CompareTo(object obj)
-        {
-            if (obj is WordInfo word)
-                return CompareTo(word);
-
-            return -1;
-        }
-
+        
         public int CompareTo([AllowNull] WordInfo other)
         {
-            return Compare(this, other);
+            if (other == null) throw new ArgumentNullException(nameof(other));
+
+            if (Paragraph.Offset > other.Paragraph.Offset) return 1;
+            if (Paragraph.Offset < other.Paragraph.Offset) return -1;
+            if (Offset > other.Offset) return 1;
+            if (Offset < other.Offset) return -1;
+
+            return 0;
         }
 
         public override string ToString()
