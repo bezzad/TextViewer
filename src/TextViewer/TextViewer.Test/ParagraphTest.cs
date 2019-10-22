@@ -14,8 +14,8 @@ namespace TextViewer.Test
         [TestInitialize]
         public void Setup()
         {
-            _rtlContent = "این محتوا برای تست می‌باشد. این content برای تست می‌باشد. this content is for testing. این متن تست پاراگراف می‌باشد.";
-            _ltrContent = "This is the test content, for test paragraph and text parsing. این متن is for testing.";
+            _rtlContent = "این محتوا برای تست می‌باشد. این content برای تست می‌باشد. this content is for testing. این متن تست پاراگراف می‌باشد";
+            _ltrContent = "This is the test content, for test paragraph and text parsing. این متن is for testing";
             _rtlWords = _rtlContent.Split(' ');
             _ltrWords = _ltrContent.Split(' ');
         }

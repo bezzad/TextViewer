@@ -27,6 +27,20 @@ namespace TextViewer
 
 
 
+        private void AddWord(WordInfo w, Dictionary<StyleType, string> contentStyle)
+        {
+            w.Paragraph = this;
+
+            // set last word to inner word for remove space after word
+            if (Words.Count > 0)
+            {
+                w.PreviousWord = Words.Last();
+                w.PreviousWord.NextWord = w;
+            }
+            w.AddStyles(contentStyle);
+            Words.Add(w);
+        }
+
         /// <summary>
         /// Attach content to end of this paragraph by same styles
         /// </summary>
@@ -38,29 +52,6 @@ namespace TextViewer
             var wordBuffer = "";
             var offset = contentOffset;
 
-            void AddWord(WordInfo w)
-            {
-                w.Paragraph = this;
-
-                // set last word to inner word for remove space after word
-                if (Words.Count > 0)
-                {
-                    w.PreviousWord = Words.Last();
-                    w.PreviousWord.NextWord = w;
-                }
-                w.AddStyles(contentStyle);
-#if DEBUG
-                // Todo: Just for test
-                if (w.IsRtl != w.Paragraph.IsRtl)
-                {
-                    w.Styles.Add(StyleType.Color, "#5555FF");
-                    w.Styles.Add(StyleType.FontWeight, "bold");
-                }
-#endif
-                Words.Add(w);
-                wordBuffer = ""; // clear buffer
-            }
-
             for (var i = 0; i < content.Length; i++)
             {
                 var charPointer = content[i];
@@ -68,13 +59,14 @@ namespace TextViewer
                 if (charPointer == ' ')
                 {
                     if (wordBuffer.Length > 0)
-                        AddWord(new WordInfo(wordBuffer, offset, WordType.Normal, wordBuffer.IsRtl()));
+                        AddWord(new WordInfo(wordBuffer, offset, WordType.Normal, wordBuffer.IsRtl()), contentStyle);
+
+                    wordBuffer = "";
 
                     // add space char as word
                     // note: space.IsRtl will complete calculate after adding all words
                     var spaceIsRtl = IsRtl == Words.LastOrDefault()?.IsRtl;
-                    AddWord(new WordInfo(charPointer.ToString(), contentOffset + i,
-                        WordType.Space, spaceIsRtl));
+                    AddWord(new WordInfo(charPointer.ToString(), contentOffset + i, WordType.Space, spaceIsRtl), contentStyle);
 
                     // maybe there are exist multiple sequence space, so we set offset outside of the keeping word buffer.
                     offset = contentOffset + i + 1; // set next word offset
@@ -84,13 +76,15 @@ namespace TextViewer
                 if (WordHelper.InertChars.Contains(charPointer))
                 {
                     if (wordBuffer.Length > 0)
-                        AddWord(new WordInfo(wordBuffer, offset, WordType.Normal | WordType.Attached, wordBuffer.IsRtl()));
+                        AddWord(new WordInfo(wordBuffer, offset, WordType.Normal | WordType.Attached, wordBuffer.IsRtl()), contentStyle);
+
+                    wordBuffer = "";
 
                     // add inert char as word
                     var isInnerWord = i + 1 < content.Length && content[i + 1] != ' ';
                     AddWord(new WordInfo(charPointer.ToString(), contentOffset + i,
                             isInnerWord ? WordType.Attached | WordType.InertChar : WordType.InertChar,
-                            charPointer.IsRtl() || IsRtl));
+                            charPointer.IsRtl() || IsRtl), contentStyle);
 
                     offset = contentOffset + i + 1; // set next word offset
                     continue;
@@ -102,9 +96,9 @@ namespace TextViewer
             //
             // keep last word from buffer
             if (wordBuffer.Length > 0)
-                AddWord(new WordInfo(wordBuffer, offset, WordType.Normal, wordBuffer.IsRtl()));
+                AddWord(new WordInfo(wordBuffer, offset, WordType.Normal, wordBuffer.IsRtl()), contentStyle);
             //
-            // calculate all space rtl from last word to first word
+            // calculate all spaces rtl from last word to first word
             foreach (var space in Words.Where(w => w.Type.HasFlag(WordType.Space)).Reverse())
             {
                 //  Paragraph.IsRtl  | Word.IsRtl  | Space.IsRtl 
