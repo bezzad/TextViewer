@@ -41,7 +41,7 @@ namespace TextViewer
     {
         protected void SetStartPoint(ref Point startPoint, Paragraph para, double extendedY = 0)
         {
-            startPoint.X = para.IsRtl
+            startPoint.X = para.IsRtlDirection
                 ? ActualWidth - Padding.Right
                 : Padding.Left;
 
@@ -51,7 +51,7 @@ namespace TextViewer
         [Time]
         protected void BuildPage(List<Paragraph> content)
         {
-            var startPoint = new Point(content.FirstOrDefault()?.IsRtl == true ? ActualWidth - Padding.Right : Padding.Left, Padding.Top);
+            var startPoint = new Point(content.FirstOrDefault()?.IsRtlDirection == true ? ActualWidth - Padding.Right : Padding.Left, Padding.Top);
             var lineWidth = ActualWidth - Padding.Left - Padding.Right;
             DrawnWords.Clear();
             Line lineBuffer;
@@ -157,7 +157,7 @@ namespace TextViewer
                         var ft = new FormattedText(word.Offset.ToString(),
                             CultureInfo.CurrentCulture, FlowDirection.LeftToRight,
                             new Typeface(FontFamily, FontStyles.Normal, FontWeights.Normal, FontStretches.Normal),
-                            OffsetEmSize, word.IsRtl == word.Paragraph.IsRtl ? Brushes.Red : Brushes.Blue,
+                            OffsetEmSize, word.IsRtl == word.Paragraph.IsRtlDirection ? Brushes.Red : Brushes.Blue,
                             PixelsPerDip);
 
                         if (word.Type.HasFlag(WordType.Space) || word.Type.HasFlag(WordType.InertChar)
@@ -171,7 +171,7 @@ namespace TextViewer
                         }
                         else
                             dc.DrawText(ft,
-                                new Point(word.Paragraph.IsRtl ? word.Area.X + word.Width - ft.Width : word.Area.X,
+                                new Point(word.Paragraph.IsRtlDirection ? word.Area.X + word.Width - ft.Width : word.Area.X,
                                     word.Area.Y));
                     }
                 }

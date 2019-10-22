@@ -57,7 +57,7 @@ namespace TextViewer.Test
                                                      @"KE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==");
 
             // cover test for parental styles
-            Parent.Styles.Add(StyleType.VerticalAlign, VerticalAlignment.Top.ToString()); 
+            Parent.Styles.Add(StyleType.VerticalAlign, VerticalAlignment.Top.ToString());
         }
 
         [TestMethod]
@@ -79,14 +79,14 @@ namespace TextViewer.Test
                 Assert.AreEqual(word.GetAttribute(StyleType.FontSize), 0.0);
                 Assert.AreEqual(word.GetAttribute(StyleType.TextAlign), TextAlignment.Justify);
                 Assert.AreEqual(word.GetAttribute(StyleType.Display), true);
-                if(word.IsImage)
+                if (word.IsImage)
                     Assert.IsNotNull(word.GetAttribute(StyleType.Image));
                 else
                     Assert.IsNull(word.GetAttribute(StyleType.Image));
 
                 var dir = word.GetAttribute(StyleType.Direction);
                 Assert.IsInstanceOfType(dir, typeof(FlowDirection));
-                Assert.AreEqual((FlowDirection) dir == FlowDirection.RightToLeft, word.IsRtl);
+                Assert.AreEqual((FlowDirection)dir == FlowDirection.RightToLeft, word.IsRtl);
             }
         }
 
@@ -223,6 +223,25 @@ namespace TextViewer.Test
             {
                 var word = Words[i];
                 Assert.AreEqual(word.ToString(), $"{word.Offset}/`{word.Text}`/{word.Offset + word.Text.Length - 1}");
+            }
+        }
+
+        [TestMethod]
+        public void IsRtlTest()
+        {
+            var ltrString = @"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890۱۲۳۴۵۶۷۸۹۰";
+            var rtlString = @"ا ب پ ت ث ج چ ح خ د ذ ر ز ژ س ش ص ض ط ظ ع غ ف ق ک گ ل م ن و ه ی ء آ اً هٔ ة ك ؛ ؟ ؤ ئ".Replace(" ", "");
+
+            for (var i = 0; i < ltrString.Length; i++)
+            {
+                var c = ltrString[i];
+                Assert.IsFalse(Paragraph.IsRtl(c), $"The {c} char at index {i} is not LTR!");
+            }
+
+            for (var i = 0; i < rtlString.Length; i++)
+            {
+                var c = rtlString[i];
+                Assert.IsTrue(Paragraph.IsRtl(c), $"The {c} char at index {i} is not RTL!");
             }
         }
     }

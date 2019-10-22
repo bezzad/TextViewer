@@ -64,20 +64,20 @@ namespace TextViewer
                     {
                         case "left":
                             {
-                                if (CurrentParagraph.IsRtl)
+                                if (CurrentParagraph.IsRtlDirection)
                                     WordPointOffset -= RemainWidth;
                                 SetWordsPosition();
                                 break;
                             }
                         case "center":
                             {
-                                WordPointOffset += RemainWidth / 2 * (CurrentParagraph.IsRtl ? -1 : 1);
+                                WordPointOffset += RemainWidth / 2 * (CurrentParagraph.IsRtlDirection ? -1 : 1);
                                 SetWordsPosition();
                                 break;
                             }
                         case "right":
                             {
-                                if (CurrentParagraph.IsRtl == false)
+                                if (CurrentParagraph.IsRtlDirection == false)
                                     WordPointOffset += RemainWidth;
                                 SetWordsPosition();
                                 break;
@@ -102,7 +102,7 @@ namespace TextViewer
         {
             var startPoint = new Point(WordPointOffset, Location.Y);
 
-            if (CurrentParagraph.IsRtl) // Left to right paragraph
+            if (CurrentParagraph.IsRtlDirection) // Left to right paragraph
             {
                 //     _______________________________________________________
                 //    |                                                       |
@@ -147,7 +147,7 @@ namespace TextViewer
 
         protected void SetWordPosition(WordInfo word)
         {
-            if (CurrentParagraph.IsRtl != word.IsRtl) NonDirectionalWordsStack.Push(word);
+            if (CurrentParagraph.IsRtlDirection != word.IsRtl) NonDirectionalWordsStack.Push(word);
             else
             {
                 PopAllNonDirectionalWords();
