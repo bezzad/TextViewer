@@ -108,13 +108,10 @@ namespace TextViewer
 
             if (IsImage && GetAttribute(StyleType.Image) is ImageSource img)
                 dc.DrawImage(img, Area);
-            else if (Type == WordType.Space)
-                dc.DrawGeometry(Brushes.Transparent, null, new RectangleGeometry(Area));
             else
                 dc.DrawText(Format, DrawPoint);
 
-            if (IsSelected)
-                dc.DrawRectangle(SelectedBrush, null, Area);
+            dc.DrawGeometry(IsSelected ? SelectedBrush : Brushes.Transparent, null, new RectangleGeometry(Area));
 
             dc.Close();
 
