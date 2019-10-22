@@ -11,8 +11,10 @@ namespace TextViewer.Test
     public class LineTest
     {
         /// <summary>An observable dictionary to which a mock will be subscribed</summary>
-        private List<WordInfo> Words { get; set; }
-        private Paragraph Parent { get; set; }
+        private List<WordInfo> LtrWords { get; set; }
+        private List<WordInfo> RtlWords { get; set; }
+        private Paragraph LtrParent { get; set; }
+        private Paragraph RtlParent { get; set; }
         private double _lineHeight = 22.0;
         private readonly double _fontSize = 20.0;
         private readonly Point _startPoint = new Point(1, 1);
@@ -23,54 +25,91 @@ namespace TextViewer.Test
         [TestInitialize]
         public void Setup()
         {
-            Parent = new Paragraph(0, false);
+            RtlParent = new Paragraph(0, true);
+            LtrParent = new Paragraph(1, false);
 
-            Words = new List<WordInfo>()
+            LtrWords = new List<WordInfo>()
             {
-                new WordInfo("Test1", 0, WordType.Normal, false) {Paragraph = Parent}, // 0
-                new WordInfo(" ", 5, WordType.Space, false) {Paragraph = Parent}, // 1
-                new WordInfo("Test2", 6, WordType.Normal, false) {Paragraph = Parent}, // 2
-                new WordInfo(" ", 11, WordType.Space, false) {Paragraph = Parent}, // 3
-                new WordInfo("Test3", 12, WordType.Normal, false) {Paragraph = Parent}, // 4
-                new WordInfo(" ", 17, WordType.Space, false) {Paragraph = Parent}, // 5
-                new WordInfo("Test4", 18, WordType.Normal, false) {Paragraph = Parent}, // 6
-                new WordInfo(" ", 23, WordType.Space, false) {Paragraph = Parent}, // 7
-                new WordInfo("Test", 24, WordType.Normal | WordType.Attached, false) {Paragraph = Parent}, // 8
-                new WordInfo(".", 25, WordType.InertChar | WordType.Attached, false) {Paragraph = Parent}, // 9
-                new WordInfo("5", 26, WordType.Normal, false) {Paragraph = Parent}, // 10
-                new WordInfo(" ", 29, WordType.Space, false) {Paragraph = Parent}, // 11
-                new WordInfo("Test6", 30, WordType.Normal, false) {Paragraph = Parent}, // 12
-                new WordInfo(" ", 33, WordType.Space, false) {Paragraph = Parent}, // 13
-                new WordInfo("تست۱", 36, WordType.Normal, true) {Paragraph = Parent}, // 14
-                new WordInfo(" ", 41, WordType.Space, true) {Paragraph = Parent}, // 15
-                new WordInfo("تست۲", 42, WordType.Normal, true) {Paragraph = Parent}, // 16
-                new WordInfo(" ", 47, WordType.Space, true) {Paragraph = Parent}, // 17
-                new WordInfo("تست۳", 48, WordType.Normal, true) {Paragraph = Parent}, // 18
-                new WordInfo("img", 55, WordType.Image, false) {Paragraph = Parent} // 19
+                new WordInfo("Test1", 0, WordType.Normal, false) {Paragraph = LtrParent}, // 0
+                new WordInfo(" ", 5, WordType.Space, false) {Paragraph = LtrParent}, // 1
+                new WordInfo("Test2", 6, WordType.Normal, false) {Paragraph = LtrParent}, // 2
+                new WordInfo(" ", 11, WordType.Space, false) {Paragraph = LtrParent}, // 3
+                new WordInfo("Test3", 12, WordType.Normal, false) {Paragraph = LtrParent}, // 4
+                new WordInfo(" ", 17, WordType.Space, false) {Paragraph = LtrParent}, // 5
+                new WordInfo("Test4", 18, WordType.Normal, false) {Paragraph = LtrParent}, // 6
+                new WordInfo(" ", 23, WordType.Space, false) {Paragraph = LtrParent}, // 7
+                new WordInfo("Test", 24, WordType.Normal | WordType.Attached, false) {Paragraph = LtrParent}, // 8
+                new WordInfo(".", 25, WordType.InertChar | WordType.Attached, false) {Paragraph = LtrParent}, // 9
+                new WordInfo("5", 26, WordType.Normal, false) {Paragraph = LtrParent}, // 10
+                new WordInfo(" ", 29, WordType.Space, false) {Paragraph = LtrParent}, // 11
+                new WordInfo("Test6", 30, WordType.Normal, false) {Paragraph = LtrParent}, // 12
+                new WordInfo(" ", 33, WordType.Space, false) {Paragraph = LtrParent}, // 13
+                new WordInfo("تست۱", 36, WordType.Normal, true) {Paragraph = LtrParent}, // 14
+                new WordInfo(" ", 41, WordType.Space, true) {Paragraph = LtrParent}, // 15
+                new WordInfo("تست۲", 42, WordType.Normal, true) {Paragraph = LtrParent}, // 16
+                new WordInfo(" ", 47, WordType.Space, true) {Paragraph = LtrParent}, // 17
+                new WordInfo("تست۳", 48, WordType.Normal, true) {Paragraph = LtrParent}, // 18
+                new WordInfo("img", 55, WordType.Image, false) {Paragraph = LtrParent} // 19
             };
 
-            for (var i = 1; i < Words.Count; i++)
+            RtlWords = new List<WordInfo>()
             {
-                Words[i - 1].NextWord = Words[i];
-                Words[i].PreviousWord = Words[i - 1];
+                new WordInfo("تستی", 0, WordType.Normal, true) {Paragraph = RtlParent}, // 0
+                new WordInfo(" ", 5, WordType.Space, true) {Paragraph = RtlParent}, // 1
+                new WordInfo("تست۲", 6, WordType.Normal, true) {Paragraph = RtlParent}, // 2
+                new WordInfo(" ", 11, WordType.Space, true) {Paragraph = RtlParent}, // 3
+                new WordInfo("تست۳", 12, WordType.Normal, true) {Paragraph = RtlParent}, // 4
+                new WordInfo(" ", 17, WordType.Space, true) {Paragraph = RtlParent}, // 5
+                new WordInfo("تست۴", 18, WordType.Normal, true) {Paragraph = RtlParent}, // 6
+                new WordInfo(" ", 23, WordType.Space, true) {Paragraph = RtlParent}, // 7
+                new WordInfo("تست", 24, WordType.Normal | WordType.Attached, true) {Paragraph = RtlParent}, // 8
+                new WordInfo(".", 25, WordType.InertChar | WordType.Attached, true) {Paragraph = RtlParent}, // 9
+                new WordInfo("۵", 26, WordType.Normal, true) {Paragraph = RtlParent}, // 10
+                new WordInfo(" ", 29, WordType.Space, false) {Paragraph = RtlParent}, // 11
+                new WordInfo("Test6", 30, WordType.Normal, false) {Paragraph = RtlParent}, // 12
+                new WordInfo(" ", 33, WordType.Space, false) {Paragraph = RtlParent}, // 13
+                new WordInfo("Test7", 36, WordType.Normal, false) {Paragraph = RtlParent}, // 14
+                new WordInfo(" ", 41, WordType.Space, true) {Paragraph = RtlParent}, // 15
+                new WordInfo("تست۸", 42, WordType.Normal, true) {Paragraph = RtlParent}, // 16
+                new WordInfo(" ", 47, WordType.Space, true) {Paragraph = RtlParent}, // 17
+                new WordInfo("تست۹", 48, WordType.Normal, true) {Paragraph = RtlParent}, // 18
+                new WordInfo("img", 55, WordType.Image, false) {Paragraph = RtlParent} // 19
+            };
+
+            for (var i = 1; i < LtrWords.Count; i++)
+            {
+                LtrWords[i - 1].NextWord = LtrWords[i];
+                LtrWords[i].PreviousWord = LtrWords[i - 1];
+
+                RtlWords[i - 1].NextWord = RtlWords[i];
+                RtlWords[i].PreviousWord = RtlWords[i - 1];
             }
 
             // set image width and height
-            Words.Last().Styles.Add(StyleType.Width, "100");
-            Words.Last().Styles.Add(StyleType.Height, "100");
+            LtrWords.Last().Styles.Add(StyleType.Width, "5");
+            LtrWords.Last().Styles.Add(StyleType.Height, "5");
+            LtrWords.Last().Styles.Add(StyleType.Image, @"iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAA" +
+                                                     @"ACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIB" +
+                                                     @"KE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==");
+
+            RtlWords.Last().Styles.Add(StyleType.Width, "5");
+            RtlWords.Last().Styles.Add(StyleType.Height, "5");
+            RtlWords.Last().Styles.Add(StyleType.Image, @"iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAA" +
+                                                        @"ACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIB" +
+                                                        @"KE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==");
         }
 
         [TestMethod]
         public void AddWordTest()
         {
-            var line = new Line(_width, Parent, _startPoint);
+            var line = new Line(_width, LtrParent, _startPoint);
 
             Assert.IsTrue(line.Height.Equals(0));
             Assert.IsTrue(line.RemainWidth.Equals(_width));
 
-            for (var i = 0; i < Words.Count; i++)
+            for (var i = 0; i < LtrWords.Count; i++)
             {
-                var word = Words[i];
+                var word = LtrWords[i];
                 Debug.WriteLine($"Word {i}");
 
                 word.GetFormattedText(_arial, _fontSize, 1, _lineHeight);
@@ -83,7 +122,7 @@ namespace TextViewer.Test
                 Assert.IsTrue(true);
                 Assert.IsTrue(line.Words.Contains(word));
 
-                if (Parent.IsRtl != word.IsRtl)
+                if (LtrParent.IsRtl != word.IsRtl)
                 {
                     Assert.IsTrue(word.DrawPoint.X.Equals(0));
                     Assert.IsTrue(word.DrawPoint.Y.Equals(0));
@@ -95,27 +134,29 @@ namespace TextViewer.Test
 
                     if (i > 0)
                     {
-                        if (Parent.IsRtl)
-                            Assert.IsTrue(CompareTo(word.DrawPoint, Words[i - 1].DrawPoint) < 0);
+                        if (LtrParent.IsRtl)
+                            Assert.IsTrue(CompareTo(word.DrawPoint, LtrWords[i - 1].DrawPoint) < 0);
                         else
-                            Assert.IsTrue(CompareTo(word.DrawPoint, Words[i - 1].DrawPoint) > 0);
+                            Assert.IsTrue(CompareTo(word.DrawPoint, LtrWords[i - 1].DrawPoint) > 0);
                     }
                 }
 
-                if (i > 0) Assert.IsTrue(word.CompareTo(Words[i - 1]) > 0);
+                if (i > 0) Assert.IsTrue(word.CompareTo(LtrWords[i - 1]) > 0);
             }
+
+            Assert.AreEqual(line.Count, LtrWords.Count);
         }
 
         [TestMethod]
         public void RenderTest()
         {
-            var line = new Line(_width, Parent, _startPoint);
+            var line = new Line(_width, LtrParent, _startPoint);
             var lineCounter = 0;
             Assert.IsTrue(line.CurrentParagraph.Lines.Count == lineCounter++);
 
-            for (var i = 0; i < Words.Count; i++)
+            for (var i = 0; i < LtrWords.Count; i++)
             {
-                var word = Words[i];
+                var word = LtrWords[i];
                 Debug.WriteLine($"Word {i}");
 
                 word.GetFormattedText(_arial, _fontSize, 1, _lineHeight);
@@ -128,9 +169,9 @@ namespace TextViewer.Test
             Debug.WriteLine(line.RemainWidth);
             Assert.IsTrue(line.RemainWidth < 0);
 
-            for (var i = 0; i < Words.Count; i++)
+            for (var i = 0; i < LtrWords.Count; i++)
             {
-                var word = Words[i];
+                var word = LtrWords[i];
                 Debug.WriteLine($"Word {i}");
 
                 Assert.IsTrue(word.DrawPoint.X > 0);
@@ -144,9 +185,9 @@ namespace TextViewer.Test
             line.Render(true);
             Assert.IsTrue(line.CurrentParagraph.Lines.Count == lineCounter++);
 
-            for (var i = 0; i < Words.Count; i++)
+            for (var i = 0; i < LtrWords.Count; i++)
             {
-                var word = Words[i];
+                var word = LtrWords[i];
                 Debug.WriteLine($"Justify Word {i}");
 
                 if (word.Type == WordType.Space)
@@ -156,19 +197,19 @@ namespace TextViewer.Test
             }
 
             // Test center text-align
-            Parent.Styles[StyleType.TextAlign] = "center";
+            LtrParent.Styles[StyleType.TextAlign] = "center";
             line.Render();
             Assert.IsTrue(line.CurrentParagraph.Lines.Count == lineCounter++);
             Assert.IsTrue(line.Words.First().Area.Location.X.Equals(line.RemainWidth / 2 + _startPoint.X));
 
             // Test left text-align
-            Parent.Styles[StyleType.TextAlign] = "left";
+            LtrParent.Styles[StyleType.TextAlign] = "left";
             line.Render();
             Assert.IsTrue(line.CurrentParagraph.Lines.Count == lineCounter++);
             Assert.IsTrue(line.Words.First().Area.Location.X.Equals(line.Location.X));
 
             // Test right text-align
-            Parent.Styles[StyleType.TextAlign] = "right";
+            LtrParent.Styles[StyleType.TextAlign] = "right";
             line.Render();
             Assert.IsTrue(line.CurrentParagraph.Lines.Count == lineCounter);
             Assert.IsTrue(line.Words.First().Area.Location.X.Equals(line.RemainWidth + _startPoint.X));

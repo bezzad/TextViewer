@@ -52,8 +52,8 @@ namespace TextViewer.Test
             }
 
             // set image width and height
-            Words.Last().Styles.Add(StyleType.Width, "79");
-            Words.Last().Styles.Add(StyleType.Height, "99");
+            Words.Last().Styles.Add(StyleType.Width, "5");
+            Words.Last().Styles.Add(StyleType.Height, "5");
             Words.Last().Styles.Add(StyleType.Image, @"iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAA" +
                                                      @"ACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIB" +
                                                      @"KE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==");
@@ -76,8 +76,8 @@ namespace TextViewer.Test
                 Assert.AreEqual(word.GetAttribute(StyleType.MarginTop), 0.0);
                 Assert.AreEqual(word.GetAttribute(StyleType.MarginLeft), 0.0);
                 Assert.AreEqual(word.GetAttribute(StyleType.MarginRight), 0.0);
-                Assert.AreEqual(word.GetAttribute(StyleType.Height), word.Type == WordType.Image ? 99 : 0.0);
-                Assert.AreEqual(word.GetAttribute(StyleType.Width), word.Type == WordType.Image ? 79 : 0.0);
+                Assert.AreEqual(word.GetAttribute(StyleType.Height), word.Type == WordType.Image ? 5 : 0.0);
+                Assert.AreEqual(word.GetAttribute(StyleType.Width), word.Type == WordType.Image ? 5 : 0.0);
                 Assert.AreEqual(word.GetAttribute(StyleType.FontSize), 0.0);
                 Assert.AreEqual(word.GetAttribute(StyleType.TextAlign), TextAlignment.Justify);
                 Assert.AreEqual(word.GetAttribute(StyleType.Display), true);
