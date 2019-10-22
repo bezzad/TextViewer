@@ -96,9 +96,9 @@ namespace TextViewer.Test
                     if (i > 0)
                     {
                         if (Parent.IsRtl)
-                            Assert.IsTrue(word.DrawPoint.CompareTo(Words[i - 1].DrawPoint) < 0);
+                            Assert.IsTrue(CompareTo(word.DrawPoint, Words[i - 1].DrawPoint) < 0);
                         else
-                            Assert.IsTrue(word.DrawPoint.CompareTo(Words[i - 1].DrawPoint) > 0);
+                            Assert.IsTrue(CompareTo(word.DrawPoint, Words[i - 1].DrawPoint) > 0);
                     }
                 }
 
@@ -174,5 +174,19 @@ namespace TextViewer.Test
             Assert.IsTrue(line.Words.First().Area.Location.X.Equals(line.RemainWidth + _startPoint.X));
         }
 
+
+        public static int CompareTo(Point pLeft, Point pRight)
+        {
+            if (pLeft.Y > pRight.Y)
+                return 1;
+            if (pLeft.Y < pRight.Y)
+                return -1;
+            if (pLeft.X > pRight.X)
+                return 1;
+            if (pLeft.X < pRight.X)
+                return -1;
+
+            return 0;
+        }
     }
 }

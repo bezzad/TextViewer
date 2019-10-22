@@ -83,7 +83,7 @@ namespace TextViewer
             WordWireFramePen = new Pen(Brushes.Red, 0.7) { DashStyle = DashStyles.Dash };
             ParagraphWireFramePen = new Pen(Brushes.Brown, 0.3) { DashStyle = DashStyles.Solid };
             DrawnWords = new VisualCollection(this);
-            PixelsPerDip = GraphicsHelper.PixelsPerDip(this);
+            PixelsPerDip = VisualTreeHelper.GetDpi(this).PixelsPerDip;
             OffsetEmSize = 6;
         }
 
