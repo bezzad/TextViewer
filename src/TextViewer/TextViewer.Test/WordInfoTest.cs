@@ -35,11 +35,11 @@ namespace TextViewer.Test
                 new WordInfo(" ", 29, WordType.Space, false) {Paragraph = Parent}, // 11
                 new WordInfo("Test6", 30, WordType.Normal, false) {Paragraph = Parent}, // 12
                 new WordInfo(" ", 33, WordType.Space, false) {Paragraph = Parent}, // 13
-                new WordInfo("تست۱", 36, WordType.Normal, true){Paragraph = Parent},  // 14
-                new WordInfo(" ", 41, WordType.Space, true){Paragraph = Parent},  // 15
-                new WordInfo("تست۲", 42, WordType.Normal, true){Paragraph = Parent},  // 16
-                new WordInfo(" ", 47, WordType.Space, true){Paragraph = Parent},  // 17
-                new WordInfo("تست۳", 48, WordType.Normal, true){Paragraph = Parent},  // 18
+                new WordInfo("تست۱", 36, WordType.Normal, true) {Paragraph = Parent}, // 14
+                new WordInfo(" ", 41, WordType.Space, true) {Paragraph = Parent}, // 15
+                new WordInfo("تست۲", 42, WordType.Normal, true) {Paragraph = Parent}, // 16
+                new WordInfo(" ", 47, WordType.Space, true) {Paragraph = Parent}, // 17
+                new WordInfo("تست۳", 48, WordType.Normal, true) {Paragraph = Parent}, // 18
                 new WordInfo("img", 55, WordType.Image, false) {Paragraph = Parent} // 19
             };
 
@@ -86,7 +86,7 @@ namespace TextViewer.Test
 
                 var dir = word.GetAttribute(StyleType.Direction);
                 Assert.IsInstanceOfType(dir, typeof(FlowDirection));
-                Assert.AreEqual((FlowDirection)dir == FlowDirection.RightToLeft, word.IsRtl);
+                Assert.AreEqual((FlowDirection) dir == FlowDirection.RightToLeft, word.IsRtl);
             }
         }
 
@@ -230,7 +230,19 @@ namespace TextViewer.Test
         public void IsRtlTest()
         {
             var ltrString = @"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890۱۲۳۴۵۶۷۸۹۰";
-            var rtlString = @"ا ب پ ت ث ج چ ح خ د ذ ر ز ژ س ش ص ض ط ظ ع غ ف ق ک گ ل م ن و ه ی ء آ اً هٔ ة ك ؛ ؟ ؤ ئ".Replace(" ", "");
+            var rtlChars = new char[]
+            {
+                ',', 'ا', 'ب', 'پ', 'ت', 
+                'ث', 'ج', 'چ', 'ح', 'خ', 
+                'د', 'ذ', 'ر', 'ز', 'ژ', 
+                'س', 'ش', 'ص', 'ض', 'ط', 
+                'ظ', 'ع', 'غ', 'ف', 'ق', 
+                'ک', 'گ', 'ل', 'م', 'ن',
+                'و', 'ه', 'ی', 'ء', 'آ',
+                'ً' , 'ٔ', 'ة', 'ك', '؛',
+                '؟', 'ؤ', 'ئ'
+            };
+
 
             for (var i = 0; i < ltrString.Length; i++)
             {
@@ -238,11 +250,13 @@ namespace TextViewer.Test
                 Assert.IsFalse(Paragraph.IsRtl(c), $"The {c} char at index {i} is not LTR!");
             }
 
-            for (var i = 0; i < rtlString.Length; i++)
+            for (var i = 0; i < rtlChars.Length; i++)
             {
-                var c = rtlString[i];
+                var c = rtlChars[i];
                 Assert.IsTrue(Paragraph.IsRtl(c), $"The {c} char at index {i} is not RTL!");
             }
+
+            Assert.IsTrue(Paragraph.IsRtl('آ'));
         }
     }
 }
