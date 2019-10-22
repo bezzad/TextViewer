@@ -61,8 +61,9 @@ namespace TextViewer
 
         public void AddStyles(Dictionary<StyleType, string> styles)
         {
-            foreach (var (key, value) in styles)
-                Styles[key] = value;
+            if (styles != null)
+                foreach (var (key, value) in styles)
+                    Styles[key] = value;
         }
 
         public object GetAttribute(StyleType style)
@@ -134,7 +135,7 @@ namespace TextViewer
                 Render();
             }
         }
-        
+
         public int CompareTo([AllowNull] WordInfo other)
         {
             if (other == null) throw new ArgumentNullException(nameof(other));

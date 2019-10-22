@@ -10,9 +10,7 @@ namespace TextViewer.Test
     [TestClass]
     public class WordInfoTest
     {
-        /// <summary>An observable dictionary to which a mock will be subscribed</summary>
         private List<WordInfo> Words { get; set; }
-
         private Paragraph Parent { get; set; }
 
         /// <summary>Initialization routine executed before each test is run</summary>

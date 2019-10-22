@@ -11,7 +11,6 @@ namespace TextViewer.Test
     [TestClass]
     public class LineTest
     {
-        /// <summary>An observable dictionary to which a mock will be subscribed</summary>
         private List<WordInfo> LtrWords { get; set; }
         private List<WordInfo> RtlWords { get; set; }
         private Paragraph LtrParent { get; set; }
@@ -22,6 +21,8 @@ namespace TextViewer.Test
         private readonly Point _ltrStartPoint = new Point(1, 1);
         private readonly Point _rtlStartPoint = new Point(199, 1);
         private readonly FontFamily _arial = new FontFamily("Arial");
+
+
 
         /// <summary>Initialization routine executed before each test is run</summary>
         [TestInitialize]
