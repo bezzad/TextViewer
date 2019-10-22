@@ -11,7 +11,7 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="40" />
         </Grid.RowDefinitions>
-        <textViewer:MagnifyingTextViewer Grid.Row="0" x:Name="Reader" Background="AntiqueWhite" Padding="20" IsSelectable="True" MagnifierZoomFactor="5" MagnifierType="Sticker" MagnifierDistanceFromMouse="0"></textViewer:MagnifyingTextViewer>
+        <textViewer:MagnifyingTextViewer Grid.Row="0" x:Name="Reader" Background="AntiqueWhite" Padding="20" IsSelectable="True" MagnifierZoomFactor="5" MagnifierDistanceFromMouse="0"></textViewer:MagnifyingTextViewer>
         <StackPanel Orientation="Horizontal" Grid.Row="1" Background="Azure" >
             <CheckBox Margin="5,10" IsChecked="{Binding ElementName=Reader, Path=ShowOffset, UpdateSourceTrigger=PropertyChanged}">Show Offset</CheckBox>
             <CheckBox Margin="5,10" IsChecked="{Binding ElementName=Reader, Path=ShowWireFrame, UpdateSourceTrigger=PropertyChanged}">Wire Frame</CheckBox>
@@ -30,8 +30,7 @@
 
             <GridSplitter Width="1" Background="Gray"></GridSplitter>
 
-            <ToggleButton Name="BtnLtrSample" Margin="10,5,0,5" Checked="BtnLtrSampleChecked">Ltr Sample</ToggleButton>
-            <ToggleButton Name="BtnRtlSample"  Margin="10,5,0,5" Checked="BtnRtlSampleChecked">Rtl Sample</ToggleButton>
+            <ToggleButton Name="BtnLoadSample" Margin="10,5,0,5" Width="100"></ToggleButton>
         </StackPanel>
     </Grid>
 </Window>

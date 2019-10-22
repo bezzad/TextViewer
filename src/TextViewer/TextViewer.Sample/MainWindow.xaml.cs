@@ -28,8 +28,10 @@ namespace TextViewerSample
             CmbLineHeight.SelectedIndex = sizes.IndexOf(22);
             CmbMagnifier.ItemsSource = magnifierTypes;
             CmbMagnifier.SelectedIndex = magnifierTypes.IndexOf(Reader.MagnifierType.ToString());
+            BtnLoadSample.Checked += delegate { BtnLoadSampleChecking(); };
+            BtnLoadSample.Unchecked += delegate { BtnLoadSampleChecking(); };
 
-            BtnRtlSampleChecked(this, null);
+            BtnLoadSampleChecking();
 
             DpiChanged += delegate
             {
@@ -38,19 +40,19 @@ namespace TextViewerSample
             };
         }
 
-        private void BtnLtrSampleChecked(object sender, RoutedEventArgs e)
+        private void BtnLoadSampleChecking()
         {
-            Reader.PageContent = Path.Combine(Environment.CurrentDirectory, "Data\\LtrContentSample.txt").GetWords(false);
-            BtnLtrSample.IsChecked = true;
-            BtnRtlSample.IsChecked = false;
-            Reader.Render();
-        }
+            if (BtnLoadSample.IsChecked == true)
+            {
+                Reader.PageContent = Path.Combine(Environment.CurrentDirectory, "Data\\LtrContentSample.txt").GetWords(false);
+                BtnLoadSample.Content = "LtrContentSample";
+            }
+            else
+            {
+                Reader.PageContent = Path.Combine(Environment.CurrentDirectory, "Data\\RtlContentSample.txt").GetWords(true);
+                BtnLoadSample.Content = "RtrContentSample";
+            }
 
-        private void BtnRtlSampleChecked(object sender, RoutedEventArgs e)
-        {
-            Reader.PageContent = Path.Combine(Environment.CurrentDirectory, "Data\\RtlContentSample.txt").GetWords(true);
-            BtnRtlSample.IsChecked = true;
-            BtnLtrSample.IsChecked = false;
             Reader.Render();
         }
     }
