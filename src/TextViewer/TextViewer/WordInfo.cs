@@ -149,31 +149,8 @@ namespace TextViewer
             return $"{Offset}/`{Text}`/{Offset + Text.Length - 1}";
         }
 
-        public object GetDefaultStyleValue(WordStyleType style)
-        {
-            switch (style)
-            {
-                case WordStyleType.MarginBottom:
-                case WordStyleType.MarginLeft:
-                case WordStyleType.MarginRight:
-                case WordStyleType.MarginTop:
-                case WordStyleType.FontSize:
-                case WordStyleType.Width:
-                case WordStyleType.Height: return 0.0;
-                case WordStyleType.FontWeight: return FontWeights.Normal;
-                case WordStyleType.VerticalAlign: return VerticalAlignment.Center;
-                case WordStyleType.Color: return Brushes.Black;
-                case WordStyleType.TextAlign: return TextAlignment.Justify;
-                case WordStyleType.Display: return true;
-                case WordStyleType.Direction: return Paragraph.IsRtlDirection;
-                default: return null;
-            }
-        }
-
         public object ConvertStyle(WordStyleType style, object value = null)
         {
-            if (value == null) return GetDefaultStyleValue(style);
-
             switch (style)
             {
                 case WordStyleType.MarginBottom:
@@ -182,15 +159,15 @@ namespace TextViewer
                 case WordStyleType.MarginTop:
                 case WordStyleType.FontSize:
                 case WordStyleType.Width:
-                case WordStyleType.Height: return value is double d ? d : GetDefaultStyleValue(style);
-                case WordStyleType.FontWeight: return value is FontWeight fw ? fw : GetDefaultStyleValue(style);
-                case WordStyleType.TextAlign: return value is TextAlignment ta ? ta : GetDefaultStyleValue(style);
-                case WordStyleType.Display: return value is bool tf ? tf : GetDefaultStyleValue(style);
-                case WordStyleType.VerticalAlign: return value is VerticalAlignment va ? va : GetDefaultStyleValue(style);
-                case WordStyleType.Direction: return value is FlowDirection flow ? flow : GetDefaultStyleValue(style);
-                case WordStyleType.Color: return value is string color ? new BrushConverter().ConvertFromString(color) : GetDefaultStyleValue(style);
+                case WordStyleType.Height: return value is double d ? d : 0.0;
+                case WordStyleType.FontWeight: return value is FontWeight fw ? fw : FontWeights.Normal;
+                case WordStyleType.TextAlign: return value is TextAlignment ta ? ta : TextAlignment.Justify;
+                case WordStyleType.Display: return !(value is bool tf) || tf;
+                case WordStyleType.VerticalAlign: return value is VerticalAlignment va ? va : VerticalAlignment.Center;
+                case WordStyleType.Direction: return value is FlowDirection flow ? flow : Paragraph.IsRtlDirection ? FlowDirection.RightToLeft : FlowDirection.LeftToRight;
+                case WordStyleType.Color: return value is string color ? new BrushConverter().ConvertFromString(color) : Brushes.Black;
                 case WordStyleType.Href: return value;
-                case WordStyleType.Image: return value is byte[] bytes ? CreateImage(bytes) : GetDefaultStyleValue(style);
+                case WordStyleType.Image: return value is byte[] bytes ? CreateImage(bytes) : null;
 
                 default: return null;
             }
