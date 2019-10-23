@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Windows;
 using System.Windows.Media;
@@ -53,6 +54,11 @@ namespace TextViewer
         {
             using var stream = new MemoryStream(bytes);
             Image = BitmapFrame.Create(stream, BitmapCreateOptions.None, BitmapCacheOption.OnLoad);
+        }
+
+        public void SetImage(string base64)
+        {
+            SetImage(Convert.FromBase64String(base64));
         }
     }
 }
