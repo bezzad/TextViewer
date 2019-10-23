@@ -145,7 +145,7 @@ namespace TextViewer
                     if (c == 0x60B) return true;
                     if (c == 0x60D) return true;
                     if (c == 0x61B) return true;
-                    if (0x61E <= c && c <= 0x64A) return true;
+                    if (0x61E <= c && c <= 0x656) return true;
                     if (0x66D <= c && c <= 0x66F) return true;
                     if (0x671 <= c && c <= 0x6D5) return true;
                     if (0x6E5 <= c && c <= 0x6E6) return true;
@@ -206,9 +206,8 @@ namespace TextViewer
                     if (0x10B78 <= c && c <= 0x10B7F) return true;
                 }
             }
-            else if (!char.IsDigit(c) &&
-                     Regex.IsMatch(c.ToString(), @"\p{IsArabic}|\p{IsHebrew}")) return true;
-
+            else if (!char.IsDigit(c) && Regex.IsMatch(c.ToString(), @"\p{IsArabic}|\p{IsHebrew}")) return true;
+            
             return false;
         }
 

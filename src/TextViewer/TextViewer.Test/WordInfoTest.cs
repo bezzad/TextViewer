@@ -229,18 +229,16 @@ namespace TextViewer.Test
         [TestMethod]
         public void IsRtlTest()
         {
-            var ltrString = @"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890۱۲۳۴۵۶۷۸۹۰";
-            var rtlChars = new char[]
+            var ltrString = @"âs̱čẕžšṣẓʿġq̈ūōēáæabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890۱۲۳۴۵۶۷۸۹۰";
+            var rtlChars = new[]
             {
-                ',', 'ا', 'ب', 'پ', 'ت', 
-                'ث', 'ج', 'چ', 'ح', 'خ', 
-                'د', 'ذ', 'ر', 'ز', 'ژ', 
-                'س', 'ش', 'ص', 'ض', 'ط', 
-                'ظ', 'ع', 'غ', 'ف', 'ق', 
-                'ک', 'گ', 'ل', 'م', 'ن',
-                'و', 'ه', 'ی', 'ء', 'آ',
-                'ً' , 'ٔ', 'ة', 'ك', '؛',
-                '؟', 'ؤ', 'ئ'
+                'ا', 'ب', 'پ', 'ت', '؟', 'ث', 'ج', 'چ', 'ح', 'خ', 
+                'د', 'ذ', 'ر', 'ز', 'ژ', 'س', 'ش', 'ص', 'ض', 'ط', 
+                'ظ', 'ع', 'غ', 'ف', 'ق', 'ک', 'گ', 'ل', 'م', 'ن',
+                'و', 'ه', 'ی', 'ء', 'آ', 'ة', 'ك', '؛', 'ؤ', 'ئ',
+                'ً', 'ٔ', 'ב', 'א', 'מ', 'ת', 'ש', 'ר', 'ה', 'ۀ',
+                '\u064C', '\u0651', '\u0622', '\u06C0', '\u0640', 
+                '\u0643', '\u0686', '\u064A', '\uFEF0'
             };
 
 
@@ -249,14 +247,12 @@ namespace TextViewer.Test
                 var c = ltrString[i];
                 Assert.IsFalse(Paragraph.IsRtl(c), $"The {c} char at index {i} is not LTR!");
             }
-
+            
             for (var i = 0; i < rtlChars.Length; i++)
             {
                 var c = rtlChars[i];
                 Assert.IsTrue(Paragraph.IsRtl(c), $"The {c} char at index {i} is not RTL!");
             }
-
-            Assert.IsTrue(Paragraph.IsRtl('آ'));
         }
     }
 }
