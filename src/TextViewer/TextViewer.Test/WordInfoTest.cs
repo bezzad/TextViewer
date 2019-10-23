@@ -50,14 +50,14 @@ namespace TextViewer.Test
             }
 
             // set image width and height
-            Words.Last().Styles.Add(StyleType.Width, "5");
-            Words.Last().Styles.Add(StyleType.Height, "5");
-            Words.Last().Styles.Add(StyleType.Image, @"iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAA" +
+            Words.Last().Styles.Add(WordStyleType.Width, "5");
+            Words.Last().Styles.Add(WordStyleType.Height, "5");
+            Words.Last().Styles.Add(WordStyleType.Image, @"iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAA" +
                                                      @"ACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIB" +
                                                      @"KE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==");
 
             // cover test for parental styles
-            Parent.Styles.Add(StyleType.VerticalAlign, VerticalAlignment.Top.ToString());
+            Parent.Styles.Add(WordStyleType.VerticalAlign, VerticalAlignment.Top.ToString());
         }
 
         [TestMethod]
@@ -67,24 +67,24 @@ namespace TextViewer.Test
             {
                 var word = Words[i];
                 Debug.WriteLine($"Word {i}");
-                Assert.AreEqual(word.GetAttribute(StyleType.Color), Brushes.Black);
-                Assert.AreEqual(word.GetAttribute(StyleType.VerticalAlign), VerticalAlignment.Top);
-                Assert.AreEqual(word.GetAttribute(StyleType.FontWeight), FontWeights.Normal);
-                Assert.AreEqual(word.GetAttribute(StyleType.MarginBottom), 0.0);
-                Assert.AreEqual(word.GetAttribute(StyleType.MarginTop), 0.0);
-                Assert.AreEqual(word.GetAttribute(StyleType.MarginLeft), 0.0);
-                Assert.AreEqual(word.GetAttribute(StyleType.MarginRight), 0.0);
-                Assert.AreEqual(word.GetAttribute(StyleType.Height), word.Type == WordType.Image ? 5 : 0.0);
-                Assert.AreEqual(word.GetAttribute(StyleType.Width), word.Type == WordType.Image ? 5 : 0.0);
-                Assert.AreEqual(word.GetAttribute(StyleType.FontSize), 0.0);
-                Assert.AreEqual(word.GetAttribute(StyleType.TextAlign), TextAlignment.Justify);
-                Assert.AreEqual(word.GetAttribute(StyleType.Display), true);
+                Assert.AreEqual(word.GetAttribute(WordStyleType.Color), Brushes.Black);
+                Assert.AreEqual(word.GetAttribute(WordStyleType.VerticalAlign), VerticalAlignment.Top);
+                Assert.AreEqual(word.GetAttribute(WordStyleType.FontWeight), FontWeights.Normal);
+                Assert.AreEqual(word.GetAttribute(WordStyleType.MarginBottom), 0.0);
+                Assert.AreEqual(word.GetAttribute(WordStyleType.MarginTop), 0.0);
+                Assert.AreEqual(word.GetAttribute(WordStyleType.MarginLeft), 0.0);
+                Assert.AreEqual(word.GetAttribute(WordStyleType.MarginRight), 0.0);
+                Assert.AreEqual(word.GetAttribute(WordStyleType.Height), word.Type == WordType.Image ? 5 : 0.0);
+                Assert.AreEqual(word.GetAttribute(WordStyleType.Width), word.Type == WordType.Image ? 5 : 0.0);
+                Assert.AreEqual(word.GetAttribute(WordStyleType.FontSize), 0.0);
+                Assert.AreEqual(word.GetAttribute(WordStyleType.TextAlign), TextAlignment.Justify);
+                Assert.AreEqual(word.GetAttribute(WordStyleType.Display), true);
                 if (word.IsImage)
-                    Assert.IsNotNull(word.GetAttribute(StyleType.Image));
+                    Assert.IsNotNull(word.GetAttribute(WordStyleType.Image));
                 else
-                    Assert.IsNull(word.GetAttribute(StyleType.Image));
+                    Assert.IsNull(word.GetAttribute(WordStyleType.Image));
 
-                var dir = word.GetAttribute(StyleType.Direction);
+                var dir = word.GetAttribute(WordStyleType.Direction);
                 Assert.IsInstanceOfType(dir, typeof(FlowDirection));
                 Assert.AreEqual((FlowDirection) dir == FlowDirection.RightToLeft, word.IsRtl);
             }
@@ -94,15 +94,15 @@ namespace TextViewer.Test
         public void SetDirectionTest()
         {
             var word = new WordInfo("test", 0, WordType.Normal, true);
-            Assert.AreEqual(word.GetAttribute(StyleType.Direction), FlowDirection.RightToLeft);
+            Assert.AreEqual(word.GetAttribute(WordStyleType.Direction), FlowDirection.RightToLeft);
             Assert.IsTrue(word.IsRtl);
 
             word.SetDirection(false);
-            Assert.AreEqual(word.GetAttribute(StyleType.Direction), FlowDirection.LeftToRight);
+            Assert.AreEqual(word.GetAttribute(WordStyleType.Direction), FlowDirection.LeftToRight);
             Assert.IsFalse(word.IsRtl);
 
             word.SetDirection(true);
-            Assert.AreEqual(word.GetAttribute(StyleType.Direction), FlowDirection.RightToLeft);
+            Assert.AreEqual(word.GetAttribute(WordStyleType.Direction), FlowDirection.RightToLeft);
             Assert.IsTrue(word.IsRtl);
         }
 
@@ -124,13 +124,13 @@ namespace TextViewer.Test
         [TestMethod]
         public void AddStylesTest()
         {
-            var styles = new Dictionary<StyleType, string>
+            var styles = new Dictionary<WordStyleType, string>
             {
-                [StyleType.Display] = "false",
-                [StyleType.Color] = "red",
-                [StyleType.MarginBottom] = "11",
-                [StyleType.Width] = "12",
-                [StyleType.Height] = "13",
+                [WordStyleType.Display] = "false",
+                [WordStyleType.Color] = "red",
+                [WordStyleType.MarginBottom] = "11",
+                [WordStyleType.Width] = "12",
+                [WordStyleType.Height] = "13",
             };
 
             for (var i = 0; i < Words.Count; i++)
@@ -138,22 +138,22 @@ namespace TextViewer.Test
                 var word = Words[i];
                 Debug.WriteLine($"Word {i}");
                 word.AddStyles(styles);
-                Assert.AreEqual(word.GetAttribute(StyleType.Color), Brushes.Red);
-                Assert.AreEqual(word.GetAttribute(StyleType.VerticalAlign), VerticalAlignment.Top);
-                Assert.AreEqual(word.GetAttribute(StyleType.FontWeight), FontWeights.Normal);
-                Assert.AreEqual(word.GetAttribute(StyleType.MarginBottom), 11.0);
-                Assert.AreEqual(word.GetAttribute(StyleType.MarginTop), 0.0);
-                Assert.AreEqual(word.GetAttribute(StyleType.MarginLeft), 0.0);
-                Assert.AreEqual(word.GetAttribute(StyleType.MarginRight), 0.0);
-                Assert.AreEqual(word.GetAttribute(StyleType.Height), 13.0);
-                Assert.AreEqual(word.GetAttribute(StyleType.Width), 12.0);
-                Assert.AreEqual(word.GetAttribute(StyleType.FontSize), 0.0);
-                Assert.AreEqual(word.GetAttribute(StyleType.TextAlign), TextAlignment.Justify);
-                Assert.AreEqual(word.GetAttribute(StyleType.Display), false);
+                Assert.AreEqual(word.GetAttribute(WordStyleType.Color), Brushes.Red);
+                Assert.AreEqual(word.GetAttribute(WordStyleType.VerticalAlign), VerticalAlignment.Top);
+                Assert.AreEqual(word.GetAttribute(WordStyleType.FontWeight), FontWeights.Normal);
+                Assert.AreEqual(word.GetAttribute(WordStyleType.MarginBottom), 11.0);
+                Assert.AreEqual(word.GetAttribute(WordStyleType.MarginTop), 0.0);
+                Assert.AreEqual(word.GetAttribute(WordStyleType.MarginLeft), 0.0);
+                Assert.AreEqual(word.GetAttribute(WordStyleType.MarginRight), 0.0);
+                Assert.AreEqual(word.GetAttribute(WordStyleType.Height), 13.0);
+                Assert.AreEqual(word.GetAttribute(WordStyleType.Width), 12.0);
+                Assert.AreEqual(word.GetAttribute(WordStyleType.FontSize), 0.0);
+                Assert.AreEqual(word.GetAttribute(WordStyleType.TextAlign), TextAlignment.Justify);
+                Assert.AreEqual(word.GetAttribute(WordStyleType.Display), false);
                 if (word.IsImage)
-                    Assert.IsNotNull(word.GetAttribute(StyleType.Image));
+                    Assert.IsNotNull(word.GetAttribute(WordStyleType.Image));
                 else
-                    Assert.IsNull(word.GetAttribute(StyleType.Image));
+                    Assert.IsNull(word.GetAttribute(WordStyleType.Image));
             }
         }
 

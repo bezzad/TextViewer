@@ -15,7 +15,7 @@ namespace TextViewer
             Type = type;
             ImageScale = 1;
             Offset = offset;
-            Styles = new Dictionary<StyleType, string>();
+            Styles = new Dictionary<WordStyleType, string>();
             SetDirection(isRtl);
         }
 
@@ -37,45 +37,45 @@ namespace TextViewer
         public Point DrawPoint { get; set; }
         public Rect Area { get; set; }
         public Paragraph Paragraph { get; set; }
-        public Dictionary<StyleType, string> Styles { get; protected set; }
+        public Dictionary<WordStyleType, string> Styles { get; protected set; }
         public string Text { get; set; }
         public WordType Type { get; set; }
         public double ImageScale { get; set; }
         public bool IsSelected { get; set; }
         public double Width => IsImage
-            ? (double)GetAttribute(StyleType.Width) * ImageScale + ExtraWidth
+            ? (double)GetAttribute(WordStyleType.Width) * ImageScale + ExtraWidth
             : (Format?.WidthIncludingTrailingWhitespace ?? 0) + ExtraWidth;
         public double Height => IsImage
-            ? (double)GetAttribute(StyleType.Height) * ImageScale
+            ? (double)GetAttribute(WordStyleType.Height) * ImageScale
             : Format?.Height ?? 0;
         public bool IsImage => Type.HasFlag(WordType.Image);
-        public bool IsRtl => Styles[StyleType.Direction] == Rtl;
+        public bool IsRtl => Styles[WordStyleType.Direction] == Rtl;
         public new int Offset { get; }
 
 
         public void SetDirection(bool isRtl)
         {
-            Styles[StyleType.Direction] = isRtl ? Rtl : Ltr;
+            Styles[WordStyleType.Direction] = isRtl ? Rtl : Ltr;
         }
 
-        public void AddStyles(Dictionary<StyleType, string> styles)
+        public void AddStyles(Dictionary<WordStyleType, string> styles)
         {
             if (styles != null)
                 foreach (var (key, value) in styles)
                     Styles[key] = value;
         }
 
-        public object GetAttribute(StyleType style)
+        public object GetAttribute(WordStyleType style)
         {
             // read word style first
             if (Styles?.ContainsKey(style) == true)
-                return style.ConvertStyleType(Styles[style]);
+                return style.ConvertStyle(Styles[style]);
 
             // if word has not style, then use parent style
             if (Paragraph?.Styles?.ContainsKey(style) == true)
-                return style.ConvertStyleType(Paragraph.Styles[style]);
+                return style.ConvertStyle(Paragraph.Styles[style]);
 
-            return style.ConvertStyleType();
+            return style.ConvertStyle();
         }
 
         public FormattedText GetFormattedText(FontFamily fontFamily,
@@ -88,9 +88,9 @@ namespace TextViewer
                 Text,
                 IsRtl ? RtlCulture : LtrCulture,
                 IsRtl ? FlowDirection.RightToLeft : FlowDirection.LeftToRight,
-                new Typeface(fontFamily, FontStyles.Normal, (FontWeight)GetAttribute(StyleType.FontWeight), FontStretches.Normal),
+                new Typeface(fontFamily, FontStyles.Normal, (FontWeight)GetAttribute(WordStyleType.FontWeight), FontStretches.Normal),
                 fontSize,
-                (SolidColorBrush)GetAttribute(StyleType.Color),
+                (SolidColorBrush)GetAttribute(WordStyleType.Color),
                 pixelsPerDip)
             {
                 LineHeight = lineHeight,
@@ -105,7 +105,7 @@ namespace TextViewer
         {
             var dc = RenderOpen();
 
-            if (IsImage && GetAttribute(StyleType.Image) is ImageSource img)
+            if (IsImage && GetAttribute(WordStyleType.Image) is ImageSource img)
                 dc.DrawImage(img, Area);
             else
                 dc.DrawText(Format, DrawPoint);

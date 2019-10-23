@@ -58,9 +58,9 @@ namespace TextViewer
                         SetWordPosition(word);
                     }
                 }
-                else if (CurrentParagraph.Styles.ContainsKey(StyleType.TextAlign))
+                else if (CurrentParagraph.Styles.ContainsKey(WordStyleType.TextAlign))
                 {
-                    switch (CurrentParagraph.Styles[StyleType.TextAlign])
+                    switch (CurrentParagraph.Styles[WordStyleType.TextAlign])
                     {
                         case "left":
                             {

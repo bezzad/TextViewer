@@ -89,15 +89,15 @@ namespace TextViewer.Test
             }
 
             // set image width and height
-            LtrWords.Last().Styles.Add(StyleType.Width, "5");
-            LtrWords.Last().Styles.Add(StyleType.Height, "5");
-            LtrWords.Last().Styles.Add(StyleType.Image, @"iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAA" +
+            LtrWords.Last().Styles.Add(WordStyleType.Width, "5");
+            LtrWords.Last().Styles.Add(WordStyleType.Height, "5");
+            LtrWords.Last().Styles.Add(WordStyleType.Image, @"iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAA" +
                                                      @"ACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIB" +
                                                      @"KE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==");
 
-            RtlWords.Last().Styles.Add(StyleType.Width, "5");
-            RtlWords.Last().Styles.Add(StyleType.Height, "5");
-            RtlWords.Last().Styles.Add(StyleType.Image, @"iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAA" +
+            RtlWords.Last().Styles.Add(WordStyleType.Width, "5");
+            RtlWords.Last().Styles.Add(WordStyleType.Height, "5");
+            RtlWords.Last().Styles.Add(WordStyleType.Image, @"iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAA" +
                                                         @"ACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIB" +
                                                         @"KE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==");
         }
@@ -238,8 +238,8 @@ namespace TextViewer.Test
             }
             //
             // Test center text-align
-            LtrParent.Styles[StyleType.TextAlign] = "center";
-            RtlParent.Styles[StyleType.TextAlign] = "center";
+            LtrParent.Styles[WordStyleType.TextAlign] = "center";
+            RtlParent.Styles[WordStyleType.TextAlign] = "center";
             ltrLine.Render();
             rtlLine.Render();
             Assert.IsTrue(ltrLine.CurrentParagraph.Lines.Count == lineCounter);
@@ -248,8 +248,8 @@ namespace TextViewer.Test
             Assert.IsTrue(rtlLine.Words.First().DrawPoint.X.Equals(_rtlStartPoint.X - rtlLine.RemainWidth / 2));
             //
             // Test left text-align
-            LtrParent.Styles[StyleType.TextAlign] = "left";
-            RtlParent.Styles[StyleType.TextAlign] = "left";
+            LtrParent.Styles[WordStyleType.TextAlign] = "left";
+            RtlParent.Styles[WordStyleType.TextAlign] = "left";
             ltrLine.Render();
             rtlLine.Render();
             Assert.IsTrue(ltrLine.CurrentParagraph.Lines.Count == lineCounter);
@@ -258,8 +258,8 @@ namespace TextViewer.Test
             Assert.IsTrue(Math.Abs(rtlLine.Words.Last().Area.Location.X) - Math.Abs(rtlLine.RemainWidth - rtlLine.ActualWidth - 200 + rtlLine.Location.X) < 0.00000000001);
             //
             // Test right text-align
-            LtrParent.Styles[StyleType.TextAlign] = "right";
-            RtlParent.Styles[StyleType.TextAlign] = "right";
+            LtrParent.Styles[WordStyleType.TextAlign] = "right";
+            RtlParent.Styles[WordStyleType.TextAlign] = "right";
             ltrLine.Render();
             rtlLine.Render();
             Assert.IsTrue(ltrLine.CurrentParagraph.Lines.Count == lineCounter);

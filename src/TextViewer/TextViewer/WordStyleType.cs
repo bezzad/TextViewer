@@ -1,6 +1,6 @@
 ﻿namespace TextViewer
 {
-    public enum StyleType
+    public enum WordStyleType
     {
         Direction,
         TextAlign,
@@ -16,7 +16,6 @@
         Href,
         Width,
         Height,
-        Image,
-        None
+        Image
     }
 }

@@ -16,21 +16,21 @@ namespace TextViewerSample
                 if (textLine.StartsWith("<left>", StringComparison.OrdinalIgnoreCase) ||
                     textLine.EndsWith("</left>", StringComparison.OrdinalIgnoreCase))
                 {
-                    para.Styles[StyleType.TextAlign] = "left";
+                    para.Styles[WordStyleType.TextAlign] = "left";
                     textLine = textLine.Replace("<left>", "").Replace("</left>", "");
                 }
 
                 if (textLine.StartsWith("<center>", StringComparison.OrdinalIgnoreCase) ||
                     textLine.EndsWith("</center>", StringComparison.OrdinalIgnoreCase))
                 {
-                    para.Styles[StyleType.TextAlign] = "center";
+                    para.Styles[WordStyleType.TextAlign] = "center";
                     textLine = textLine.Replace("<center>", "").Replace("</center>", "");
                 }
 
                 if (textLine.StartsWith("<right>", StringComparison.OrdinalIgnoreCase) ||
                     textLine.EndsWith("</right>", StringComparison.OrdinalIgnoreCase))
                 {
-                    para.Styles[StyleType.TextAlign] = "right";
+                    para.Styles[WordStyleType.TextAlign] = "right";
                     textLine = textLine.Replace("<right>", "").Replace("</right>", "");
                 }
 
@@ -46,21 +46,21 @@ namespace TextViewerSample
                             var startVal = word.IndexOf("\"", StringComparison.Ordinal) + 1;
                             var w = word.Substring(startVal,
                                 word.LastIndexOf("\"", StringComparison.Ordinal) - startVal);
-                            imgWord.Styles.Add(StyleType.Width, w);
+                            imgWord.Styles.Add(WordStyleType.Width, w);
                         }
                         else if (word.StartsWith("height"))
                         {
                             var startVal = word.IndexOf("\"", StringComparison.Ordinal) + 1;
                             var h = word.Substring(startVal,
                                 word.LastIndexOf("\"", StringComparison.Ordinal) - startVal);
-                            imgWord.Styles.Add(StyleType.Height, h);
+                            imgWord.Styles.Add(WordStyleType.Height, h);
                         }
                         else if (word.StartsWith("src"))
                         {
                             var startVal = word.IndexOf("\"", StringComparison.Ordinal) + 1;
                             var src = word.Substring(startVal,
                                 word.LastIndexOf("\"", StringComparison.Ordinal) - startVal);
-                            imgWord.Styles.Add(StyleType.Image, src);
+                            imgWord.Styles.Add(WordStyleType.Image, src);
                         }
                     }
 
@@ -89,7 +89,7 @@ namespace TextViewerSample
                 // TODO: upper codes just used for reading sample text --------------------------------------------------------------------
 
                 if (string.IsNullOrEmpty(content) == false)
-                    para.AddContent(0, content, new Dictionary<StyleType, string>());
+                    para.AddContent(0, content, new Dictionary<WordStyleType, string>());
             }
 
             return paragraphs;
