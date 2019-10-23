@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.IO;
 using System.Windows;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace TextViewer
 {
@@ -15,15 +17,13 @@ namespace TextViewer
             Type = type;
             ImageScale = 1;
             Offset = offset;
-            Styles = new Dictionary<WordStyleType, string>();
+            Styles = new Dictionary<WordStyleType, object>();
             SetDirection(isRtl);
         }
 
         public static readonly Brush SelectedBrush = new SolidColorBrush(Colors.DarkCyan) { Opacity = 0.5 };
         public static readonly CultureInfo RtlCulture = CultureInfo.GetCultureInfo("fa-ir");
         public static readonly CultureInfo LtrCulture = CultureInfo.GetCultureInfo("en-us");
-        public static readonly string Rtl = "rtl";
-        public static readonly string Ltr = "ltr";
 
         private double _extraWidth;
         public double ExtraWidth
@@ -37,7 +37,7 @@ namespace TextViewer
         public Point DrawPoint { get; set; }
         public Rect Area { get; set; }
         public Paragraph Paragraph { get; set; }
-        public Dictionary<WordStyleType, string> Styles { get; protected set; }
+        public Dictionary<WordStyleType, object> Styles { get; protected set; }
         public string Text { get; set; }
         public WordType Type { get; set; }
         public double ImageScale { get; set; }
@@ -49,16 +49,16 @@ namespace TextViewer
             ? (double)GetAttribute(WordStyleType.Height) * ImageScale
             : Format?.Height ?? 0;
         public bool IsImage => Type.HasFlag(WordType.Image);
-        public bool IsRtl => Styles[WordStyleType.Direction] == Rtl;
+        public bool IsRtl => (FlowDirection)GetAttribute(WordStyleType.Direction) == FlowDirection.RightToLeft;
         public new int Offset { get; }
 
 
         public void SetDirection(bool isRtl)
         {
-            Styles[WordStyleType.Direction] = isRtl ? Rtl : Ltr;
+            Styles[WordStyleType.Direction] = isRtl ? FlowDirection.RightToLeft : FlowDirection.LeftToRight;
         }
 
-        public void AddStyles(Dictionary<WordStyleType, string> styles)
+        public void AddStyles(Dictionary<WordStyleType, object> styles)
         {
             if (styles != null)
                 foreach (var (key, value) in styles)
@@ -69,13 +69,13 @@ namespace TextViewer
         {
             // read word style first
             if (Styles?.ContainsKey(style) == true)
-                return style.ConvertStyle(Styles[style]);
+                return ConvertStyle(style, Styles[style]);
 
             // if word has not style, then use parent style
             if (Paragraph?.Styles?.ContainsKey(style) == true)
-                return style.ConvertStyle(Paragraph.Styles[style]);
+                return ConvertStyle(style, Paragraph.Styles[style]);
 
-            return style.ConvertStyle();
+            return ConvertStyle(style);
         }
 
         public FormattedText GetFormattedText(FontFamily fontFamily,
@@ -87,7 +87,7 @@ namespace TextViewer
             Format = new FormattedText(
                 Text,
                 IsRtl ? RtlCulture : LtrCulture,
-                IsRtl ? FlowDirection.RightToLeft : FlowDirection.LeftToRight,
+                (FlowDirection)GetAttribute(WordStyleType.Direction),
                 new Typeface(fontFamily, FontStyles.Normal, (FontWeight)GetAttribute(WordStyleType.FontWeight), FontStretches.Normal),
                 fontSize,
                 (SolidColorBrush)GetAttribute(WordStyleType.Color),
@@ -147,6 +147,60 @@ namespace TextViewer
         public override string ToString()
         {
             return $"{Offset}/`{Text}`/{Offset + Text.Length - 1}";
+        }
+
+        public object GetDefaultStyleValue(WordStyleType style)
+        {
+            switch (style)
+            {
+                case WordStyleType.MarginBottom:
+                case WordStyleType.MarginLeft:
+                case WordStyleType.MarginRight:
+                case WordStyleType.MarginTop:
+                case WordStyleType.FontSize:
+                case WordStyleType.Width:
+                case WordStyleType.Height: return 0.0;
+                case WordStyleType.FontWeight: return FontWeights.Normal;
+                case WordStyleType.VerticalAlign: return VerticalAlignment.Center;
+                case WordStyleType.Color: return Brushes.Black;
+                case WordStyleType.TextAlign: return TextAlignment.Justify;
+                case WordStyleType.Display: return true;
+                case WordStyleType.Direction: return Paragraph.IsRtlDirection;
+                default: return null;
+            }
+        }
+
+        public object ConvertStyle(WordStyleType style, object value = null)
+        {
+            if (value == null) return GetDefaultStyleValue(style);
+
+            switch (style)
+            {
+                case WordStyleType.MarginBottom:
+                case WordStyleType.MarginLeft:
+                case WordStyleType.MarginRight:
+                case WordStyleType.MarginTop:
+                case WordStyleType.FontSize:
+                case WordStyleType.Width:
+                case WordStyleType.Height: return value is double d ? d : GetDefaultStyleValue(style);
+                case WordStyleType.FontWeight: return value is FontWeight fw ? fw : GetDefaultStyleValue(style);
+                case WordStyleType.TextAlign: return value is TextAlignment ta ? ta : GetDefaultStyleValue(style);
+                case WordStyleType.Display: return value is bool tf ? tf : GetDefaultStyleValue(style);
+                case WordStyleType.VerticalAlign: return value is VerticalAlignment va ? va : GetDefaultStyleValue(style);
+                case WordStyleType.Direction: return value is FlowDirection flow ? flow : GetDefaultStyleValue(style);
+                case WordStyleType.Color: return value is string color ? new BrushConverter().ConvertFromString(color) : GetDefaultStyleValue(style);
+                case WordStyleType.Href: return value;
+                case WordStyleType.Image: return value is byte[] bytes ? CreateImage(bytes) : GetDefaultStyleValue(style);
+
+                default: return null;
+            }
+        }
+
+
+        protected ImageSource CreateImage(byte[] bytes)
+        {
+            using var stream = new MemoryStream(bytes);
+            return BitmapFrame.Create(stream, BitmapCreateOptions.None, BitmapCacheOption.OnLoad);
         }
     }
 }

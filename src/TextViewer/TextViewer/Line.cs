@@ -62,20 +62,20 @@ namespace TextViewer
                 {
                     switch (CurrentParagraph.Styles[WordStyleType.TextAlign])
                     {
-                        case "left":
+                        case TextAlignment.Left:
                             {
                                 if (CurrentParagraph.IsRtlDirection)
                                     WordPointOffset -= RemainWidth;
                                 SetWordsPosition();
                                 break;
                             }
-                        case "center":
+                        case TextAlignment.Center:
                             {
                                 WordPointOffset += RemainWidth / 2 * (CurrentParagraph.IsRtlDirection ? -1 : 1);
                                 SetWordsPosition();
                                 break;
                             }
-                        case "right":
+                        case TextAlignment.Right:
                             {
                                 if (CurrentParagraph.IsRtlDirection == false)
                                     WordPointOffset += RemainWidth;

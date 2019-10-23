@@ -14,21 +14,21 @@ namespace TextViewer
             IsRtlDirection = isRtl;
             Words = new List<WordInfo>();
             Lines = new List<Line>();
-            Styles = new Dictionary<WordStyleType, string>();
+            Styles = new Dictionary<WordStyleType, object>();
         }
 
         public const string InertChars = "\\|«»<>[]{}()'/،.,:!@#$%٪^&~*_-+=~‍‍‍‍\"`×?";
         public new int Offset { get; set; }
         public List<WordInfo> Words { get; protected set; }
         public List<Line> Lines { get; protected set; }
-        public Dictionary<WordStyleType, string> Styles { get; protected set; }
+        public Dictionary<WordStyleType, object> Styles { get; protected set; }
         public bool IsRtlDirection { get; set; }
         public Size Size { get; set; }
         public Point Location { get; set; }
 
 
 
-        private void AddWord(WordInfo w, Dictionary<WordStyleType, string> contentStyle)
+        private void AddWord(WordInfo w, Dictionary<WordStyleType, object> contentStyle)
         {
             w.Paragraph = this;
 
@@ -48,7 +48,7 @@ namespace TextViewer
         /// <param name="contentOffset">The offset of attached content inflowing of this paragraph</param>
         /// <param name="content">Text of content which is want to attached at this paragraph</param>
         /// <param name="contentStyle">The given styles will be applied on the all of given content</param>
-        public void AddContent(int contentOffset, string content, Dictionary<WordStyleType, string> contentStyle)
+        public void AddContent(int contentOffset, string content, Dictionary<WordStyleType, object> contentStyle)
         {
             var wordBuffer = "";
             var offset = contentOffset;

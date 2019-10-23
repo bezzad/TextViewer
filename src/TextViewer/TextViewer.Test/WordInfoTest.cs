@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows;
@@ -50,14 +51,14 @@ namespace TextViewer.Test
             }
 
             // set image width and height
-            Words.Last().Styles.Add(WordStyleType.Width, "5");
-            Words.Last().Styles.Add(WordStyleType.Height, "5");
-            Words.Last().Styles.Add(WordStyleType.Image, @"iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAA" +
+            Words.Last().Styles.Add(WordStyleType.Width, 5.0);
+            Words.Last().Styles.Add(WordStyleType.Height, 5.0);
+            Words.Last().Styles.Add(WordStyleType.Image, Convert.FromBase64String(@"iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAA" +
                                                      @"ACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIB" +
-                                                     @"KE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==");
+                                                     @"KE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg=="));
 
             // cover test for parental styles
-            Parent.Styles.Add(WordStyleType.VerticalAlign, VerticalAlignment.Top.ToString());
+            Parent.Styles.Add(WordStyleType.VerticalAlign, VerticalAlignment.Top);
         }
 
         [TestMethod]
@@ -124,13 +125,13 @@ namespace TextViewer.Test
         [TestMethod]
         public void AddStylesTest()
         {
-            var styles = new Dictionary<WordStyleType, string>
+            var styles = new Dictionary<WordStyleType, object>
             {
-                [WordStyleType.Display] = "false",
+                [WordStyleType.Display] = false,
                 [WordStyleType.Color] = "red",
-                [WordStyleType.MarginBottom] = "11",
-                [WordStyleType.Width] = "12",
-                [WordStyleType.Height] = "13",
+                [WordStyleType.MarginBottom] = 11.0,
+                [WordStyleType.Width] = 12.0,
+                [WordStyleType.Height] = 13.0
             };
 
             for (var i = 0; i < Words.Count; i++)
