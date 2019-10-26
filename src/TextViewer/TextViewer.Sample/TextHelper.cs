@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Media;
@@ -13,62 +14,66 @@ namespace TextViewerSample
     {
         private static string SetParagraphStyle(string textLine, Paragraph para)
         {
-            if (textLine[0] == '<') // read HTML tag
-            {
-                if (textLine.StartsWith("<left>", StringComparison.OrdinalIgnoreCase) ||
-                    textLine.EndsWith("</left>", StringComparison.OrdinalIgnoreCase))
+            for (var i = 0; i < textLine.Length; i++)
+                if (textLine[i] == '<') // read HTML tag
                 {
-                    para.Styles.TextAlign = TextAlignment.Left;
-                    textLine = textLine.Replace("<left>", "").Replace("</left>", "");
-                }
-
-                if (textLine.StartsWith("<center>", StringComparison.OrdinalIgnoreCase) ||
-                    textLine.EndsWith("</center>", StringComparison.OrdinalIgnoreCase))
-                {
-                    para.Styles.TextAlign = TextAlignment.Center;
-                    textLine = textLine.Replace("<center>", "").Replace("</center>", "");
-                }
-
-                if (textLine.StartsWith("<right>", StringComparison.OrdinalIgnoreCase) ||
-                    textLine.EndsWith("</right>", StringComparison.OrdinalIgnoreCase))
-                {
-                    para.Styles.TextAlign = TextAlignment.Right;
-                    textLine = textLine.Replace("<right>", "").Replace("</right>", "");
-                }
-
-                if (textLine.IndexOf("<img", StringComparison.OrdinalIgnoreCase) >= 0)
-                {
-                    var imgWord = new WordInfo("img", 0, WordType.Image, para.Styles.IsRtl) { Paragraph = para };
-                    para.Words.Add(imgWord);
-
-                    foreach (var word in textLine.Split(" ", StringSplitOptions.RemoveEmptyEntries))
+                    if (textLine.Substring(i, 6).Equals("<left>", StringComparison.OrdinalIgnoreCase) ||
+                        textLine.Substring(i, 7).Equals("</left>", StringComparison.OrdinalIgnoreCase))
                     {
-                        if (word.StartsWith("width"))
-                        {
-                            var startVal = word.IndexOf("\"", StringComparison.Ordinal) + 1;
-                            var w = word.Substring(startVal,
-                                word.LastIndexOf("\"", StringComparison.Ordinal) - startVal);
-                            imgWord.Styles.Width = double.Parse(w);
-                        }
-                        else if (word.StartsWith("height"))
-                        {
-                            var startVal = word.IndexOf("\"", StringComparison.Ordinal) + 1;
-                            var h = word.Substring(startVal,
-                                word.LastIndexOf("\"", StringComparison.Ordinal) - startVal);
-                            imgWord.Styles.Height = double.Parse(h);
-                        }
-                        else if (word.StartsWith("src"))
-                        {
-                            var startVal = word.IndexOf("\"", StringComparison.Ordinal) + 1;
-                            var src = word.Substring(startVal,
-                                word.LastIndexOf("\"", StringComparison.Ordinal) - startVal);
-                            imgWord.Styles.SetImage(src);
-                        }
+                        para.Styles.TextAlign = TextAlignment.Left;
+                        textLine = textLine.Replace("<left>", "", StringComparison.OrdinalIgnoreCase)
+                            .Replace("</left>", "", StringComparison.OrdinalIgnoreCase);
                     }
 
-                    textLine = "";
+                    if (textLine.Substring(i, 8).Equals("<center>", StringComparison.OrdinalIgnoreCase) ||
+                        textLine.Substring(i, 9).Equals("</center>", StringComparison.OrdinalIgnoreCase))
+                    {
+                        para.Styles.TextAlign = TextAlignment.Center;
+                        textLine = textLine.Replace("<center>", "", StringComparison.OrdinalIgnoreCase)
+                            .Replace("</center>", "", StringComparison.OrdinalIgnoreCase);
+                    }
+
+                    if (textLine.Substring(i, 7).Equals("<right>", StringComparison.OrdinalIgnoreCase) ||
+                        textLine.Substring(i, 8).Equals("</right>", StringComparison.OrdinalIgnoreCase))
+                    {
+                        para.Styles.TextAlign = TextAlignment.Right;
+                        textLine = textLine.Replace("<right>", "", StringComparison.OrdinalIgnoreCase)
+                                           .Replace("</right>", "", StringComparison.OrdinalIgnoreCase);
+                    }
+
+                    if (textLine.IndexOf("<img", StringComparison.OrdinalIgnoreCase) >= 0)
+                    {
+                        var imgWord = new WordInfo("img", 0, WordType.Image, para.Styles.IsRtl) { Paragraph = para };
+                        para.Words.Add(imgWord);
+
+                        foreach (var word in textLine.Split(" ", StringSplitOptions.RemoveEmptyEntries))
+                        {
+                            if (word.StartsWith("width"))
+                            {
+                                var startVal = word.IndexOf("\"", StringComparison.Ordinal) + 1;
+                                var w = word.Substring(startVal,
+                                    word.LastIndexOf("\"", StringComparison.Ordinal) - startVal);
+                                imgWord.Styles.Width = double.Parse(w);
+                            }
+                            else if (word.StartsWith("height"))
+                            {
+                                var startVal = word.IndexOf("\"", StringComparison.Ordinal) + 1;
+                                var h = word.Substring(startVal,
+                                    word.LastIndexOf("\"", StringComparison.Ordinal) - startVal);
+                                imgWord.Styles.Height = double.Parse(h);
+                            }
+                            else if (word.StartsWith("src"))
+                            {
+                                var startVal = word.IndexOf("\"", StringComparison.Ordinal) + 1;
+                                var src = word.Substring(startVal,
+                                    word.LastIndexOf("\"", StringComparison.Ordinal) - startVal);
+                                imgWord.Styles.SetImage(src);
+                            }
+                        }
+
+                        textLine = "";
+                    }
                 }
-            }
 
             return textLine;
         }
@@ -98,14 +103,27 @@ namespace TextViewerSample
                         var isRtl = Paragraph.IsRtl(word);
                         var style = new WordStyle(para.Styles.IsRtl);
 
-                        if (word.Length > 10 || !isRtl)
+                        if (!isRtl || word.FirstOrDefault() == '<')
                         {
                             para.AddContent(offset, paraBuffer, style);
                             offset += paraBuffer.Length;
-                            paraBuffer = word + " ";
+                            paraBuffer = word + " "; // reset buffer
 
-                            if (word.Length > 10) style.FontWeight = FontWeights.Bold;
                             if (!isRtl) style.Foreground = Brushes.Blue;
+
+                            if (word.FirstOrDefault() == '<')
+                            {
+                                if (word.First() == '<')
+                                {
+                                    if (word.StartsWith("<bold>", StringComparison.OrdinalIgnoreCase) ||
+                                        word.StartsWith("</bold>", StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        style.FontWeight = FontWeights.Bold;
+                                        paraBuffer = word.Replace("<bold>", "", StringComparison.OrdinalIgnoreCase)
+                                            .Replace("</bold>", "", StringComparison.OrdinalIgnoreCase) + " ";
+                                    }
+                                }
+                            }
 
                             para.AddContent(offset, paraBuffer, style);
                             offset += paraBuffer.Length;
