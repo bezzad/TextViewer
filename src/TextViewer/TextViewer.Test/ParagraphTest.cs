@@ -63,7 +63,6 @@ namespace TextViewer.Test
             // paragraph properties calculated in TextViewer BuildPage method
             Assert.AreEqual(0, ltrPara.Size.Width);
             Assert.AreEqual(0, ltrPara.Size.Height);
-            Assert.AreEqual(0, ltrPara.Styles.Count);
             Assert.AreEqual(0, ltrPara.Location.X);
             Assert.AreEqual(0, ltrPara.Location.Y);
             Assert.AreEqual(0, ltrPara.Lines.Count);

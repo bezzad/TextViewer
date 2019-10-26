@@ -24,7 +24,7 @@ namespace TextViewer
         public double MarginRight { get; set; }
         public double MarginTop { get; set; }
         public double FontSize { get; set; }
-        public VerticalAlignment VerticalAlign { get; set; }
+        public VerticalAlignment? VerticalAlign { get; set; }
         public Brush Foreground { get; set; }
         public FontWeight FontWeight { get; set; }
         public string HyperRef { get; set; }
@@ -33,15 +33,14 @@ namespace TextViewer
         public ImageSource Image { get; set; }
 
 
-        public WordStyle(bool isRtl, WordStyle parentStyle = null)
+        public WordStyle(bool isRtl, WordStyle style = null)
         {
             MarginBottom = MarginLeft = MarginRight = MarginTop = FontSize = Width = Height = 0;
             FontWeight = FontWeights.Normal;
-            VerticalAlign = VerticalAlignment.Center;
             Foreground = Brushes.Black;
             Display = true;
 
-            AddStyle(parentStyle);
+            AddStyle(style);
             SetDirection(isRtl);
         }
 
@@ -49,7 +48,11 @@ namespace TextViewer
         {
             if (style != null)
                 foreach (var prop in typeof(WordStyle).GetProperties().Where(p => p.CanWrite && p.CanRead))
-                    prop.SetValue(this, prop.GetValue(style));
+                {
+                    var val = prop.GetValue(style);
+                    if (val != null)
+                        prop.SetValue(this, val);
+                }
         }
 
         public void SetDirection(bool isRtl)

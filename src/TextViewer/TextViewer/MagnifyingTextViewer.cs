@@ -144,7 +144,6 @@ namespace TextViewer
                     SetTop(MagnifierShape, currentMousePosition.Y + MagnifierDistanceFromMouse - Radius);
                 else
                     SetTop(MagnifierShape, currentMousePosition.Y - MagnifierDistanceFromMouse - Radius);
-
             }
             else
             {

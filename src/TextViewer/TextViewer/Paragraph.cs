@@ -11,24 +11,22 @@ namespace TextViewer
         public Paragraph(int offset, bool isRtl)
         {
             Offset = offset;
-            IsRtlDirection = isRtl;
             Words = new List<WordInfo>();
             Lines = new List<Line>();
-            Styles = new Dictionary<WordStyleType, object>();
+            Styles = new WordStyle(isRtl);
         }
 
         public const string InertChars = "\\|«»<>[]{}()'/،.,:!@#$%٪^&~*_-+=~‍‍‍‍\"`×?";
         public new int Offset { get; set; }
         public List<WordInfo> Words { get; protected set; }
         public List<Line> Lines { get; protected set; }
-        public Dictionary<WordStyleType, object> Styles { get; protected set; }
-        public bool IsRtlDirection { get; set; }
+        public WordStyle Styles { get; protected set; }
         public Size Size { get; set; }
         public Point Location { get; set; }
 
 
 
-        private void AddWord(WordInfo w, Dictionary<WordStyleType, object> contentStyle)
+        private void AddWord(WordInfo w)
         {
             w.Paragraph = this;
 
@@ -38,7 +36,6 @@ namespace TextViewer
                 w.PreviousWord = Words.Last();
                 w.PreviousWord.NextWord = w;
             }
-            w.AddStyles(contentStyle);
             Words.Add(w);
         }
 
@@ -48,7 +45,7 @@ namespace TextViewer
         /// <param name="contentOffset">The offset of attached content inflowing of this paragraph</param>
         /// <param name="content">Text of content which is want to attached at this paragraph</param>
         /// <param name="contentStyle">The given styles will be applied on the all of given content</param>
-        public void AddContent(int contentOffset, string content, Dictionary<WordStyleType, object> contentStyle)
+        public void AddContent(int contentOffset, string content, WordStyle contentStyle)
         {
             var wordBuffer = "";
             var offset = contentOffset;
@@ -60,14 +57,14 @@ namespace TextViewer
                 if (charPointer == ' ')
                 {
                     if (wordBuffer.Length > 0)
-                        AddWord(new WordInfo(wordBuffer, offset, WordType.Normal, IsRtl(wordBuffer)), contentStyle);
-
+                        AddWord(new WordInfo(wordBuffer, offset, WordType.Normal, IsRtl(wordBuffer), contentStyle));
+                    
                     wordBuffer = "";
 
                     // add space char as word
                     // note: space.IsRtl will complete calculate after adding all words
-                    var spaceIsRtl = IsRtlDirection == Words.LastOrDefault()?.IsRtl;
-                    AddWord(new WordInfo(charPointer.ToString(), contentOffset + i, WordType.Space, spaceIsRtl), contentStyle);
+                    var spaceIsRtl = Styles.IsRtl == Words.LastOrDefault()?.IsRtl;
+                    AddWord(new WordInfo(charPointer.ToString(), contentOffset + i, WordType.Space, spaceIsRtl, contentStyle));
 
                     // maybe there are exist multiple sequence space, so we set offset outside of the keeping word buffer.
                     offset = contentOffset + i + 1; // set next word offset
@@ -77,7 +74,7 @@ namespace TextViewer
                 if (InertChars.Contains(charPointer))
                 {
                     if (wordBuffer.Length > 0)
-                        AddWord(new WordInfo(wordBuffer, offset, WordType.Normal | WordType.Attached, IsRtl(wordBuffer)), contentStyle);
+                        AddWord(new WordInfo(wordBuffer, offset, WordType.Normal | WordType.Attached, IsRtl(wordBuffer), contentStyle));
 
                     wordBuffer = "";
 
@@ -85,7 +82,7 @@ namespace TextViewer
                     var isInnerWord = i + 1 < content.Length && content[i + 1] != ' ';
                     AddWord(new WordInfo(charPointer.ToString(), contentOffset + i,
                             isInnerWord ? WordType.Attached | WordType.InertChar : WordType.InertChar,
-                            IsRtl(charPointer) || IsRtlDirection), contentStyle);
+                            IsRtl(charPointer) || Styles.IsRtl, contentStyle));
 
                     offset = contentOffset + i + 1; // set next word offset
                     continue;
@@ -97,7 +94,7 @@ namespace TextViewer
             //
             // keep last word from buffer
             if (wordBuffer.Length > 0)
-                AddWord(new WordInfo(wordBuffer, offset, WordType.Normal, IsRtl(wordBuffer)), contentStyle);
+                AddWord(new WordInfo(wordBuffer, offset, WordType.Normal, IsRtl(wordBuffer), contentStyle));
             //
             // calculate all spaces rtl from last word to first word
             foreach (var space in Words.Where(w => w.Type.HasFlag(WordType.Space)).Reverse())
@@ -112,9 +109,9 @@ namespace TextViewer
 
                 // space.IsRtl default value is: (Paragraph.IsRtl == Word.IsRtl)
                 if (space.IsRtl || space.NextWord == null)
-                    space.SetDirection(IsRtlDirection);
+                    space.Styles.SetDirection(Styles.IsRtl);
                 else
-                    space.SetDirection(space.NextWord.IsRtl);
+                    space.Styles.SetDirection(space.NextWord.IsRtl);
             }
         }
 

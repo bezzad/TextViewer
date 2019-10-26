@@ -46,8 +46,8 @@ namespace TextViewer
                             var lastWord = line.Words.LastOrDefault();
                             if (lastWord != null)
                             {
-                                if (line.CurrentParagraph.IsRtlDirection && position.X <= lastWord.Area.X || // RTL line
-                                    !line.CurrentParagraph.IsRtlDirection && position.X >= lastWord.Area.X) // LTR line
+                                if (line.CurrentParagraph.Styles.IsRtl && position.X <= lastWord.Area.X || // RTL line
+                                    !line.CurrentParagraph.Styles.IsRtl && position.X >= lastWord.Area.X)  // LTR line
                                     selectedWord = lastWord;
                                 else
                                     selectedWord = line.Words.FirstOrDefault();

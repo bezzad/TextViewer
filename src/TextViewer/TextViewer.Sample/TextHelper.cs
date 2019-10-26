@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Windows;
+using System.Windows.Media;
 using TextViewer;
 
 namespace TextViewerSample
@@ -17,27 +18,27 @@ namespace TextViewerSample
                 if (textLine.StartsWith("<left>", StringComparison.OrdinalIgnoreCase) ||
                     textLine.EndsWith("</left>", StringComparison.OrdinalIgnoreCase))
                 {
-                    para.Styles[WordStyleType.TextAlign] = TextAlignment.Left;
+                    para.Styles.TextAlign = TextAlignment.Left;
                     textLine = textLine.Replace("<left>", "").Replace("</left>", "");
                 }
 
                 if (textLine.StartsWith("<center>", StringComparison.OrdinalIgnoreCase) ||
                     textLine.EndsWith("</center>", StringComparison.OrdinalIgnoreCase))
                 {
-                    para.Styles[WordStyleType.TextAlign] = TextAlignment.Center;
+                    para.Styles.TextAlign = TextAlignment.Center;
                     textLine = textLine.Replace("<center>", "").Replace("</center>", "");
                 }
 
                 if (textLine.StartsWith("<right>", StringComparison.OrdinalIgnoreCase) ||
                     textLine.EndsWith("</right>", StringComparison.OrdinalIgnoreCase))
                 {
-                    para.Styles[WordStyleType.TextAlign] = TextAlignment.Right;
+                    para.Styles.TextAlign = TextAlignment.Right;
                     textLine = textLine.Replace("<right>", "").Replace("</right>", "");
                 }
 
                 if (textLine.IndexOf("<img", StringComparison.OrdinalIgnoreCase) >= 0)
                 {
-                    var imgWord = new WordInfo("img", 0, WordType.Image, para.IsRtlDirection) { Paragraph = para };
+                    var imgWord = new WordInfo("img", 0, WordType.Image, para.Styles.IsRtl) { Paragraph = para };
                     para.Words.Add(imgWord);
 
                     foreach (var word in textLine.Split(" ", StringSplitOptions.RemoveEmptyEntries))
@@ -47,21 +48,21 @@ namespace TextViewerSample
                             var startVal = word.IndexOf("\"", StringComparison.Ordinal) + 1;
                             var w = word.Substring(startVal,
                                 word.LastIndexOf("\"", StringComparison.Ordinal) - startVal);
-                            imgWord.Styles.Add(WordStyleType.Width, double.Parse(w));
+                            imgWord.Styles.Width = double.Parse(w);
                         }
                         else if (word.StartsWith("height"))
                         {
                             var startVal = word.IndexOf("\"", StringComparison.Ordinal) + 1;
                             var h = word.Substring(startVal,
                                 word.LastIndexOf("\"", StringComparison.Ordinal) - startVal);
-                            imgWord.Styles.Add(WordStyleType.Height, double.Parse(h));
+                            imgWord.Styles.Height = double.Parse(h);
                         }
                         else if (word.StartsWith("src"))
                         {
                             var startVal = word.IndexOf("\"", StringComparison.Ordinal) + 1;
                             var src = word.Substring(startVal,
                                 word.LastIndexOf("\"", StringComparison.Ordinal) - startVal);
-                            imgWord.Styles.Add(WordStyleType.Image, Convert.FromBase64String(src));
+                            imgWord.Styles.SetImage(src);
                         }
                     }
 
@@ -85,12 +86,41 @@ namespace TextViewerSample
                 var para = new Paragraph(paraOffset++, isContentRtl);
                 paragraphs.Add(para);
 
-                // TODO: below codes just used for reading sample text --------------------------------------------------------------------
                 var content = SetParagraphStyle(text, para);
-                // TODO: upper codes just used for reading sample text --------------------------------------------------------------------
 
                 if (string.IsNullOrEmpty(content) == false)
-                    para.AddContent(0, content, new Dictionary<WordStyleType, object>());
+                {
+                    //var words = content.Split(" ");
+                    //var paraBuffer = "";
+                    //var offset = 0;
+                    //foreach (var word in words)
+                    //{
+                    //    var isRtl = Paragraph.IsRtl(word);
+                    //    var style = new WordStyle(para.Styles.IsRtl);
+
+                    //    if (word.Length > 10 || !isRtl)
+                    //    {
+                    //        para.AddContent(offset, paraBuffer, style);
+                    //        offset += paraBuffer.Length;
+                    //        paraBuffer = word + " ";
+
+                    //        if (word.Length > 10) style.FontWeight = FontWeights.Bold;
+                    //        if (!isRtl) style.Foreground = Brushes.Blue;
+
+                    //        para.AddContent(offset, paraBuffer, style);
+                    //        offset += paraBuffer.Length;
+                    //        paraBuffer = "";
+                    //    }
+                    //    else
+                    //        paraBuffer += word + " ";
+                    //}
+
+                    //if (paraBuffer.Length > 0)
+                    //    para.AddContent(offset, paraBuffer, new WordStyle(para.Styles.IsRtl));
+
+                    para.AddContent(0, content, new WordStyle(para.Styles.IsRtl));
+
+                }
             }
 
             return paragraphs;

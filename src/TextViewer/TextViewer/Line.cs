@@ -39,7 +39,7 @@ namespace TextViewer
             RemainWidth -= word.Width;
         }
 
-        public void Render(bool justify = false)
+        public void Render(bool justify)
         {
             // clear non directional words stack
             PopAllNonDirectionalWords();
@@ -58,26 +58,26 @@ namespace TextViewer
                         SetWordPosition(word);
                     }
                 }
-                else if (CurrentParagraph.Styles.ContainsKey(WordStyleType.TextAlign))
+                else if (CurrentParagraph.Styles.TextAlign.HasValue)
                 {
-                    switch (CurrentParagraph.Styles[WordStyleType.TextAlign])
+                    switch (CurrentParagraph.Styles.TextAlign.Value)
                     {
                         case TextAlignment.Left:
                             {
-                                if (CurrentParagraph.IsRtlDirection)
+                                if (CurrentParagraph.Styles.IsRtl)
                                     WordPointOffset -= RemainWidth;
                                 SetWordsPosition();
                                 break;
                             }
                         case TextAlignment.Center:
                             {
-                                WordPointOffset += RemainWidth / 2 * (CurrentParagraph.IsRtlDirection ? -1 : 1);
+                                WordPointOffset += RemainWidth / 2 * (CurrentParagraph.Styles.IsRtl ? -1 : 1);
                                 SetWordsPosition();
                                 break;
                             }
                         case TextAlignment.Right:
                             {
-                                if (CurrentParagraph.IsRtlDirection == false)
+                                if (CurrentParagraph.Styles.IsLtr)
                                     WordPointOffset += RemainWidth;
                                 SetWordsPosition();
                                 break;
@@ -102,7 +102,7 @@ namespace TextViewer
         {
             var startPoint = new Point(WordPointOffset, Location.Y);
 
-            if (CurrentParagraph.IsRtlDirection) // Left to right paragraph
+            if (CurrentParagraph.Styles.IsRtl) // Left to right paragraph
             {
                 //     _______________________________________________________
                 //    |                                                       |
@@ -147,7 +147,8 @@ namespace TextViewer
 
         protected void SetWordPosition(WordInfo word)
         {
-            if (CurrentParagraph.IsRtlDirection != word.IsRtl) NonDirectionalWordsStack.Push(word);
+            if (CurrentParagraph.Styles.IsRtl != word.IsRtl) 
+                NonDirectionalWordsStack.Push(word);
             else
             {
                 PopAllNonDirectionalWords();

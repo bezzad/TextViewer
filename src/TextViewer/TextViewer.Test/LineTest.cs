@@ -88,18 +88,16 @@ namespace TextViewer.Test
                 RtlWords[i].PreviousWord = RtlWords[i - 1];
             }
 
-            var imgBytes = Convert.FromBase64String(@"iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAA" +
-                                                    @"ACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIB" +
-                                                    @"KE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==");
+            var img = @"iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==";
 
             // set image width and height
-            LtrWords.Last().Styles.Add(WordStyleType.Width, 5.0);
-            LtrWords.Last().Styles.Add(WordStyleType.Height, 5.0);
-            LtrWords.Last().Styles.Add(WordStyleType.Image, imgBytes);
+            LtrWords.Last().Styles.Width =  5.0;
+            LtrWords.Last().Styles.Height = 5.0;
+            LtrWords.Last().Styles.SetImage(img);
 
-            RtlWords.Last().Styles.Add(WordStyleType.Width, 5.0);
-            RtlWords.Last().Styles.Add(WordStyleType.Height, 5.0);
-            RtlWords.Last().Styles.Add(WordStyleType.Image, imgBytes);
+            RtlWords.Last().Styles.Width = 5.0;
+            RtlWords.Last().Styles.Height = 5.0;
+            RtlWords.Last().Styles.SetImage(img);
         }
 
         [TestMethod]
@@ -134,7 +132,7 @@ namespace TextViewer.Test
                 Assert.IsTrue(ltrLine.Words.Contains(ltrWord));
                 Assert.IsTrue(rtlLine.Words.Contains(rtlWord));
 
-                if (LtrParent.IsRtlDirection != ltrWord.IsRtl)
+                if (LtrParent.Styles.IsRtl != ltrWord.IsRtl)
                 {
                     Assert.IsTrue(ltrWord.DrawPoint.X.Equals(0));
                     Assert.IsTrue(ltrWord.DrawPoint.Y.Equals(0));
@@ -148,7 +146,7 @@ namespace TextViewer.Test
                         Assert.IsTrue(CompareTo(ltrWord.DrawPoint, LtrWords[i - 1].DrawPoint) > 0); // ltr
                 }
 
-                if (RtlParent.IsRtlDirection != rtlWord.IsRtl)
+                if (RtlParent.Styles.IsRtl != rtlWord.IsRtl)
                 {
                     Assert.IsTrue(rtlWord.DrawPoint.X.Equals(0));
                     Assert.IsTrue(rtlWord.DrawPoint.Y.Equals(0));
@@ -195,8 +193,8 @@ namespace TextViewer.Test
                 rtlLine.AddWord(rtlWord);
             }
 
-            ltrLine.Render(); // test after line rendering
-            rtlLine.Render(); // test after line rendering
+            ltrLine.Render(false); // test after line rendering
+            rtlLine.Render(false); // test after line rendering
             Assert.IsTrue(ltrLine.CurrentParagraph.Lines.Count == lineCounter);
             Assert.IsTrue(rtlLine.CurrentParagraph.Lines.Count == lineCounter++);
             Assert.IsTrue(ltrLine.RemainWidth < 0);
@@ -238,30 +236,30 @@ namespace TextViewer.Test
             }
             //
             // Test center text-align
-            LtrParent.Styles[WordStyleType.TextAlign] = TextAlignment.Center;
-            RtlParent.Styles[WordStyleType.TextAlign] = TextAlignment.Center;
-            ltrLine.Render();
-            rtlLine.Render();
+            LtrParent.Styles.TextAlign = TextAlignment.Center;
+            RtlParent.Styles.TextAlign = TextAlignment.Center;
+            ltrLine.Render(false);
+            rtlLine.Render(false);
             Assert.IsTrue(ltrLine.CurrentParagraph.Lines.Count == lineCounter);
             Assert.IsTrue(rtlLine.CurrentParagraph.Lines.Count == lineCounter++);
             Assert.IsTrue(ltrLine.Words.First().Area.Location.X.Equals(ltrLine.RemainWidth / 2 + _ltrStartPoint.X));
             Assert.IsTrue(rtlLine.Words.First().DrawPoint.X.Equals(_rtlStartPoint.X - rtlLine.RemainWidth / 2));
             //
             // Test left text-align
-            LtrParent.Styles[WordStyleType.TextAlign] = TextAlignment.Left;
-            RtlParent.Styles[WordStyleType.TextAlign] = TextAlignment.Left;
-            ltrLine.Render();
-            rtlLine.Render();
+            LtrParent.Styles.TextAlign = TextAlignment.Left;
+            RtlParent.Styles.TextAlign = TextAlignment.Left;
+            ltrLine.Render(false);
+            rtlLine.Render(false);
             Assert.IsTrue(ltrLine.CurrentParagraph.Lines.Count == lineCounter);
             Assert.IsTrue(rtlLine.CurrentParagraph.Lines.Count == lineCounter++);
             Assert.IsTrue(ltrLine.Words.First().Area.Location.X.Equals(ltrLine.Location.X));
             Assert.IsTrue(Math.Abs(rtlLine.Words.Last().Area.Location.X) - Math.Abs(rtlLine.RemainWidth - rtlLine.ActualWidth - 200 + rtlLine.Location.X) < 0.00000000001);
             //
             // Test right text-align
-            LtrParent.Styles[WordStyleType.TextAlign] = TextAlignment.Right;
-            RtlParent.Styles[WordStyleType.TextAlign] = TextAlignment.Right;
-            ltrLine.Render();
-            rtlLine.Render();
+            LtrParent.Styles.TextAlign = TextAlignment.Right;
+            RtlParent.Styles.TextAlign = TextAlignment.Right;
+            ltrLine.Render(false);
+            rtlLine.Render(false);
             Assert.IsTrue(ltrLine.CurrentParagraph.Lines.Count == lineCounter);
             Assert.IsTrue(rtlLine.CurrentParagraph.Lines.Count == lineCounter);
             Assert.IsTrue(ltrLine.Words.First().Area.Location.X.Equals(ltrLine.RemainWidth + _ltrStartPoint.X));
