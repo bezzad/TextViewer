@@ -90,37 +90,36 @@ namespace TextViewerSample
 
                 if (string.IsNullOrEmpty(content) == false)
                 {
-                    //var words = content.Split(" ");
-                    //var paraBuffer = "";
-                    //var offset = 0;
-                    //foreach (var word in words)
-                    //{
-                    //    var isRtl = Paragraph.IsRtl(word);
-                    //    var style = new WordStyle(para.Styles.IsRtl);
+                    var words = content.Split(" ");
+                    var paraBuffer = "";
+                    var offset = 0;
+                    foreach (var word in words)
+                    {
+                        var isRtl = Paragraph.IsRtl(word);
+                        var style = new WordStyle(para.Styles.IsRtl);
 
-                    //    if (word.Length > 10 || !isRtl)
-                    //    {
-                    //        para.AddContent(offset, paraBuffer, style);
-                    //        offset += paraBuffer.Length;
-                    //        paraBuffer = word + " ";
+                        if (word.Length > 10 || !isRtl)
+                        {
+                            para.AddContent(offset, paraBuffer, style);
+                            offset += paraBuffer.Length;
+                            paraBuffer = word + " ";
 
-                    //        if (word.Length > 10) style.FontWeight = FontWeights.Bold;
-                    //        if (!isRtl) style.Foreground = Brushes.Blue;
+                            if (word.Length > 10) style.FontWeight = FontWeights.Bold;
+                            if (!isRtl) style.Foreground = Brushes.Blue;
 
-                    //        para.AddContent(offset, paraBuffer, style);
-                    //        offset += paraBuffer.Length;
-                    //        paraBuffer = "";
-                    //    }
-                    //    else
-                    //        paraBuffer += word + " ";
-                    //}
+                            para.AddContent(offset, paraBuffer, style);
+                            offset += paraBuffer.Length;
+                            paraBuffer = "";
+                        }
+                        else
+                            paraBuffer += word + " ";
+                    }
 
-                    //if (paraBuffer.Length > 0)
-                    //    para.AddContent(offset, paraBuffer, new WordStyle(para.Styles.IsRtl));
-
-                    para.AddContent(0, content, new WordStyle(para.Styles.IsRtl));
-
+                    if (paraBuffer.Length > 0)
+                        para.AddContent(offset, paraBuffer, new WordStyle(para.Styles.IsRtl));
                 }
+
+                para.CalculateDirection();
             }
 
             return paragraphs;

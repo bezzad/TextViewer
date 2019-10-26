@@ -95,6 +95,11 @@ namespace TextViewer
             // keep last word from buffer
             if (wordBuffer.Length > 0)
                 AddWord(new WordInfo(wordBuffer, offset, WordType.Normal, IsRtl(wordBuffer), contentStyle));
+        }
+
+
+        public void CalculateDirection()
+        {
             //
             // calculate all spaces rtl from last word to first word
             foreach (var space in Words.Where(w => w.Type.HasFlag(WordType.Space)).Reverse())
@@ -114,7 +119,6 @@ namespace TextViewer
                     space.Styles.SetDirection(space.NextWord.IsRtl);
             }
         }
-
 
         public DrawingVisual Render()
         {

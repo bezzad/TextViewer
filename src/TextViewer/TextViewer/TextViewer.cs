@@ -157,7 +157,7 @@ namespace TextViewer
                         var ft = new FormattedText(word.Offset.ToString(),
                             CultureInfo.CurrentCulture, FlowDirection.LeftToRight,
                             new Typeface(FontFamily, FontStyles.Normal, FontWeights.Normal, FontStretches.Normal),
-                            OffsetEmSize, word.IsRtl == word.Paragraph.Styles.IsRtl ? Brushes.Red : Brushes.Blue,
+                            OffsetEmSize, word.IsRtl ? Brushes.Red : Brushes.Blue,
                             PixelsPerDip);
 
                         if (word.Type.HasFlag(WordType.Space) || word.Type.HasFlag(WordType.InertChar)
