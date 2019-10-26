@@ -38,14 +38,14 @@ namespace TextViewer.Test
             Assert.AreEqual(rtlPara.Words.Count(w => w.Type.HasFlag(WordType.InertChar)), 3);
             Assert.AreEqual(rtlPara.Words.Count(w => w.Type.HasFlag(WordType.Attached)), 3);
             Assert.AreEqual(rtlPara.Words.Count(w => w.Type.HasFlag(WordType.Normal)), _rtlWords.Length);
-            Assert.AreEqual(rtlPara.Words.Count(w => w.Type.HasFlag(WordType.Normal) && w.IsRtl), 14);
-            Assert.AreEqual(rtlPara.Words.Count(w => w.Type.HasFlag(WordType.Normal) && !w.IsRtl), _rtlWords.Length - 14);
+            Assert.AreEqual(rtlPara.Words.Count(w => w.Type.HasFlag(WordType.Normal) && w.Styles.IsRtl), 14);
+            Assert.AreEqual(rtlPara.Words.Count(w => w.Type.HasFlag(WordType.Normal) && !w.Styles.IsRtl), _rtlWords.Length - 14);
 
             Assert.AreEqual(ltrPara.Words.Count(w => w.Type.HasFlag(WordType.InertChar)), 2);
             Assert.AreEqual(ltrPara.Words.Count(w => w.Type.HasFlag(WordType.Attached)), 2);
             Assert.AreEqual(ltrPara.Words.Count(w => w.Type.HasFlag(WordType.Normal)), _ltrWords.Length);
-            Assert.AreEqual(ltrPara.Words.Count(w => w.Type.HasFlag(WordType.Normal) && w.IsRtl), 2);
-            Assert.AreEqual(ltrPara.Words.Count(w => w.Type.HasFlag(WordType.Normal) && !w.IsRtl), _ltrWords.Length - 2);
+            Assert.AreEqual(ltrPara.Words.Count(w => w.Type.HasFlag(WordType.Normal) && w.Styles.IsRtl), 2);
+            Assert.AreEqual(ltrPara.Words.Count(w => w.Type.HasFlag(WordType.Normal) && !w.Styles.IsRtl), _ltrWords.Length - 2);
         }
 
         [TestMethod]

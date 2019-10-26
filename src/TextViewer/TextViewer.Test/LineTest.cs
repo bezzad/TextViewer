@@ -132,7 +132,7 @@ namespace TextViewer.Test
                 Assert.IsTrue(ltrLine.Words.Contains(ltrWord));
                 Assert.IsTrue(rtlLine.Words.Contains(rtlWord));
 
-                if (LtrParent.Styles.IsRtl != ltrWord.IsRtl)
+                if (LtrParent.Styles.IsRtl != ltrWord.Styles.IsRtl)
                 {
                     Assert.IsTrue(ltrWord.DrawPoint.X.Equals(0));
                     Assert.IsTrue(ltrWord.DrawPoint.Y.Equals(0));
@@ -146,7 +146,7 @@ namespace TextViewer.Test
                         Assert.IsTrue(CompareTo(ltrWord.DrawPoint, LtrWords[i - 1].DrawPoint) > 0); // ltr
                 }
 
-                if (RtlParent.Styles.IsRtl != rtlWord.IsRtl)
+                if (RtlParent.Styles.IsRtl != rtlWord.Styles.IsRtl)
                 {
                     Assert.IsTrue(rtlWord.DrawPoint.X.Equals(0));
                     Assert.IsTrue(rtlWord.DrawPoint.Y.Equals(0));

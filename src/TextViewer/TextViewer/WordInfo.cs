@@ -38,7 +38,6 @@ namespace TextViewer
         public double Width => IsImage ? Styles.Width * ImageScale + ExtraWidth : (Format?.WidthIncludingTrailingWhitespace ?? 0) + ExtraWidth;
         public double Height => IsImage ? Styles.Height * ImageScale : Format?.Height ?? 0;
         public bool IsImage => Type.HasFlag(WordType.Image);
-        public bool IsRtl => Styles.IsRtl;
         public new int Offset { get; }
 
 

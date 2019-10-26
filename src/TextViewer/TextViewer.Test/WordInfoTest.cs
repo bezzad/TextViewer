@@ -84,7 +84,7 @@ namespace TextViewer.Test
 
                 var dir = word.Styles.Direction;
                 Assert.IsInstanceOfType(dir, typeof(FlowDirection));
-                Assert.AreEqual((FlowDirection)dir == FlowDirection.RightToLeft, word.IsRtl);
+                Assert.AreEqual((FlowDirection)dir == FlowDirection.RightToLeft, word.Styles.IsRtl);
             }
         }
 
@@ -93,15 +93,15 @@ namespace TextViewer.Test
         {
             var word = new WordInfo("test", 0, WordType.Normal, true);
             Assert.AreEqual(word.Styles.Direction, FlowDirection.RightToLeft);
-            Assert.IsTrue(word.IsRtl);
+            Assert.IsTrue(word.Styles.IsRtl);
 
             word.Styles.SetDirection(false);
             Assert.AreEqual(word.Styles.Direction, FlowDirection.LeftToRight);
-            Assert.IsFalse(word.IsRtl);
+            Assert.IsFalse(word.Styles.IsRtl);
 
             word.Styles.SetDirection(true);
             Assert.AreEqual(word.Styles.Direction, FlowDirection.RightToLeft);
-            Assert.IsTrue(word.IsRtl);
+            Assert.IsTrue(word.Styles.IsRtl);
         }
 
         [TestMethod]

@@ -63,7 +63,7 @@ namespace TextViewer
 
                     // add space char as word
                     // note: space.IsRtl will complete calculate after adding all words
-                    var spaceIsRtl = Styles.IsRtl == Words.LastOrDefault()?.IsRtl;
+                    var spaceIsRtl = Styles.IsRtl == Words.LastOrDefault()?.Styles.IsRtl;
                     AddWord(new WordInfo(charPointer.ToString(), contentOffset + i, WordType.Space, spaceIsRtl, contentStyle));
 
                     // maybe there are exist multiple sequence space, so we set offset outside of the keeping word buffer.
@@ -113,10 +113,10 @@ namespace TextViewer
                 //
 
                 // space.IsRtl default value is: (Paragraph.IsRtl == Word.IsRtl)
-                if (space.IsRtl || space.NextWord == null)
+                if (space.Styles.IsRtl || space.NextWord == null)
                     space.Styles.SetDirection(Styles.IsRtl);
                 else
-                    space.Styles.SetDirection(space.NextWord.IsRtl);
+                    space.Styles.SetDirection(space.NextWord.Styles.IsRtl);
             }
         }
 

@@ -115,7 +115,7 @@ namespace TextViewer
                 //    |_______________________________________________________| 
                 //
                 word.Area = new Rect(new Point(startPoint.X - word.Width, startPoint.Y), new Size(word.Width, word.Height));
-                word.DrawPoint = word.IsRtl ? startPoint : word.Area.Location;
+                word.DrawPoint = word.Styles.IsRtl ? startPoint : word.Area.Location;
                 WordPointOffset -= word.Width;
             }
             else // Left to right paragraph
@@ -131,7 +131,7 @@ namespace TextViewer
                 //    |________________________________________________________| 
                 //
                 word.Area = new Rect(startPoint, new Size(word.Width, word.Height));
-                word.DrawPoint = word.IsRtl ? new Point(WordPointOffset + word.Width, startPoint.Y) : word.Area.Location;
+                word.DrawPoint = word.Styles.IsRtl ? new Point(WordPointOffset + word.Width, startPoint.Y) : word.Area.Location;
                 WordPointOffset += word.Width;
             }
 
@@ -147,7 +147,7 @@ namespace TextViewer
 
         protected void SetWordPosition(WordInfo word)
         {
-            if (CurrentParagraph.Styles.IsRtl != word.IsRtl) 
+            if (CurrentParagraph.Styles.IsRtl != word.Styles.IsRtl) 
                 NonDirectionalWordsStack.Push(word);
             else
             {
