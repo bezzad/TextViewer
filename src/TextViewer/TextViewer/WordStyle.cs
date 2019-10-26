@@ -15,7 +15,9 @@ namespace TextViewer
 
         public FlowDirection Direction { get; set; }
         public CultureInfo Language => Direction == FlowDirection.RightToLeft ? RtlCulture : LtrCulture;
-        public TextAlignment TextAlign { get; set; }
+        public bool IsRtl => Direction == FlowDirection.RightToLeft;
+        public bool IsLtr => !IsRtl;
+        public TextAlignment? TextAlign { get; set; }
         public bool Display { get; set; }
         public double MarginBottom { get; set; }
         public double MarginLeft { get; set; }
@@ -37,7 +39,6 @@ namespace TextViewer
             FontWeight = FontWeights.Normal;
             VerticalAlign = VerticalAlignment.Center;
             Foreground = Brushes.Black;
-            TextAlign = isRtl ? TextAlignment.Right : TextAlignment.Left;
             Display = true;
 
             AddStyle(parentStyle);
