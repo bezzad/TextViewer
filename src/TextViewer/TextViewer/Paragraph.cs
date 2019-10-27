@@ -58,7 +58,7 @@ namespace TextViewer
                 {
                     if (wordBuffer.Length > 0)
                         AddWord(new WordInfo(wordBuffer, offset, WordType.Normal, IsRtl(wordBuffer), contentStyle));
-                    
+
                     wordBuffer = "";
 
                     // add space char as word
@@ -80,9 +80,10 @@ namespace TextViewer
 
                     // add inert char as word
                     var isInnerWord = i + 1 < content.Length && content[i + 1] != ' ';
+                    var inertIsRtl = IsRtl(charPointer) || Styles.IsRtl == Words.LastOrDefault()?.Styles.IsRtl;
                     AddWord(new WordInfo(charPointer.ToString(), contentOffset + i,
                             isInnerWord ? WordType.Attached | WordType.InertChar : WordType.InertChar,
-                            IsRtl(charPointer) || Styles.IsRtl, contentStyle));
+                            inertIsRtl, contentStyle));
 
                     offset = contentOffset + i + 1; // set next word offset
                     continue;
@@ -102,7 +103,7 @@ namespace TextViewer
         {
             //
             // calculate all spaces rtl from last word to first word
-            foreach (var space in Words.Where(w => w.Type.HasFlag(WordType.Space)).Reverse())
+            foreach (var space in Words.Where(w => w.Type.HasFlag(WordType.Space) || w.Type.HasFlag(WordType.InertChar)).Reverse())
             {
                 //  Paragraph.IsRtl  | Word.IsRtl  | Space.IsRtl 
                 // ------------------|-------------|--------------
@@ -208,7 +209,7 @@ namespace TextViewer
                 }
             }
             else if (!char.IsDigit(c) && Regex.IsMatch(c.ToString(), @"\p{IsArabic}|\p{IsHebrew}")) return true;
-            
+
             return false;
         }
 
