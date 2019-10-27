@@ -44,12 +44,12 @@ namespace TextViewerSample
         {
             if (BtnLoadSample.IsChecked == true)
             {
-                Reader.PageContent = Path.Combine(Environment.CurrentDirectory, "Data\\LtrContentSample.txt").GetWords(false);
+                Reader.PageContent = Path.Combine(Environment.CurrentDirectory, "Data\\LtrSample.html").GetParagraphs(false);
                 BtnLoadSample.Content = "LtrContentSample";
             }
             else
             {
-                Reader.PageContent = Path.Combine(Environment.CurrentDirectory, "Data\\RtlContentSample.txt").GetWords(true);
+                Reader.PageContent = Path.Combine(Environment.CurrentDirectory, "Data\\RtlSample.html").GetParagraphs(true);
                 BtnLoadSample.Content = "RtrContentSample";
             }
 

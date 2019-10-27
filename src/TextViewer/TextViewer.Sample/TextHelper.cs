@@ -1,9 +1,8 @@
-﻿using MethodTimer;
+﻿using HtmlAgilityPack;
+using MethodTimer;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Media;
 using TextViewer;
@@ -12,135 +11,106 @@ namespace TextViewerSample
 {
     public static class TextHelper
     {
-        private static string SetParagraphStyle(string textLine, Paragraph para)
-        {
-            for (var i = 0; i < textLine.Length; i++)
-                if (textLine[i] == '<') // read HTML tag
-                {
-                    if (textLine.Substring(i, 6).Equals("<left>", StringComparison.OrdinalIgnoreCase) ||
-                        textLine.Substring(i, 7).Equals("</left>", StringComparison.OrdinalIgnoreCase))
-                    {
-                        para.Styles.TextAlign = TextAlignment.Left;
-                        textLine = textLine.Replace("<left>", "", StringComparison.OrdinalIgnoreCase)
-                            .Replace("</left>", "", StringComparison.OrdinalIgnoreCase);
-                    }
-
-                    if (textLine.Substring(i, 8).Equals("<center>", StringComparison.OrdinalIgnoreCase) ||
-                        textLine.Substring(i, 9).Equals("</center>", StringComparison.OrdinalIgnoreCase))
-                    {
-                        para.Styles.TextAlign = TextAlignment.Center;
-                        textLine = textLine.Replace("<center>", "", StringComparison.OrdinalIgnoreCase)
-                            .Replace("</center>", "", StringComparison.OrdinalIgnoreCase);
-                    }
-
-                    if (textLine.Substring(i, 7).Equals("<right>", StringComparison.OrdinalIgnoreCase) ||
-                        textLine.Substring(i, 8).Equals("</right>", StringComparison.OrdinalIgnoreCase))
-                    {
-                        para.Styles.TextAlign = TextAlignment.Right;
-                        textLine = textLine.Replace("<right>", "", StringComparison.OrdinalIgnoreCase)
-                                           .Replace("</right>", "", StringComparison.OrdinalIgnoreCase);
-                    }
-
-                    if (textLine.IndexOf("<img", StringComparison.OrdinalIgnoreCase) >= 0)
-                    {
-                        var imgWord = new WordInfo("img", 0, WordType.Image, para.Styles.IsRtl) { Paragraph = para };
-                        para.Words.Add(imgWord);
-
-                        foreach (var word in textLine.Split(" ", StringSplitOptions.RemoveEmptyEntries))
-                        {
-                            if (word.StartsWith("width"))
-                            {
-                                var startVal = word.IndexOf("\"", StringComparison.Ordinal) + 1;
-                                var w = word.Substring(startVal,
-                                    word.LastIndexOf("\"", StringComparison.Ordinal) - startVal);
-                                imgWord.Styles.Width = double.Parse(w);
-                            }
-                            else if (word.StartsWith("height"))
-                            {
-                                var startVal = word.IndexOf("\"", StringComparison.Ordinal) + 1;
-                                var h = word.Substring(startVal,
-                                    word.LastIndexOf("\"", StringComparison.Ordinal) - startVal);
-                                imgWord.Styles.Height = double.Parse(h);
-                            }
-                            else if (word.StartsWith("src"))
-                            {
-                                var startVal = word.IndexOf("\"", StringComparison.Ordinal) + 1;
-                                var src = word.Substring(startVal,
-                                    word.LastIndexOf("\"", StringComparison.Ordinal) - startVal);
-                                imgWord.Styles.SetImage(src);
-                            }
-                        }
-
-                        textLine = "";
-                    }
-                }
-
-            return textLine;
-        }
-
         [Time]
-        public static List<Paragraph> GetWords(this string path, bool isContentRtl)
+        public static List<Paragraph> GetParagraphs(this string path, bool isContentRtl)
         {
-            var allLines = File.ReadAllLines(path, Encoding.UTF8);
-            var paragraphs = new List<Paragraph>();
             var paraOffset = 0;
+            var paragraphs = new List<Paragraph>();
+            var doc = new HtmlDocument();
+            doc.Load(path);
 
-            // read paragraphs
-            foreach (var text in allLines)
+            var body = doc.DocumentNode.SelectSingleNode("//body");
+            foreach (var p in body.SelectNodes("//p"))
             {
                 var para = new Paragraph(paraOffset++, isContentRtl);
                 paragraphs.Add(para);
-
-                var content = SetParagraphStyle(text, para);
-
-                if (string.IsNullOrEmpty(content) == false)
-                {
-                    var words = content.Split(" ");
-                    var paraBuffer = "";
-                    var offset = 0;
-                    foreach (var word in words)
-                    {
-                        var isRtl = Paragraph.IsRtl(word);
-                        var style = new WordStyle(para.Styles.IsRtl);
-
-                        if (!isRtl || word.FirstOrDefault() == '<')
-                        {
-                            para.AddContent(offset, paraBuffer, style);
-                            offset += paraBuffer.Length;
-                            paraBuffer = word + " "; // reset buffer
-
-                            if (!isRtl) style.Foreground = Brushes.Blue;
-
-                            if (word.FirstOrDefault() == '<')
-                            {
-                                if (word.First() == '<')
-                                {
-                                    if (word.StartsWith("<bold>", StringComparison.OrdinalIgnoreCase) ||
-                                        word.StartsWith("</bold>", StringComparison.OrdinalIgnoreCase))
-                                    {
-                                        style.FontWeight = FontWeights.Bold;
-                                        paraBuffer = word.Replace("<bold>", "", StringComparison.OrdinalIgnoreCase)
-                                            .Replace("</bold>", "", StringComparison.OrdinalIgnoreCase) + " ";
-                                    }
-                                }
-                            }
-
-                            para.AddContent(offset, paraBuffer, style);
-                            offset += paraBuffer.Length;
-                            paraBuffer = "";
-                        }
-                        else
-                            paraBuffer += word + " ";
-                    }
-
-                    if (paraBuffer.Length > 0)
-                        para.AddContent(offset, paraBuffer, new WordStyle(para.Styles.IsRtl));
-                }
-
+                var style = new WordStyle(isContentRtl);
+                var offset = 0;
+                p.ParseInnerHtml(para, style, ref offset);
                 para.CalculateDirection();
             }
 
             return paragraphs;
+        }
+
+        private static void ParseInnerHtml(this HtmlNode node, Paragraph parent, WordStyle parentStyle, ref int contentOffset)
+        {
+            var nodeStyle = new WordStyle(parent.Styles.IsRtl, parentStyle);
+            if (node.Name == "b")
+                nodeStyle.FontWeight = FontWeights.Bold;
+
+            if (node.Name == "img")
+            {
+                var src = node.GetAttributeValue("src", null);
+                if (src != null)
+                {
+                    if (src.StartsWith("data:image"))
+                        src = src.Substring(src.IndexOf("base64,") + 8);
+
+                    nodeStyle.SetImage(src);
+                    parent.Words.Add(new WordInfo("img", contentOffset++, WordType.Image, nodeStyle.IsRtl, nodeStyle) { Paragraph = parent });
+                }
+            }
+
+            if (node.HasAttributes)
+            {
+                var styles = node.GetAttributeValue("style", null);
+                if (styles != null)
+                    foreach (var entries in styles.Split(';'))
+                    {
+                        var values = entries.Split(':');
+                        switch (values[0].ToLower().Trim())
+                        {
+                            case "text-align":
+                                parent.Styles.TextAlign = (TextAlignment)Enum.Parse(typeof(TextAlignment), values[1], true);
+                                break;
+                            case "color":
+                                nodeStyle.Foreground = (Brush)new BrushConverter().ConvertFromString(values[1]);
+                                break;
+                            case "direction":
+                                nodeStyle.SetDirection(values[1] == "rtl");
+                                break;
+                            case "font-weight":
+                                nodeStyle.FontWeight = int.Parse(values[1]) > 500 ? FontWeights.Bold : FontWeights.Normal;
+                                break;
+                            case "margin-bottom":
+                                nodeStyle.MarginBottom = double.Parse(values[1].Replace("px", ""));
+                                break;
+                            case "margin-top":
+                                nodeStyle.MarginTop = double.Parse(values[1].Replace("px", ""));
+                                break;
+                            case "margin-left":
+                                nodeStyle.MarginLeft = double.Parse(values[1].Replace("px", ""));
+                                break;
+                            case "margin-right":
+                                nodeStyle.MarginRight = double.Parse(values[1].Replace("px", ""));
+                                break;
+                        }
+                    }
+
+                var dir = node.GetAttributeValue("dir", null);
+                if (dir != null) nodeStyle.SetDirection(dir == "rtl");
+
+                var w = node.GetAttributeValue("width", null);
+                if (w != null)  parent.Words.Last().Styles.Width = double.Parse(w);
+
+                var h = node.GetAttributeValue("height", null);
+                if (h != null) parent.Words.Last().Styles.Height = double.Parse(h);
+            }
+
+            if (node.HasChildNodes)
+            {
+                foreach (var child in node.ChildNodes)
+                {
+                    if (child.NodeType == HtmlNodeType.Text)
+                    {
+                        parent.AddContent(contentOffset, child.InnerText, nodeStyle);
+                        contentOffset += child.InnerText.Length;
+                    }
+                    else
+                        child.ParseInnerHtml(parent, nodeStyle, ref contentOffset);
+                }
+            }
         }
     }
 }

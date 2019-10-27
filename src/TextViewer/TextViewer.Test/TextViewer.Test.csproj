@@ -7,15 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="TestData\LtrContentSample.txt" />
-    <None Remove="TestData\RtlContentSample.txt" />
+    <None Remove="TestData\RtlSample.html" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="TestData\LtrContentSample.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="TestData\RtlContentSample.txt">
+    <Content Include="TestData\RtlSample.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
