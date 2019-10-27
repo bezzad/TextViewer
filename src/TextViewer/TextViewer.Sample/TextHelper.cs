@@ -61,6 +61,9 @@ namespace TextViewerSample
                         var values = entries.Split(':');
                         switch (values[0].ToLower().Trim())
                         {
+                            case "vertical-align":
+                                nodeStyle.VerticalAlign = (VerticalAlignment)Enum.Parse(typeof(VerticalAlignment), values[1], true);
+                                break;
                             case "text-align":
                                 parent.Styles.TextAlign = (TextAlignment)Enum.Parse(typeof(TextAlignment), values[1], true);
                                 break;
@@ -72,6 +75,9 @@ namespace TextViewerSample
                                 break;
                             case "font-weight":
                                 nodeStyle.FontWeight = int.Parse(values[1]) > 500 ? FontWeights.Bold : FontWeights.Normal;
+                                break;
+                            case "font-size":
+                                nodeStyle.FontSize = double.Parse(values[1].Replace("px", ""));
                                 break;
                             case "margin-bottom":
                                 nodeStyle.MarginBottom = double.Parse(values[1].Replace("px", ""));
@@ -92,7 +98,7 @@ namespace TextViewerSample
                 if (dir != null) nodeStyle.SetDirection(dir == "rtl");
 
                 var w = node.GetAttributeValue("width", null);
-                if (w != null)  parent.Words.Last().Styles.Width = double.Parse(w);
+                if (w != null) parent.Words.Last().Styles.Width = double.Parse(w);
 
                 var h = node.GetAttributeValue("height", null);
                 if (h != null) parent.Words.Last().Styles.Height = double.Parse(h);

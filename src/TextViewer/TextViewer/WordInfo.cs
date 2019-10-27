@@ -46,6 +46,9 @@ namespace TextViewer
             double pixelsPerDip,
             double lineHeight)
         {
+            if (Styles.FontSize != 0)
+                fontSize += Styles.FontSize;
+
             // Create the initial formatted text string.
             Format = new FormattedText(
                 Text,
@@ -67,7 +70,7 @@ namespace TextViewer
         public DrawingVisual Render()
         {
             var dc = RenderOpen();
-            
+
             if (IsImage)
                 dc.DrawImage(Styles.Image, Area);
             else

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 
@@ -135,6 +136,14 @@ namespace TextViewer
                 WordPointOffset += word.Width;
             }
 
+            if (word.Styles.VerticalAlign.HasValue)
+            {
+                if (word.Styles.VerticalAlign.Value == VerticalAlignment.Top)
+                    word.DrawPoint = new Point(word.DrawPoint.X, word.DrawPoint.Y - Math.Abs(word.Styles.FontSize));
+                if (word.Styles.VerticalAlign.Value == VerticalAlignment.Bottom)
+                    word.DrawPoint = new Point(word.DrawPoint.X, word.DrawPoint.Y + Math.Abs(word.Styles.FontSize));
+            }
+
             return word;
         }
 
@@ -147,7 +156,7 @@ namespace TextViewer
 
         protected void SetWordPosition(WordInfo word)
         {
-            if (CurrentParagraph.Styles.IsRtl != word.Styles.IsRtl) 
+            if (CurrentParagraph.Styles.IsRtl != word.Styles.IsRtl)
                 NonDirectionalWordsStack.Push(word);
             else
             {
