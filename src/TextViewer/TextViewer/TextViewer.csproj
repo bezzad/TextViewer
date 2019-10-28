@@ -26,6 +26,10 @@
     <TieredCompilation>true</TieredCompilation>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="MethodTimer.Fody" Version="3.1.0" />
   </ItemGroup>

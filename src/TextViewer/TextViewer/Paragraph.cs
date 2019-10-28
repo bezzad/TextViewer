@@ -64,7 +64,8 @@ namespace TextViewer
                     // add space char as word
                     // note: space.IsRtl will complete calculate after adding all words
                     var spaceIsRtl = Styles.IsRtl == Words.LastOrDefault()?.Styles.IsRtl;
-                    AddWord(new WordInfo(charPointer.ToString(), contentOffset + i, WordType.Space, spaceIsRtl, contentStyle));
+                    AddWord(new SpaceWord(contentOffset + i, spaceIsRtl, contentStyle));
+                    //AddWord(new WordInfo(charPointer.ToString(), contentOffset + i, WordType.Space, spaceIsRtl, contentStyle));
 
                     // maybe there are exist multiple sequence space, so we set offset outside of the keeping word buffer.
                     offset = contentOffset + i + 1; // set next word offset

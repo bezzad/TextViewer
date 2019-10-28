@@ -50,7 +50,7 @@ namespace TextViewerSample
                         src = src.Substring(src.IndexOf("base64,") + 8);
 
                     nodeStyle.SetImage(src);
-                    parent.Words.Add(new WordInfo("img", contentOffset++, WordType.Image, nodeStyle.IsRtl, nodeStyle) { Paragraph = parent });
+                    parent.Words.Add(new ImageWord(contentOffset++, nodeStyle) { Paragraph = parent });
                 }
             }
 

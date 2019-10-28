@@ -36,13 +36,13 @@ namespace TextViewer
         public WordType Type { get; set; }
         public double ImageScale { get; set; }
         public bool IsSelected { get; set; }
-        public double Width => IsImage ? Styles.Width * ImageScale + ExtraWidth : (Format?.WidthIncludingTrailingWhitespace ?? 0) + ExtraWidth;
-        public double Height => IsImage ? Styles.Height * ImageScale : Format?.Height ?? 0;
+        public virtual double Width => (Format?.WidthIncludingTrailingWhitespace ?? 0) + ExtraWidth;
+        public virtual double Height => Format?.Height ?? 0;
         public bool IsImage => Type.HasFlag(WordType.Image);
         public new int Offset { get; }
 
 
-        public FormattedText GetFormattedText(FontFamily fontFamily,
+        public virtual FormattedText GetFormattedText(FontFamily fontFamily,
             double fontSize,
             double pixelsPerDip,
             double lineHeight)
