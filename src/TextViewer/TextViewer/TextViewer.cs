@@ -79,10 +79,7 @@ namespace TextViewer
 
                 foreach (var word in para.Words)
                 {
-                    if (word.IsImage)
-                        word.ImageScale = 1;
-                    else
-                        word.GetFormattedText(FontFamily, FontSize, PixelsPerDip, LineHeight);
+                    word.SetFormattedText(FontFamily, FontSize, PixelsPerDip, LineHeight);
 
                     var wordWidth = word.Width;
                     var wordPointer = word;
@@ -106,8 +103,8 @@ namespace TextViewer
                         }
                         else // the current word width is more than a line!
                         {
-                            if (word.IsImage) // set image scale according by image and page width
-                                word.ImageScale = lineBuffer.RemainWidth / word.Styles.Width;
+                            if (word.IsImage && word is ImageWord imgWord) // set image scale according by image and page width
+                                imgWord.ImageScale = lineBuffer.RemainWidth / word.Styles.Width;
                             else
                                 word.Format.MaxTextWidth = lineBuffer.RemainWidth;
                         }

@@ -46,49 +46,49 @@ namespace TextViewer.Test
             LtrWords = new List<WordInfo>()
             {
                 new WordInfo("Test1", 0, WordType.Normal, false) {Paragraph = LtrParent}, // 0
-                new WordInfo(" ", 5, WordType.Space, false) {Paragraph = LtrParent}, // 1
+                new SpaceWord(5, false) {Paragraph = LtrParent}, // 1
                 new WordInfo("Test2", 6, WordType.Normal, false) {Paragraph = LtrParent}, // 2
-                new WordInfo(" ", 11, WordType.Space, false) {Paragraph = LtrParent}, // 3
+                new SpaceWord(11, false) {Paragraph = LtrParent}, // 3
                 new WordInfo("Test3", 12, WordType.Normal, false) {Paragraph = LtrParent}, // 4
-                new WordInfo(" ", 17, WordType.Space, false) {Paragraph = LtrParent}, // 5
+                new SpaceWord(17, false) {Paragraph = LtrParent}, // 5
                 new WordInfo("Test4", 18, WordType.Normal, false) {Paragraph = LtrParent}, // 6
-                new WordInfo(" ", 23, WordType.Space, false) {Paragraph = LtrParent}, // 7
+                new SpaceWord(23, false) {Paragraph = LtrParent}, // 7
                 new WordInfo("Test", 24, WordType.Normal | WordType.Attached, false) {Paragraph = LtrParent}, // 8
                 new WordInfo(".", 25, WordType.InertChar | WordType.Attached, false) {Paragraph = LtrParent}, // 9
                 new WordInfo("5", 26, WordType.Normal, false) {Paragraph = LtrParent}, // 10
-                new WordInfo(" ", 29, WordType.Space, false) {Paragraph = LtrParent}, // 11
+                new SpaceWord(29, false) {Paragraph = LtrParent}, // 11
                 new WordInfo("Test6", 30, WordType.Normal, false) {Paragraph = LtrParent}, // 12
-                new WordInfo(" ", 33, WordType.Space, false) {Paragraph = LtrParent}, // 13
+                new SpaceWord(33, false) {Paragraph = LtrParent}, // 13
                 new WordInfo("تست۱", 36, WordType.Normal, true) {Paragraph = LtrParent}, // 14
-                new WordInfo(" ", 41, WordType.Space, true) {Paragraph = LtrParent}, // 15
+                new SpaceWord(41, true) {Paragraph = LtrParent}, // 15
                 new WordInfo("تست۲", 42, WordType.Normal, true) {Paragraph = LtrParent}, // 16
-                new WordInfo(" ", 47, WordType.Space, true) {Paragraph = LtrParent}, // 17
+                new SpaceWord(47, true) {Paragraph = LtrParent}, // 17
                 new WordInfo("تست۳", 48, WordType.Normal, true) {Paragraph = LtrParent}, // 18
-                new WordInfo("img", 55, WordType.Image, false) {Paragraph = LtrParent} // 19
+                new ImageWord(55) {Paragraph = LtrParent} // 19
             };
 
             RtlWords = new List<WordInfo>()
             {
                 new WordInfo("تستی", 0, WordType.Normal, true) {Paragraph = RtlParent}, // 0
-                new WordInfo(" ", 5, WordType.Space, true) {Paragraph = RtlParent}, // 1
+                new SpaceWord(5, true) {Paragraph = RtlParent}, // 1
                 new WordInfo("تست۲", 6, WordType.Normal, true) {Paragraph = RtlParent}, // 2
-                new WordInfo(" ", 11, WordType.Space, true) {Paragraph = RtlParent}, // 3
+                new SpaceWord(11, true) {Paragraph = RtlParent}, // 3
                 new WordInfo("تست۳", 12, WordType.Normal, true) {Paragraph = RtlParent}, // 4
-                new WordInfo(" ", 17, WordType.Space, true) {Paragraph = RtlParent}, // 5
+                new SpaceWord(17, true) {Paragraph = RtlParent}, // 5
                 new WordInfo("تست۴", 18, WordType.Normal, true) {Paragraph = RtlParent}, // 6
-                new WordInfo(" ", 23, WordType.Space, true) {Paragraph = RtlParent}, // 7
+                new SpaceWord(23, true) {Paragraph = RtlParent}, // 7
                 new WordInfo("تست", 24, WordType.Normal | WordType.Attached, true) {Paragraph = RtlParent}, // 8
                 new WordInfo(".", 25, WordType.InertChar | WordType.Attached, true) {Paragraph = RtlParent}, // 9
                 new WordInfo("۵", 26, WordType.Normal, true) {Paragraph = RtlParent}, // 10
-                new WordInfo(" ", 29, WordType.Space, false) {Paragraph = RtlParent}, // 11
+                new SpaceWord(29, false) {Paragraph = RtlParent}, // 11
                 new WordInfo("Test6", 30, WordType.Normal, false) {Paragraph = RtlParent}, // 12
-                new WordInfo(" ", 33, WordType.Space, false) {Paragraph = RtlParent}, // 13
+                new SpaceWord(33, false) {Paragraph = RtlParent}, // 13
                 new WordInfo("Test7", 36, WordType.Normal, false) {Paragraph = RtlParent}, // 14
-                new WordInfo(" ", 41, WordType.Space, true) {Paragraph = RtlParent}, // 15
+                new SpaceWord(41, true) {Paragraph = RtlParent}, // 15
                 new WordInfo("تست۸", 42, WordType.Normal, true) {Paragraph = RtlParent}, // 16
-                new WordInfo(" ", 47, WordType.Space, true) {Paragraph = RtlParent}, // 17
+                new SpaceWord(47, true) {Paragraph = RtlParent}, // 17
                 new WordInfo("تست۹", 48, WordType.Normal, true) {Paragraph = RtlParent}, // 18
-                new WordInfo("img", 55, WordType.Image, false) {Paragraph = RtlParent} // 19
+                new ImageWord( 55) {Paragraph = RtlParent} // 19
             };
 
             for (var i = 1; i < LtrWords.Count; i++)
@@ -129,10 +129,17 @@ namespace TextViewer.Test
                 var rtlWord = RtlWords[i];
                 Debug.WriteLine($"Word {i}");
 
-                ltrWord.GetFormattedText(_arial, _fontSize, 1, _lineHeight);
-                rtlWord.GetFormattedText(_arial, _fontSize, 1, _lineHeight);
-                Assert.IsNotNull(ltrWord.Format);
-                Assert.IsNotNull(rtlWord.Format);
+                ltrWord.SetFormattedText(_arial, _fontSize, 1, _lineHeight);
+                rtlWord.SetFormattedText(_arial, _fontSize, 1, _lineHeight);
+                if (ltrWord.IsImage || ltrWord.Type == WordType.Space)
+                    Assert.IsNull(ltrWord.Format);
+                else
+                    Assert.IsNotNull(ltrWord.Format);
+
+                if (rtlWord.IsImage || rtlWord.Type == WordType.Space)
+                    Assert.IsNull(rtlWord.Format);
+                else
+                    Assert.IsNotNull(rtlWord.Format);
                 Assert.IsTrue(ltrWord.Width > 0);
                 Assert.IsTrue(rtlWord.Width > 0);
                 ltrLine.AddWord(ltrWord);
@@ -199,8 +206,8 @@ namespace TextViewer.Test
                 var rtlWord = RtlWords[i];
                 Debug.WriteLine($"Word {i}");
 
-                ltrWord.GetFormattedText(_arial, _fontSize, 1, _lineHeight);
-                rtlWord.GetFormattedText(_arial, _fontSize, 1, _lineHeight);
+                ltrWord.SetFormattedText(_arial, _fontSize, 1, _lineHeight);
+                rtlWord.SetFormattedText(_arial, _fontSize, 1, _lineHeight);
                 ltrLine.AddWord(ltrWord);
                 rtlLine.AddWord(rtlWord);
             }
@@ -240,11 +247,8 @@ namespace TextViewer.Test
                 var rtlWord = RtlWords[i];
                 Debug.WriteLine($"Justify Word {i}");
 
-                if (ltrWord.Type == WordType.Space) Assert.IsTrue(ltrWord.ExtraWidth > 0);
-                else Assert.AreEqual(ltrWord.ExtraWidth, 0);
-
-                if (rtlWord.Type == WordType.Space) Assert.IsTrue(rtlWord.ExtraWidth > 0);
-                else Assert.AreEqual(rtlWord.ExtraWidth, 0);
+                if (ltrWord is SpaceWord ltrSpace) Assert.IsTrue(ltrSpace.ExtraWidth > 0);
+                if (rtlWord is SpaceWord rtlSpace) Assert.IsTrue(rtlSpace.ExtraWidth > 0);
             }
             //
             // Test center text-align
@@ -290,10 +294,10 @@ namespace TextViewer.Test
             foreach (var word in content.Split(" "))
             {
                 var wordInfo = new WordInfo(word, offset, WordType.Normal, Paragraph.IsRtl(word));
-                wordInfo.GetFormattedText(_arial, _fontSize, 1, _lineHeight);
+                wordInfo.SetFormattedText(_arial, _fontSize, 1, _lineHeight);
                 offset += word.Length;
                 var space = new WordInfo(" ", offset++, WordType.Space, wordInfo.Styles.IsRtl);
-                space.GetFormattedText(_arial, _fontSize, 1, _lineHeight);
+                space.SetFormattedText(_arial, _fontSize, 1, _lineHeight);
 
                 ltrLine.AddWord(wordInfo);
                 Assert.AreEqual(++wordCounter, ltrLine.Words.Count);
@@ -323,16 +327,16 @@ namespace TextViewer.Test
             var content = "این یک متن راست به چپ برای تست left to right content می‌باشد.";
             var rtlPara = new Paragraph(0, true);
             var rtlLine = new Line(_width, rtlPara, new Point(1000, 0));
-            var offset = 0; 
+            var offset = 0;
             var wordCounter = 0;
 
             foreach (var word in content.Split(" "))
             {
                 var wordInfo = new WordInfo(word, offset, WordType.Normal, Paragraph.IsRtl(word));
-                wordInfo.GetFormattedText(_arial, _fontSize, 1, _lineHeight);
+                wordInfo.SetFormattedText(_arial, _fontSize, 1, _lineHeight);
                 offset += word.Length;
                 var space = new WordInfo(" ", offset++, WordType.Space, wordInfo.Styles.IsRtl);
-                space.GetFormattedText(_arial, _fontSize, 1, _lineHeight);
+                space.SetFormattedText(_arial, _fontSize, 1, _lineHeight);
 
                 rtlLine.AddWord(wordInfo);
                 Assert.AreEqual(++wordCounter, rtlLine.Words.Count);

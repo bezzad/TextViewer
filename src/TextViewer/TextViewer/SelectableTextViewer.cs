@@ -121,7 +121,7 @@ namespace TextViewer
                 // select words which are within range
                 if (HighlightFirstWord != HighlightLastWord)
                 {
-                    var isFirstWordBeginOfHighlight = HighlightLastWord.CompareTo(HighlightFirstWord) > 0;
+                    var isFirstWordBeginOfHighlight = HighlightLastWord?.CompareTo(HighlightFirstWord) > 0;
                     var from = isFirstWordBeginOfHighlight ? HighlightFirstWord : HighlightLastWord;
                     var to = isFirstWordBeginOfHighlight ? HighlightLastWord : HighlightFirstWord;
 

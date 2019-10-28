@@ -4,14 +4,20 @@ namespace TextViewer
 {
     public class ImageWord : WordInfo
     {
+        public double ImageScale { get; set; }
         public override double Height => Styles.Height * ImageScale;
-        public override double Width => Styles.Width * ImageScale + ExtraWidth;
+        public override double Width => Styles.Width * ImageScale;
 
         public ImageWord(int offset, WordStyle style = null)
-            : base("img", offset, WordType.Image, false, style)
+            : base(null, offset, WordType.Image, false, style)
         {
+            ImageScale = 1;
         }
 
+        public override void SetFormattedText(FontFamily fontFamily, double fontSize, double pixelsPerDip, double lineHeight)
+        {
+            ImageScale = 1;
+        }
 
         public override DrawingVisual Render()
         {

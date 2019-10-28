@@ -1,10 +1,9 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Media;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace TextViewer.Test
 {
@@ -25,25 +24,25 @@ namespace TextViewer.Test
             Words = new List<WordInfo>()
             {
                 new WordInfo("Test1", 0, WordType.Normal, false, Parent.Styles) {Paragraph = Parent}, // 0
-                new WordInfo(" ", 5, WordType.Space, false, Parent.Styles) {Paragraph = Parent}, // 1
+                new SpaceWord(5, false, Parent.Styles) {Paragraph = Parent}, // 1
                 new WordInfo("Test2", 6, WordType.Normal, false, Parent.Styles) {Paragraph = Parent}, // 2
-                new WordInfo(" ", 11, WordType.Space, false, Parent.Styles) {Paragraph = Parent}, // 3
+                new SpaceWord(11, false, Parent.Styles) {Paragraph = Parent}, // 3
                 new WordInfo("Test3", 12, WordType.Normal, false, Parent.Styles) {Paragraph = Parent}, // 4
-                new WordInfo(" ", 17, WordType.Space, false, Parent.Styles) {Paragraph = Parent}, // 5
+                new SpaceWord(17, false, Parent.Styles) {Paragraph = Parent}, // 5
                 new WordInfo("Test4", 18, WordType.Normal, false, Parent.Styles) {Paragraph = Parent}, // 6
-                new WordInfo(" ", 23, WordType.Space, false, Parent.Styles) {Paragraph = Parent}, // 7
+                new SpaceWord(23, false, Parent.Styles) {Paragraph = Parent}, // 7
                 new WordInfo("Test", 24, WordType.Normal | WordType.Attached, false, Parent.Styles) {Paragraph = Parent}, // 8
                 new WordInfo(".", 25, WordType.InertChar | WordType.Attached, false, Parent.Styles) {Paragraph = Parent}, // 9
                 new WordInfo("5", 26, WordType.Normal, false, Parent.Styles) {Paragraph = Parent}, // 10
-                new WordInfo(" ", 29, WordType.Space, false, Parent.Styles) {Paragraph = Parent}, // 11
+                new SpaceWord(29, false, Parent.Styles) {Paragraph = Parent}, // 11
                 new WordInfo("Test6", 30, WordType.Normal, false, Parent.Styles) {Paragraph = Parent}, // 12
-                new WordInfo(" ", 33, WordType.Space, false, Parent.Styles) {Paragraph = Parent}, // 13
+                new SpaceWord(33, false, Parent.Styles) {Paragraph = Parent}, // 13
                 new WordInfo("تست۱", 36, WordType.Normal, true, Parent.Styles) {Paragraph = Parent}, // 14
-                new WordInfo(" ", 41, WordType.Space, true, Parent.Styles) {Paragraph = Parent}, // 15
+                new SpaceWord(41, true, Parent.Styles) {Paragraph = Parent}, // 15
                 new WordInfo("تست۲", 42, WordType.Normal, true, Parent.Styles) {Paragraph = Parent}, // 16
-                new WordInfo(" ", 47, WordType.Space, true, Parent.Styles) {Paragraph = Parent}, // 17
+                new SpaceWord(47, true, Parent.Styles) {Paragraph = Parent}, // 17
                 new WordInfo("تست۳", 48, WordType.Normal, true, Parent.Styles) {Paragraph = Parent}, // 18
-                new WordInfo("img", 55, WordType.Image, false, Parent.Styles) {Paragraph = Parent} // 19
+                new ImageWord(55, Parent.Styles) {Paragraph = Parent} // 19
             };
 
             for (var i = 1; i < Words.Count; i++)
@@ -83,8 +82,7 @@ namespace TextViewer.Test
                     Assert.IsNull(word.Styles.Image);
 
                 var dir = word.Styles.Direction;
-                Assert.IsInstanceOfType(dir, typeof(FlowDirection));
-                Assert.AreEqual((FlowDirection)dir == FlowDirection.RightToLeft, word.Styles.IsRtl);
+                Assert.AreEqual(dir == FlowDirection.RightToLeft, word.Styles.IsRtl);
             }
         }
 
@@ -112,8 +110,14 @@ namespace TextViewer.Test
             {
                 var word = Words[i];
                 Debug.WriteLine($"Word {i}");
-                Assert.IsNotNull(word.GetFormattedText(fontFamily, 16, 1, 20));
-                Assert.IsNotNull(word.Format);
+                word.SetFormattedText(fontFamily, 16, 1, 20);
+                if (word is ImageWord imgWord)
+                    Assert.IsNull(imgWord.Format);
+                else if (word is SpaceWord spaceW)
+                    Assert.IsNull(spaceW.Format);
+                else
+                    Assert.IsNotNull(word.Format);
+
                 Assert.IsTrue(word.Width > 0);
                 Assert.IsTrue(word.Height > 0);
             }
@@ -162,31 +166,6 @@ namespace TextViewer.Test
             Assert.IsTrue(Words.Last().IsImage);
         }
 
-
-        [TestMethod]
-        public void ExtraWidthTest()
-        {
-            var extendedPad = 5;
-            for (var i = 0; i < Words.Count; i++)
-            {
-                var word = Words[i];
-                Debug.WriteLine($"Word {i}");
-                var wordWidth = word.Width;
-                Assert.IsTrue(word.ExtraWidth.Equals(0));
-                word.ExtraWidth = extendedPad;
-                if (word.Type.HasFlag(WordType.Attached))
-                {
-                    Assert.IsTrue(word.ExtraWidth.Equals(0));
-                    Assert.IsTrue(word.Width.Equals(wordWidth));
-                }
-                else
-                {
-                    Assert.IsTrue(word.ExtraWidth.Equals(5));
-                    Assert.IsTrue(word.Width.Equals(wordWidth + extendedPad));
-                }
-            }
-        }
-
         [TestMethod]
         public void CompareToTest()
         {
@@ -220,7 +199,8 @@ namespace TextViewer.Test
             for (var i = 1; i < Words.Count; i++)
             {
                 var word = Words[i];
-                Assert.AreEqual(word.ToString(), $"{word.Offset}/`{word.Text}`/{word.Offset + word.Text.Length - 1}");
+                if (word.IsImage == false)
+                    Assert.AreEqual(word.ToString(), $"{word.Offset}/`{word.Text}`/{word.Offset + word.Text.Length - 1}");
             }
         }
 

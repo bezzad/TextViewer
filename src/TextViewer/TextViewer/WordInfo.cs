@@ -11,7 +11,6 @@ namespace TextViewer
         {
             Text = text;
             Type = type;
-            ImageScale = 1;
             Offset = offset;
             Styles = new WordStyle(isRtl, style);
         }
@@ -19,12 +18,6 @@ namespace TextViewer
         public static readonly Brush SelectedBrush = new SolidColorBrush(Colors.DarkCyan) { Opacity = 0.5 };
         public static Brush HyperLinkBrush { get; set; } = Brushes.Blue;
         public static TextDecorationCollection HyperLinkDecoration { get; set; } = TextDecorations.Underline;
-        private double _extraWidth;
-        public double ExtraWidth
-        {
-            get => Type.HasFlag(WordType.Attached) ? 0 : _extraWidth;
-            set => _extraWidth = value;
-        }
         public WordInfo NextWord { get; set; }
         public WordInfo PreviousWord { get; set; }
         public FormattedText Format { get; set; }
@@ -34,15 +27,14 @@ namespace TextViewer
         public WordStyle Styles { get; protected set; }
         public string Text { get; set; }
         public WordType Type { get; set; }
-        public double ImageScale { get; set; }
         public bool IsSelected { get; set; }
-        public virtual double Width => (Format?.WidthIncludingTrailingWhitespace ?? 0) + ExtraWidth;
-        public virtual double Height => Format?.Height ?? 0;
+        public virtual double Width { get; protected set; }
+        public virtual double Height { get; protected set; }
         public bool IsImage => Type.HasFlag(WordType.Image);
         public new int Offset { get; }
 
 
-        public virtual FormattedText GetFormattedText(FontFamily fontFamily,
+        public virtual void SetFormattedText(FontFamily fontFamily,
             double fontSize,
             double pixelsPerDip,
             double lineHeight)
@@ -67,14 +59,14 @@ namespace TextViewer
             if (Styles.IsHyperLink && HyperLinkDecoration != null)
                 Format.SetTextDecorations(HyperLinkDecoration);
 
-            ExtraWidth = 0; // reset extra space
-            return Format;
+            Width = Format.Width;
+            Height = lineHeight;
         }
 
         public virtual DrawingVisual Render()
         {
             var dc = RenderOpen();
-            
+
             dc.DrawText(Format, DrawPoint);
             dc.DrawGeometry(IsSelected ? SelectedBrush : Brushes.Transparent, null, new RectangleGeometry(Area));
 
