@@ -52,6 +52,9 @@ namespace TextViewerSample
                 }
             }
 
+            if (node.Name == "a")
+                nodeStyle.HyperRef = node.GetAttributeValue("href", null);
+
             if (node.HasAttributes)
             {
                 var styles = node.GetAttributeValue("style", null);

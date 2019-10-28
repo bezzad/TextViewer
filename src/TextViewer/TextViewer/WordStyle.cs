@@ -28,6 +28,7 @@ namespace TextViewer
         public Brush Foreground { get; set; }
         public FontWeight FontWeight { get; set; }
         public string HyperRef { get; set; }
+        public bool IsHyperLink => !string.IsNullOrEmpty(HyperRef);
         public double Width { get; set; }
         public double Height { get; set; }
         public ImageSource Image { get; set; }

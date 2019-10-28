@@ -17,7 +17,8 @@ namespace TextViewer
         }
 
         public static readonly Brush SelectedBrush = new SolidColorBrush(Colors.DarkCyan) { Opacity = 0.5 };
-
+        public static Brush HyperLinkBrush { get; set; } = Brushes.Blue;
+        public static TextDecorationCollection HyperLinkDecoration { get; set; } = TextDecorations.Underline;
         private double _extraWidth;
         public double ExtraWidth
         {
@@ -56,12 +57,15 @@ namespace TextViewer
                 Styles.Direction,
                 new Typeface(fontFamily, FontStyles.Normal, Styles.FontWeight, FontStretches.Normal),
                 fontSize,
-                Styles.Foreground,
+                Styles.IsHyperLink ? HyperLinkBrush : Styles.Foreground,
                 pixelsPerDip)
             {
                 LineHeight = lineHeight,
                 Trimming = TextTrimming.None
             };
+
+            if (Styles.IsHyperLink && HyperLinkDecoration != null)
+                Format.SetTextDecorations(HyperLinkDecoration);
 
             ExtraWidth = 0; // reset extra space
             return Format;
