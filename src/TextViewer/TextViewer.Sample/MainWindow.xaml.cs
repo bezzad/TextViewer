@@ -19,35 +19,40 @@ namespace TextViewerSample
 
             var fonts = Fonts.SystemFontFamilies.OrderBy(f => f.Source).ToList();
             var sizes = new List<double>() { 8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72, 96 };
+            var magnifierTypes = Enum.GetNames(typeof(MagnifierType)).ToList();
             CmbFontFamily.ItemsSource = fonts;
             CmbFontFamily.SelectedIndex = fonts.FindIndex(f => f.Source == "Arial");
             CmbFontSize.ItemsSource = sizes;
             CmbFontSize.SelectedIndex = sizes.IndexOf(18);
             CmbLineHeight.ItemsSource = sizes;
             CmbLineHeight.SelectedIndex = sizes.IndexOf(22);
+            CmbMagnifier.ItemsSource = magnifierTypes;
+            CmbMagnifier.SelectedIndex = magnifierTypes.IndexOf(Reader.MagnifierType.ToString());
+            BtnLoadSample.Checked += delegate { BtnLoadSampleChecking(); };
+            BtnLoadSample.Unchecked += delegate { BtnLoadSampleChecking(); };
 
-            BtnRtlSampleChecked(this, null);
+            BtnLoadSampleChecking();
 
             DpiChanged += delegate
             {
-                Reader.PixelsPerDip = GraphicsHelper.PixelsPerDip(this);
+                Reader.PixelsPerDip = VisualTreeHelper.GetDpi(this).PixelsPerDip;
                 Reader.Render();
             };
         }
 
-        private void BtnLtrSampleChecked(object sender, RoutedEventArgs e)
+        private void BtnLoadSampleChecking()
         {
-            Reader.PageContent = Path.Combine(Environment.CurrentDirectory, "Data\\LtrContentSample.txt").GetWords(false);
-            BtnLtrSample.IsChecked = true;
-            BtnRtlSample.IsChecked = false;
-            Reader.Render();
-        }
+            if (BtnLoadSample.IsChecked == true)
+            {
+                Reader.PageContent = Path.Combine(Environment.CurrentDirectory, "Data\\LtrSample.html").GetParagraphs(false);
+                BtnLoadSample.Content = "LtrContentSample";
+            }
+            else
+            {
+                Reader.PageContent = Path.Combine(Environment.CurrentDirectory, "Data\\RtlSample.html").GetParagraphs(true);
+                BtnLoadSample.Content = "RtrContentSample";
+            }
 
-        private void BtnRtlSampleChecked(object sender, RoutedEventArgs e)
-        {
-            Reader.PageContent = Path.Combine(Environment.CurrentDirectory, "Data\\RtlContentSample.txt").GetWords(true);
-            BtnRtlSample.IsChecked = true;
-            BtnLtrSample.IsChecked = false;
             Reader.Render();
         }
     }
