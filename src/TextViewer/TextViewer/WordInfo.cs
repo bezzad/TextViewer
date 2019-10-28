@@ -46,7 +46,7 @@ namespace TextViewer
             double pixelsPerDip,
             double lineHeight)
         {
-            if (Styles.FontSize != 0)
+            if (Math.Abs(Styles.FontSize) > 0)
                 fontSize += Styles.FontSize;
 
             // Create the initial formatted text string.

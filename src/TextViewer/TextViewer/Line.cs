@@ -138,10 +138,12 @@ namespace TextViewer
 
             if (word.Styles.VerticalAlign.HasValue)
             {
+                var size = Math.Abs(word.Styles.FontSize);
+                size = size > 0 ? size : 5;
                 if (word.Styles.VerticalAlign.Value == VerticalAlignment.Top)
-                    word.DrawPoint = new Point(word.DrawPoint.X, word.DrawPoint.Y - Math.Abs(word.Styles.FontSize));
+                    word.DrawPoint = new Point(word.DrawPoint.X, word.DrawPoint.Y - size);
                 if (word.Styles.VerticalAlign.Value == VerticalAlignment.Bottom)
-                    word.DrawPoint = new Point(word.DrawPoint.X, word.DrawPoint.Y + Math.Abs(word.Styles.FontSize));
+                    word.DrawPoint = new Point(word.DrawPoint.X, word.DrawPoint.Y + size);
             }
 
             return word;
