@@ -1,17 +1,19 @@
 ﻿using HtmlAgilityPack;
-using MethodTimer;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Media;
+using MethodTimer;
 using TextViewer;
 
 namespace TextViewerSample
 {
     public static class TextHelper
     {
+#if DEBUG
         [Time]
+#endif
         public static List<Paragraph> GetParagraphs(this string path, bool isContentRtl)
         {
             var paraOffset = 0;

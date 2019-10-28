@@ -48,7 +48,6 @@ namespace TextViewer
             startPoint.Y += extendedY;
         }
 
-        [Time]
         protected void BuildPage(List<Paragraph> content)
         {
             var startPoint = new Point(content.FirstOrDefault()?.Styles.IsRtl == true ? ActualWidth - Padding.Right : Padding.Left, Padding.Top);
@@ -133,7 +132,9 @@ namespace TextViewer
             }
         }
 
-
+#if DEBUG
+        [Time]
+#endif
         protected override void OnRender(DrawingContext dc)
         {
             base.OnRender(dc);
