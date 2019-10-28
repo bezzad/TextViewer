@@ -75,6 +75,7 @@ namespace TextViewer
         public List<Paragraph> PageContent { get; set; }
         public double PixelsPerDip { get; set; }
         public double OffsetEmSize { get; set; }
+        public double FpsEmSize { get; set; }
 
         /// <summary>
         /// Note: A margin based on the line-height has been used before this paragraph space.
@@ -91,6 +92,7 @@ namespace TextViewer
             DrawnWords = new VisualCollection(this);
             PixelsPerDip = VisualTreeHelper.GetDpi(this).PixelsPerDip;
             OffsetEmSize = 6;
+            FpsEmSize = 12;
         }
 
         protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
