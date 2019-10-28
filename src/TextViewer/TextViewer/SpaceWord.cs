@@ -31,6 +31,14 @@ namespace TextViewer
             return base.GetFormattedText(fontFamily, fontSize, pixelsPerDip, lineHeight);
         }
 
+        public override DrawingVisual Render()
+        {
+            var dc = RenderOpen();
+            dc.DrawGeometry(IsSelected ? SelectedBrush : Brushes.Transparent, null, new RectangleGeometry(Area));
+            dc.Close();
+
+            return this;
+        }
 
         public int GetHashCode(double fontSize, double ppd, double lineHeight)
         {

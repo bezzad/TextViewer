@@ -25,8 +25,14 @@ namespace TextViewer
             "ShowWireFrame", typeof(bool), typeof(BaseTextViewer), new PropertyMetadata(default(bool)));
         public static readonly DependencyProperty ShowOffsetProperty = DependencyProperty.Register(
             "ShowOffset", typeof(bool), typeof(BaseTextViewer), new PropertyMetadata(default(bool)));
+        public static readonly DependencyProperty ShowFramePerSecondProperty = DependencyProperty.Register(
+            "ShowFramePerSecond", typeof(bool), typeof(BaseTextViewer), new PropertyMetadata(default(bool)));
 
-
+        public bool ShowFramePerSecond
+        {
+            get => (bool) GetValue(ShowFramePerSecondProperty);
+            set => SetValue(ShowFramePerSecondProperty, value);
+        }
         public bool ShowWireFrame
         {
             get => (bool)GetValue(ShowWireFrameProperty);

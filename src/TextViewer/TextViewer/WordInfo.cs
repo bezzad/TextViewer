@@ -71,15 +71,11 @@ namespace TextViewer
             return Format;
         }
 
-        public DrawingVisual Render()
+        public virtual DrawingVisual Render()
         {
             var dc = RenderOpen();
-
-            if (IsImage)
-                dc.DrawImage(Styles.Image, Area);
-            else
-                dc.DrawText(Format, DrawPoint);
-
+            
+            dc.DrawText(Format, DrawPoint);
             dc.DrawGeometry(IsSelected ? SelectedBrush : Brushes.Transparent, null, new RectangleGeometry(Area));
 
             dc.Close();

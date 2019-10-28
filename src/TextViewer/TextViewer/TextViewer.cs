@@ -125,7 +125,7 @@ namespace TextViewer
                 lineBuffer.Render(false);  // last line of paragraph has no justified!
                 SetStartPoint(ref startPoint, para, lineBuffer.Height); // new line
                 para.Size = new Size(lineWidth, startPoint.Y - para.Location.Y);
-                
+
 
                 // + ParagraphSpace
                 startPoint.Y += ParagraphSpace;
@@ -161,8 +161,7 @@ namespace TextViewer
                             OffsetEmSize, word.Styles.IsRtl ? Brushes.Red : Brushes.Blue,
                             PixelsPerDip);
 
-                        if (word.Type.HasFlag(WordType.Space) || word.Type.HasFlag(WordType.InertChar)
-                        ) //rotate 90 degree the offset text at the space area
+                        if (word.Type.HasFlag(WordType.Space) || word.Type.HasFlag(WordType.InertChar)) //rotate 90 degree the offset text at the space area
                         {
                             var drawPoint = new Point(word.Area.X + word.Width + 1,
                                 word.Area.Y + (word.Type.HasFlag(WordType.Space) ? word.Height / 2 - ft.Width / 2 : 1));
@@ -171,9 +170,7 @@ namespace TextViewer
                             dc.Pop();
                         }
                         else
-                            dc.DrawText(ft,
-                                new Point(word.Paragraph.Styles.IsRtl ? word.Area.X + word.Width - ft.Width : word.Area.X,
-                                    word.Area.Y));
+                            dc.DrawText(ft, new Point(word.Paragraph.Styles.IsRtl ? word.Area.X + word.Width - ft.Width : word.Area.X, word.Area.Y));
                     }
                 }
                 else if (visual is Paragraph para)
@@ -181,10 +178,7 @@ namespace TextViewer
                     para.Render();
 
                     if (ShowWireFrame) // show paragraph area
-                    {
-                        dc.DrawRoundedRectangle(null, ParagraphWireFramePen,
-                            new Rect(para.Location, para.Size), 4, 4);
-                    }
+                        dc.DrawRoundedRectangle(null, ParagraphWireFramePen, new Rect(para.Location, para.Size), 4, 4);
                 }
             }
         }
