@@ -296,7 +296,7 @@ namespace TextViewer.Test
                 var wordInfo = new WordInfo(word, offset, WordType.Normal, Paragraph.IsRtl(word));
                 wordInfo.SetFormattedText(_arial, _fontSize, 1, _lineHeight);
                 offset += word.Length;
-                var space = new WordInfo(" ", offset++, WordType.Space, wordInfo.Styles.IsRtl);
+                var space = new SpaceWord(offset++, wordInfo.Styles.IsRtl);
                 space.SetFormattedText(_arial, _fontSize, 1, _lineHeight);
 
                 ltrLine.AddWord(wordInfo);
@@ -335,7 +335,7 @@ namespace TextViewer.Test
                 var wordInfo = new WordInfo(word, offset, WordType.Normal, Paragraph.IsRtl(word));
                 wordInfo.SetFormattedText(_arial, _fontSize, 1, _lineHeight);
                 offset += word.Length;
-                var space = new WordInfo(" ", offset++, WordType.Space, wordInfo.Styles.IsRtl);
+                var space = new SpaceWord(offset++, wordInfo.Styles.IsRtl);
                 space.SetFormattedText(_arial, _fontSize, 1, _lineHeight);
 
                 rtlLine.AddWord(wordInfo);
