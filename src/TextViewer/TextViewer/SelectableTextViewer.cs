@@ -26,60 +26,64 @@ namespace TextViewer
             Cursor = Cursors.IBeam;
         }
 
+        protected virtual void OnTouchVisualHit(Point position, HitTestResult result)
+        {
+            WordInfo selectedWord = null;
+
+            if (result.VisualHit is WordInfo word) // It's Word
+                selectedWord = word;
+            else if (result.VisualHit is Paragraph para) // It's Paragraph
+            {
+                foreach (var line in para.Lines)
+                {
+                    if (line.Location.Y <= position.Y && line.Location.Y + line.Height >= position.Y)
+                    {
+                        var lastWord = line.Words.LastOrDefault();
+                        if (lastWord != null)
+                        {
+                            if (line.CurrentParagraph.Styles.IsRtl && position.X <= lastWord.Area.X || // RTL line
+                                !line.CurrentParagraph.Styles.IsRtl && position.X >= lastWord.Area.X)  // LTR line
+                                selectedWord = lastWord;
+                            else
+                                selectedWord = line.Words.FirstOrDefault();
+
+                            break;
+                        }
+                    }
+                }
+            }
+            else // There are no lines! Be sure to click on the space between paragraphs.
+            {
+                foreach (var paragraph in PageContent)
+                {
+                    if (position.Y < paragraph.Location.Y)
+                    {
+                        selectedWord = paragraph.Lines.FirstOrDefault()?.Words.FirstOrDefault();
+                        break;
+                    }
+                }
+
+                if (selectedWord == null)
+                    selectedWord = PageContent.LastOrDefault()?.Lines.LastOrDefault()?.Words.LastOrDefault();
+            }
+
+            // Set Highlight Range 
+            if (selectedWord != null)
+            {
+                if (HighlightFirstWord == null)
+                    HighlightFirstWord = selectedWord;
+                else
+                    HighlightLastWord = selectedWord;
+            }
+        }
 
         // If a child visual object is hit.
-        public void CatchHitObject(Point position, bool isStartPoint)
+        protected void CatchHitObject(Point position)
         {
             // Initiate the hit test by setting up a hit test result callback method.
             VisualTreeHelper.HitTest(this, null, result =>
             {
-                WordInfo selectedWord = null;
-
-                if (result.VisualHit is WordInfo word)
-                    selectedWord = word;
-                else if (result.VisualHit is Paragraph para)
-                {
-                    foreach (var line in para.Lines)
-                    {
-                        if (line.Location.Y <= position.Y && line.Location.Y + line.Height >= position.Y)
-                        {
-                            var lastWord = line.Words.LastOrDefault();
-                            if (lastWord != null)
-                            {
-                                if (line.CurrentParagraph.Styles.IsRtl && position.X <= lastWord.Area.X || // RTL line
-                                    !line.CurrentParagraph.Styles.IsRtl && position.X >= lastWord.Area.X)  // LTR line
-                                    selectedWord = lastWord;
-                                else
-                                    selectedWord = line.Words.FirstOrDefault();
-
-                                break;
-                            }
-                        }
-                    }
-                }
-                else // There are no lines! Be sure to click on the space between paragraphs.
-                {
-                    foreach (var paragraph in PageContent)
-                    {
-                        if (position.Y < paragraph.Location.Y)
-                        {
-                            selectedWord = paragraph.Lines.FirstOrDefault()?.Words.FirstOrDefault();
-                            break;
-                        }
-                    }
-
-                    if (selectedWord == null)
-                        selectedWord = PageContent.LastOrDefault()?.Lines.LastOrDefault()?.Words.LastOrDefault();
-                }
-
-                // Set Highlight Range 
-                if (selectedWord != null)
-                {
-                    if (isStartPoint)
-                        HighlightFirstWord = selectedWord;
-                    else
-                        HighlightLastWord = selectedWord;
-                }
+                OnTouchVisualHit(position, result);
 
                 // Stop the hit test enumeration of objects in the visual tree.
                 return HitTestResultBehavior.Stop;
@@ -90,7 +94,7 @@ namespace TextViewer
         {
             if (IsSelectable && IsMouseDown)
             {
-                CatchHitObject(e.GetPosition(this), false);
+                CatchHitObject(e.GetPosition(this));
                 HighlightSelectedText();
             }
         }
@@ -100,7 +104,7 @@ namespace TextViewer
             // Retrieve the coordinates of the mouse button event.
             IsMouseDown = true;
             ClearSelection();
-            CatchHitObject(e.GetPosition(this), true);
+            CatchHitObject(e.GetPosition(this));
         }
 
         protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
@@ -109,7 +113,7 @@ namespace TextViewer
             if (IsSelectable && IsMouseDown)
             {
                 IsMouseDown = false;
-                CatchHitObject(e.GetPosition(this), false);
+                CatchHitObject(e.GetPosition(this));
                 HighlightSelectedText();
             }
         }
