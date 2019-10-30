@@ -11,7 +11,8 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="40" />
         </Grid.RowDefinitions>
-        <textViewer:MagnifyingTextViewer Grid.Row="0" x:Name="Reader" Background="AntiqueWhite" Padding="20" IsSelectable="True" MagnifierZoomFactor="5" MagnifierDistanceFromMouse="0"></textViewer:MagnifyingTextViewer>
+        <textViewer:MagnifyingTextViewer Grid.Row="0" x:Name="Reader" Background="AntiqueWhite" Padding="20" IsSelectable="True" 
+                                         MagnifierZoomFactor="5" OpenLinkRefOnClick="True" CopyLinkRefOnClick="True" MagnifierDistanceFromMouse="0"></textViewer:MagnifyingTextViewer>
         <StackPanel Orientation="Horizontal" Grid.Row="1" Background="Azure" >
             <CheckBox Margin="5,10" IsChecked="{Binding ElementName=Reader, Path=ShowOffset, UpdateSourceTrigger=PropertyChanged}">Show Offset</CheckBox>
             <CheckBox Margin="5,10" IsChecked="{Binding ElementName=Reader, Path=ShowWireFrame, UpdateSourceTrigger=PropertyChanged}">Wire Frame</CheckBox>

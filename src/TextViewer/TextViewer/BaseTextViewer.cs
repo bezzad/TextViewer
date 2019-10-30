@@ -30,7 +30,7 @@ namespace TextViewer
 
         public bool ShowFramePerSecond
         {
-            get => (bool) GetValue(ShowFramePerSecondProperty);
+            get => (bool)GetValue(ShowFramePerSecondProperty);
             set => SetValue(ShowFramePerSecondProperty, value);
         }
         public bool ShowWireFrame
@@ -82,6 +82,13 @@ namespace TextViewer
         /// Default value is 1.6x of line spacing.
         /// </summary>
         public double ParagraphSpace => LineHeight * 0.66;
+
+        public delegate void MessageEventHandler(object sender, TextViewerEventArgs args);
+        public event MessageEventHandler Message;
+        protected virtual void OnMessage(string message, MessageType messageType)
+        {
+            Message?.Invoke(this, new TextViewerEventArgs(message, messageType));
+        }
 
 
         protected BaseTextViewer()

@@ -1,4 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
+using System.Security.Policy;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -7,7 +11,9 @@ namespace TextViewer
 {
     public class AnnotationTextViewer : SelectableTextViewer
     {
-        public List<WordInfo> HyperLinks { get; protected set; }
+        protected List<WordInfo> HyperLinks { get; set; }
+        public bool CopyLinkRefOnClick { get; set; }
+        public bool OpenLinkRefOnClick { get; set; }
 
         public AnnotationTextViewer()
         {
@@ -21,9 +27,29 @@ namespace TextViewer
 
             if (result.VisualHit is WordInfo word && HighlightLastWord == null && word.Styles.IsHyperLink)
             {
-                // open link
+                // is external link
+                if (word.Styles.HyperRef.StartsWith("http"))
+                {
+                    if (CopyLinkRefOnClick)
+                    {
+                        Clipboard.SetText(word.Styles.HyperRef);
+                        OnMessage(Properties.Resources.LinkCopied, MessageType.Info);
+                    }
 
+                    if (OpenLinkRefOnClick) // copy web link in clipboard
+                    {
+                        OpenUrl(word.Styles.HyperRef);
+                        OnMessage(Properties.Resources.LinkOpened, MessageType.Info);
+                    }
+                }
+                else
+                    AnnotationStart(word.Styles.HyperRef);
             }
+        }
+
+        protected void AnnotationStart(string link)
+        {
+
         }
 
         protected override void OnMouseMove(MouseEventArgs e)
@@ -71,6 +97,39 @@ namespace TextViewer
                 return false;
 
             return true;
+        }
+
+        public void OpenUrl(string url)
+        {
+            url = url.Replace("&", "^&");
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                Process.Start(new ProcessStartInfo("cmd", $"/c start {url}")
+                {
+                    WindowStyle = ProcessWindowStyle.Hidden,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                });
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                Process.Start("xdg-open", url);
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                Process.Start("open", url);
+            }
+            else
+            {
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = url,
+                    WindowStyle = ProcessWindowStyle.Hidden,
+                    UseShellExecute = true,
+                    CreateNoWindow = true
+                });
+            }
         }
     }
 }
