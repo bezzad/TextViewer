@@ -9,7 +9,7 @@ namespace TextViewer
     public abstract class BaseTextViewer : Canvas
     {
         // Provide a required override for the VisualChildrenCount property.
-        protected override int VisualChildrenCount => DrawnWords.Count;
+        protected override int VisualChildrenCount => DrawnWords?.Count ?? 0;
 
         public static readonly DependencyProperty FontSizeProperty = DependencyProperty.Register(
             "FontSize", typeof(double), typeof(BaseTextViewer), new PropertyMetadata(default(double)));
@@ -103,6 +103,19 @@ namespace TextViewer
             if (e.Property.Name.StartsWith("IsMouse") == false)
                 Render();
 
+        }
+
+        public virtual void DrawWord(DrawingVisual visual)
+        {
+            DrawnWords.Add(visual);
+        }
+        public virtual void RemoveDrawnWord(int index)
+        {
+            DrawnWords.RemoveAt(index);
+        }
+        public virtual void ClearDrawnWords()
+        {
+            DrawnWords.Clear();
         }
 
         public virtual void Render() { InvalidateVisual(); }

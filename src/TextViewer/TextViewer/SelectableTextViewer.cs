@@ -120,7 +120,7 @@ namespace TextViewer
 
         protected void HighlightSelectedText()
         {
-            if (DrawnWords?.Count > 0)
+            if (VisualChildrenCount > 0)
             {
                 // select words which are within range
                 if (HighlightFirstWord != HighlightLastWord)
@@ -154,7 +154,7 @@ namespace TextViewer
 
         public void UnSelectWords()
         {
-            if (DrawnWords?.Count > 0)
+            if (VisualChildrenCount > 0)
             {
                 foreach (var visual in DrawnWords)
                     if (visual is WordInfo word)

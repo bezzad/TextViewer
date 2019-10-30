@@ -52,7 +52,7 @@ namespace TextViewer
         {
             var startPoint = new Point(content.FirstOrDefault()?.Styles.IsRtl == true ? ActualWidth - Padding.Right : Padding.Left, Padding.Top);
             var lineWidth = ActualWidth - Padding.Left - Padding.Right;
-            DrawnWords.Clear();
+            ClearDrawnWords();
             Line lineBuffer;
 
             void RemoveSpaceFromEndOfLine()
@@ -62,7 +62,7 @@ namespace TextViewer
                 {
                     lineBuffer.RemainWidth += lineBuffer.Words.Last().Width;
                     lineBuffer.Words.RemoveAt(lineBuffer.Words.Count - 1);
-                    DrawnWords.RemoveAt(DrawnWords.Count - 1);
+                    RemoveDrawnWord(VisualChildrenCount - 1);
                 }
             }
 
@@ -72,7 +72,7 @@ namespace TextViewer
                 para.Lines.Clear(); // clear old lines
                 para.Location = new Point(Padding.Left, startPoint.Y);
                 para.Size = new Size(0, 0);
-                DrawnWords.Add(para);
+                DrawWord(para);
 
                 // create new line buffer, without cleaning last line
                 lineBuffer = new Line(lineWidth, para, startPoint);
@@ -114,7 +114,7 @@ namespace TextViewer
                     if (lineBuffer.Count > 0 || word.Type.HasFlag(WordType.Space) == false)
                     {
                         lineBuffer.AddWord(word);
-                        DrawnWords.Add(word);
+                        DrawWord(word);
                     }
                 }
 

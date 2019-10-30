@@ -6,7 +6,7 @@ using System.Windows.Shapes;
 
 namespace TextViewer
 {
-    public class MagnifyingTextViewer : SelectableTextViewer
+    public class MagnifyingTextViewer : AnnotationTextViewer
     {
         public static readonly DependencyProperty ZoomFactorProperty = DependencyProperty.Register(nameof(MagnifierZoomFactor), typeof(double), typeof(MagnifyingTextViewer), new PropertyMetadata(default(double)));
         public static readonly DependencyProperty RadiusProperty = DependencyProperty.Register(nameof(MagnifierLength), typeof(double), typeof(MagnifyingTextViewer), new PropertyMetadata(default(double)));
