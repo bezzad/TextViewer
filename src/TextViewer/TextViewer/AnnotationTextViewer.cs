@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using System.Security.Policy;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -12,12 +10,21 @@ namespace TextViewer
     public class AnnotationTextViewer : SelectableTextViewer
     {
         protected List<WordInfo> HyperLinks { get; set; }
+        protected Annotation Annotation { get; set; }
         public bool CopyLinkRefOnClick { get; set; }
         public bool OpenLinkRefOnClick { get; set; }
 
         public AnnotationTextViewer()
         {
             HyperLinks = new List<WordInfo>();
+            Annotation = new Annotation()
+            {
+                Width = 300,
+                Height = 200,
+                FlowDirection = FlowDirection,
+                Padding = 4,
+                Visibility = Visibility.Hidden
+            };
         }
 
 
