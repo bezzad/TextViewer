@@ -113,7 +113,6 @@ namespace TextViewer
             if (IsSelectable && IsMouseDown)
             {
                 IsMouseDown = false;
-                CatchHitObject(e.GetPosition(this));
                 HighlightSelectedText();
             }
         }
@@ -123,7 +122,7 @@ namespace TextViewer
             if (VisualChildrenCount > 0)
             {
                 // select words which are within range
-                if (HighlightFirstWord != HighlightLastWord)
+                if (HighlightFirstWord != null && HighlightLastWord != null && HighlightFirstWord != HighlightLastWord)
                 {
                     var isFirstWordBeginOfHighlight = HighlightLastWord?.CompareTo(HighlightFirstWord) > 0;
                     var from = isFirstWordBeginOfHighlight ? HighlightFirstWord : HighlightLastWord;

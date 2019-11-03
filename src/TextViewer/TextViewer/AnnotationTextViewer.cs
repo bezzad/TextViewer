@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
@@ -14,72 +16,118 @@ namespace TextViewer
         protected Annotation Annotation { get; set; }
         public bool CopyLinkRefOnClick { get; set; }
         public bool OpenLinkRefOnClick { get; set; }
+        public double MaxFontSize { get; set; }
+        public double MinFontSize { get; set; }
+        public double PeakHeight { get; set; }
+
 
         public AnnotationTextViewer()
         {
+            MaxFontSize = 30;
+            MinFontSize = 8;
+            PeakHeight = 10;
+
             HyperLinks = new List<WordInfo>();
-            Annotation = new Annotation()
-            {
-                Width = 300,
-                Height = 200,
-                FlowDirection = FlowDirection.RightToLeft,
-                Padding = 4,
-                Visibility = Visibility.Hidden
-            };
+
         }
 
 
         protected override void OnTouchVisualHit(Point position, HitTestResult result)
         {
             base.OnTouchVisualHit(position, result);
-            AnnotationStart("test");
-
-            if (result.VisualHit is WordInfo word && HighlightLastWord == null && word.Styles.IsHyperLink)
+            if (result.VisualHit is WordInfo word)
             {
-                // is external link
-                if (word.Styles.HyperRef.StartsWith("http"))
+                AnnotationStart(word.Text);
+                if (HighlightLastWord == null && word.Styles.IsHyperLink)
                 {
-                    if (CopyLinkRefOnClick)
+                    // is external link
+                    if (word.Styles.HyperRef.StartsWith("http"))
                     {
-                        Clipboard.SetText(word.Styles.HyperRef);
-                        OnMessage(Properties.Resources.LinkCopied, MessageType.Info);
-                    }
+                        if (CopyLinkRefOnClick)
+                        {
+                            Clipboard.SetText(word.Styles.HyperRef);
+                            OnMessage(Properties.Resources.LinkCopied, MessageType.Info);
+                        }
 
-                    if (OpenLinkRefOnClick) // copy web link in clipboard
-                    {
-                        OpenUrl(word.Styles.HyperRef);
-                        OnMessage(Properties.Resources.LinkOpened, MessageType.Info);
+                        if (OpenLinkRefOnClick) // copy web link in clipboard
+                        {
+                            OpenUrl(word.Styles.HyperRef);
+                            OnMessage(Properties.Resources.LinkOpened, MessageType.Info);
+                        }
                     }
+                    else
+                        AnnotationStart(word.Styles.HyperRef);
                 }
-                else
-                    AnnotationStart(word.Styles.HyperRef);
             }
         }
 
         protected void AnnotationStart(string text)
         {
-            if (Annotation != null)
+            if (string.IsNullOrEmpty(text))
+                return;
+
+            if (VisualTreeHelper.GetParent(this) is Panel container)
             {
-                if (VisualTreeHelper.GetParent(this) is Panel container)
+                if (Annotation == null)
                 {
+                    Annotation = new Annotation();
                     if (container.Children.Contains(Annotation) == false)
                         container.Children.Add(Annotation);
+                }
 
-                    Annotation.Text = text;
-                    Annotation.Height = ActualHeight / 2 - 25;
+                InitialAnnotationTextBlock(text);
 
-                    
-                        var e = Mouse.GetPosition(container);
-                        Annotation.Margin = new Thickness(e.X -32 , 
-                            e.Y + 25, 
-                            container.ActualWidth - e.X - Annotation.ActualWidth + 32, 
-                            container.ActualHeight - e.Y - Annotation.ActualHeight - 100);
+                var onContainerPosition = Mouse.GetPosition(container);
+                var onCanvasPosition = Mouse.GetPosition(this);
+                var left = 0.0;
+                var right = 0.0;
+                var top = onContainerPosition.Y + PeakHeight * 2;
+                var bottom = container.ActualHeight - top - Annotation.Height - Annotation.Padding*2;
 
-                    Annotation.Visibility = Visibility.Visible;
-                } 
-                
+                if (onCanvasPosition.X + Annotation.Width / 2 > ActualWidth - Padding.Right) // if the length of annotation over from right of page
+                {
+                    Debug.WriteLine("Right Overflow");
+                    var rightSpace = ActualWidth - Padding.Right - onCanvasPosition.X;
+                    left = onContainerPosition.X + rightSpace - Annotation.Width;
+                    right = container.ActualWidth - left - Annotation.Width;
+                    Annotation.BubblePeakPosition = new Point(Annotation.Width - rightSpace, -PeakHeight);
+                }
+                else
+                {
+                    Debug.WriteLine("Middle Position");
+                    left = onContainerPosition.X - Annotation.Width / 2;
+                    right = container.ActualWidth - left - Annotation.Width;
+                    Annotation.BubblePeakPosition = new Point(Annotation.Width / 2, -PeakHeight);
+                }
+
+                Annotation.Margin = new Thickness(left, top, right, bottom);
             }
         }
+
+        private void InitialAnnotationTextBlock(string text)
+        {
+            Annotation.Text = text;
+            Annotation.Padding = 4;
+            Annotation.FontFamily = FontFamily;
+            Annotation.FontSize = Math.Max(Math.Min(FontSize - 2, MaxFontSize), MinFontSize);
+            Annotation.FontWeight = FontWeights.Normal;
+            Annotation.TextAlign = TextAlignment.Justify;
+            Annotation.FlowDirection = FlowDirection.RightToLeft;
+            Annotation.LineHeight = Math.Max(Math.Min(LineHeight, MaxFontSize), MinFontSize);
+            Annotation.Visibility = Visibility.Visible;
+            Annotation.MaxHeight = ActualHeight / 2;
+            Annotation.MaxWidth = ActualWidth / 2;
+            Annotation.MinHeight = Annotation.LineHeight;
+
+            var textSize = MeasureString(text, CultureInfo.CurrentCulture, Annotation.FlowDirection,
+                Annotation.FontFamily, Annotation.FontWeight, Annotation.FontSize,
+                Annotation.MaxWidth, Annotation.LineHeight, Annotation.TextAlign);
+
+            Annotation.Width = Math.Max(Math.Min(textSize.Width + Annotation.Padding * 4, Annotation.MaxWidth), Annotation.MinWidth);
+            Annotation.Height = Math.Max(Math.Min(textSize.Height + Annotation.Padding * 4 + PeakHeight, Annotation.MaxHeight), Annotation.MinHeight);
+        }
+
+
 
         protected override void OnMouseMove(MouseEventArgs e)
         {
@@ -92,9 +140,9 @@ namespace TextViewer
                     Mouse.SetCursor(Cursors.Hand);
         }
 
-        public override void DrawWord(DrawingVisual visual)
+        public override void AddDrawnWord(DrawingVisual visual)
         {
-            base.DrawWord(visual);
+            base.AddDrawnWord(visual);
             if (visual is WordInfo word && word.Styles.IsHyperLink)
                 HyperLinks.Add(word);
         }

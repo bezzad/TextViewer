@@ -1,7 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 
 namespace TextViewer
@@ -22,7 +23,31 @@ namespace TextViewer
         public static readonly DependencyProperty BubblePeakPositionProperty = DependencyProperty.Register(nameof(BubblePeakPosition), typeof(Point), typeof(Annotation), new PropertyMetadata(default(Point)));
         public static readonly DependencyProperty TextProperty = DependencyProperty.Register(nameof(Text), typeof(string), typeof(Annotation), new PropertyMetadata(default(string)));
         public static readonly DependencyProperty TextAlignProperty = DependencyProperty.Register(nameof(TextAlign), typeof(TextAlignment), typeof(Annotation), new PropertyMetadata(default(TextAlignment)));
+        public static readonly DependencyProperty FontFamilyProperty = DependencyProperty.Register(nameof(FontFamily), typeof(FontFamily), typeof(Annotation), new PropertyMetadata(default(FontFamily)));
+        public static readonly DependencyProperty FontWeightProperty = DependencyProperty.Register(nameof(FontWeight), typeof(FontWeight), typeof(Annotation), new PropertyMetadata(default(FontWeight)));
+        public static readonly DependencyProperty FontSizeProperty = DependencyProperty.Register(nameof(FontSize), typeof(double), typeof(Annotation), new PropertyMetadata(default(double)));
+        public static readonly DependencyProperty LineHeightProperty = DependencyProperty.Register(nameof(LineHeight), typeof(double), typeof(Annotation), new PropertyMetadata(default(double)));
 
+        public double LineHeight
+        {
+            get => (double)GetValue(LineHeightProperty);
+            set => SetValue(LineHeightProperty, value);
+        }
+        public double FontSize
+        {
+            get => (double)GetValue(FontSizeProperty);
+            set => SetValue(FontSizeProperty, value);
+        }
+        public FontWeight FontWeight
+        {
+            get => (FontWeight)GetValue(FontWeightProperty);
+            set => SetValue(FontWeightProperty, value);
+        }
+        public FontFamily FontFamily
+        {
+            get => (FontFamily)GetValue(FontFamilyProperty);
+            set => SetValue(FontFamilyProperty, value);
+        }
         public TextAlignment TextAlign
         {
             get => (TextAlignment)GetValue(TextAlignProperty);
@@ -74,26 +99,40 @@ namespace TextViewer
             set => SetValue(PaddingProperty, value);
         }
 
-
-
         public Annotation()
         {
             BorderThickness = 1;
             CornerRadius = 10;
             BubblePeakWidth = 16;
             BorderBrush = Brushes.Teal;
+            TextAlign = TextAlignment.Justify;
+            FontWeight = FontWeights.Normal;
+            FontSize = 10;
+            FontFamily = new FontFamily("Arial");
+            LineHeight = FontSize;
+            Padding = 5;
+            BubblePeakPosition = new Point(CornerRadius + BubblePeakWidth, 0);
+            Foreground = Brushes.Teal;
+            Background = new SolidColorBrush(Colors.Bisque) { Opacity = 0.97 };
+            MinWidth = CornerRadius * 2 + BubblePeakWidth + 1;
+
             _pen = new Pen(BorderBrush, BorderThickness);
-            _textViewer = new TextBlock() { TextWrapping = TextWrapping.Wrap };
+            _textViewer = new TextBlock()
+            {
+                TextWrapping = TextWrapping.Wrap,
+                FontWeight = FontWeight,
+                FontSize = FontSize,
+                FontFamily = FontFamily,
+                LineHeight = LineHeight,
+                Cursor = Cursors.Arrow,
+                TextAlignment = TextAlign
+            };
             _scrollBar = new ScrollViewer()
             {
                 VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
                 Content = _textViewer
             };
-            Padding = 5;
-            BubblePeakPosition = new Point(CornerRadius + BubblePeakWidth, 0);
-            Foreground = Brushes.Teal;
-            Background = new SolidColorBrush(Colors.Bisque) { Opacity = 0.97 };
-            TextAlign = TextAlignment.Justify;
+
             Child = _scrollBar;
         }
 
@@ -106,13 +145,11 @@ namespace TextViewer
             {
                 if (e.Property.Name == nameof(BubblePeakPosition))
                 {
-                    if (BubblePeakPosition.X < CornerRadius + BubblePeakWidth)
-                        BubblePeakPosition = new Point(CornerRadius + BubblePeakWidth,
-                            BubblePeakPosition.Y < ActualHeight ? 0 : ActualHeight);
+                    //if (BubblePeakPosition.X < CornerRadius + BubblePeakWidth)
+                    //    SetValue(BubblePeakPositionProperty, new Point(CornerRadius + BubblePeakWidth, BubblePeakPosition.Y < ActualHeight ? 0 : ActualHeight));
 
-                    if (BubblePeakPosition.X > ActualWidth - CornerRadius - BubblePeakWidth)
-                        BubblePeakPosition = new Point(ActualWidth - CornerRadius - BubblePeakWidth,
-                            BubblePeakPosition.Y < ActualHeight ? 0 : ActualHeight);
+                    //if (BubblePeakPosition.X > ActualWidth - CornerRadius - BubblePeakWidth)
+                    //    SetValue(BubblePeakPositionProperty, new Point(ActualWidth - CornerRadius - BubblePeakWidth, BubblePeakPosition.Y < ActualHeight ? 0 : ActualHeight));
                 }
             }
 
@@ -130,7 +167,16 @@ namespace TextViewer
                 _textViewer.Foreground = Foreground;
             else if (e.Property.Name == nameof(Padding) && _scrollBar != null && _textViewer != null)
                 _scrollBar.Margin = _textViewer.Padding = new Thickness(Padding);
-
+            else if (e.Property.Name == nameof(FontSize) && _textViewer != null)
+                _textViewer.FontSize = FontSize;
+            else if (e.Property.Name == nameof(FontWeight) && _textViewer != null)
+                _textViewer.FontWeight = FontWeight;
+            else if (e.Property.Name == nameof(FontFamily) && _textViewer != null)
+                _textViewer.FontFamily = FontFamily;
+            else if (e.Property.Name == nameof(LineHeight) && _textViewer != null)
+                _textViewer.LineHeight = LineHeight;
+            else if (e.Property.Name == nameof(CornerRadius) || e.Property.Name == nameof(BubblePeakWidth))
+                MinWidth = CornerRadius * 2 + BubblePeakWidth + 1;
         }
 
         protected override void OnRender(DrawingContext drawingContext)
@@ -152,7 +198,7 @@ namespace TextViewer
             var a = new Point(0, CornerRadius);
             var b = new Point(CornerRadius, 0);
             var c = new Point(BubblePeakPosition.X - BubblePeakWidth / 2, 0);
-            var d = new Point(BubblePeakPosition.X, -CornerRadius);
+            var d = new Point(BubblePeakPosition.X, BubblePeakPosition.Y);
             var e = new Point(BubblePeakPosition.X + BubblePeakWidth / 2, 0);
             var f = new Point(ActualWidth - CornerRadius, 0);
             var g = new Point(ActualWidth, 10);

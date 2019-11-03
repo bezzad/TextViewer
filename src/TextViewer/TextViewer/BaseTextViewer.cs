@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -112,7 +113,7 @@ namespace TextViewer
 
         }
 
-        public virtual void DrawWord(DrawingVisual visual)
+        public virtual void AddDrawnWord(DrawingVisual visual)
         {
             DrawnWords.Add(visual);
         }
@@ -137,6 +138,29 @@ namespace TextViewer
             }
 
             return DrawnWords[index];
+        }
+
+        protected virtual Size MeasureString(string input, CultureInfo lang, FlowDirection dir, 
+            FontFamily fontFamily, FontWeight fontWeight, double fontSize,
+            double maxTextWidth, double lineHeight, TextAlignment textAlign)
+        {
+            var formattedText = new FormattedText(
+                input,
+                lang,
+                dir,
+                new Typeface(fontFamily, FontStyles.Normal, fontWeight, FontStretches.Normal),
+                fontSize,
+                Brushes.Black,
+                new NumberSubstitution(),
+                VisualTreeHelper.GetDpi(this).PixelsPerDip)
+            {
+                MaxTextWidth = maxTextWidth,
+                LineHeight = lineHeight,
+                TextAlignment = textAlign,
+                Trimming = TextTrimming.None
+            };
+
+            return new Size(formattedText.WidthIncludingTrailingWhitespace, formattedText.Height);
         }
     }
 }

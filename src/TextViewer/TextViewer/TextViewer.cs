@@ -72,7 +72,7 @@ namespace TextViewer
                 para.Lines.Clear(); // clear old lines
                 para.Location = new Point(Padding.Left, startPoint.Y);
                 para.Size = new Size(0, 0);
-                DrawWord(para);
+                AddDrawnWord(para);
 
                 // create new line buffer, without cleaning last line
                 lineBuffer = new Line(lineWidth, para, startPoint);
@@ -114,7 +114,7 @@ namespace TextViewer
                     if (lineBuffer.Count > 0 || word.Type.HasFlag(WordType.Space) == false)
                     {
                         lineBuffer.AddWord(word);
-                        DrawWord(word);
+                        AddDrawnWord(word);
                     }
                 }
 
