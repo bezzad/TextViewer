@@ -32,6 +32,7 @@ namespace TextViewer
         protected override void OnTouchVisualHit(Point position, HitTestResult result)
         {
             base.OnTouchVisualHit(position, result);
+            AnnotationStart("test");
 
             if (result.VisualHit is WordInfo word && HighlightLastWord == null && word.Styles.IsHyperLink)
             {
@@ -51,22 +52,32 @@ namespace TextViewer
                     }
                 }
                 else
-                    AnnotationStart(word.Styles.HyperRef, position);
+                    AnnotationStart(word.Styles.HyperRef);
             }
         }
 
-        protected void AnnotationStart(string text, Point position)
+        protected void AnnotationStart(string text)
         {
             if (Annotation != null)
             {
-                if (VisualTreeHelper.GetParent(this) is Panel container && container.Children.Contains(Annotation) == false)
-                    container.Children.Add(Annotation);
+                if (VisualTreeHelper.GetParent(this) is Panel container)
+                {
+                    if (container.Children.Contains(Annotation) == false)
+                        container.Children.Add(Annotation);
 
-                Annotation.Text = text;
-                Annotation.Height = ActualHeight / 2 - 25;
-                SetLeft(Annotation, position.X - 32);
-                SetTop(Annotation, position.Y + 25);
-                Annotation.Visibility = Visibility.Visible;
+                    Annotation.Text = text;
+                    Annotation.Height = ActualHeight / 2 - 25;
+
+                    
+                        var e = Mouse.GetPosition(container);
+                        Annotation.Margin = new Thickness(e.X -32 , 
+                            e.Y + 25, 
+                            container.ActualWidth - e.X - Annotation.ActualWidth + 32, 
+                            container.ActualHeight - e.Y - Annotation.ActualHeight - 100);
+
+                    Annotation.Visibility = Visibility.Visible;
+                } 
+                
             }
         }
 

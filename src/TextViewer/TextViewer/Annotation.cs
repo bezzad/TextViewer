@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -82,17 +83,12 @@ namespace TextViewer
             BubblePeakWidth = 16;
             BorderBrush = Brushes.Teal;
             _pen = new Pen(BorderBrush, BorderThickness);
-            _textViewer = new TextBlock()
-            {
-                TextWrapping = TextWrapping.Wrap
-            };
-
+            _textViewer = new TextBlock() { TextWrapping = TextWrapping.Wrap };
             _scrollBar = new ScrollViewer()
             {
                 VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
                 Content = _textViewer
             };
-
             Padding = 5;
             BubblePeakPosition = new Point(CornerRadius + BubblePeakWidth, 0);
             Foreground = Brushes.Teal;

@@ -6,6 +6,9 @@
         xmlns:textViewer="clr-namespace:TextViewer;assembly=TextViewer"
         mc:Ignorable="d"
         Title="MainWindow" Height="800" Width="900">
+    <Window.Resources>
+        <ResourceDictionary Source="pack://application:,,,/TextViewer;component/Assets/ScrollViewerStyle.xaml" />
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
