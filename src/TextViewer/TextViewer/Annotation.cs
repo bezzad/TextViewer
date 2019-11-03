@@ -139,7 +139,7 @@ namespace TextViewer
 
         protected override void OnRender(DrawingContext drawingContext)
         {
-            var dX = BubblePeakPosition.Y > 0 ? ActualWidth - BubblePeakPosition.X : BubblePeakPosition.X; // rotate around x axis 
+            //
             //                  d
             //                 / \
             //     b____2____c/3 4\e___5___f
@@ -155,9 +155,9 @@ namespace TextViewer
             //
             var a = new Point(0, CornerRadius);
             var b = new Point(CornerRadius, 0);
-            var c = new Point(dX - BubblePeakWidth / 2, 0);
-            var d = new Point(dX, -CornerRadius);
-            var e = new Point(dX + BubblePeakWidth / 2, 0);
+            var c = new Point(BubblePeakPosition.X - BubblePeakWidth / 2, 0);
+            var d = new Point(BubblePeakPosition.X, -CornerRadius);
+            var e = new Point(BubblePeakPosition.X + BubblePeakWidth / 2, 0);
             var f = new Point(ActualWidth - CornerRadius, 0);
             var g = new Point(ActualWidth, 10);
             var h = new Point(ActualWidth, ActualHeight - CornerRadius);
@@ -181,7 +181,7 @@ namespace TextViewer
             };
 
             var pthFigure = new PathFigure(a, pathSegments, false) { IsFilled = true };
-            var transform = BubblePeakPosition.Y > 0 ? new RotateTransform(-180, ActualWidth / 2, ActualHeight / 2) : null;
+            var transform = BubblePeakPosition.Y > 0 ? new ScaleTransform(1, -1, ActualWidth / 2, ActualHeight / 2) : null; // rotate around x axis 
             var pthGeometry = new PathGeometry(new List<PathFigure> { pthFigure }, FillRule.EvenOdd, transform);
             drawingContext.DrawGeometry(Background, _pen, pthGeometry);
         }

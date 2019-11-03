@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 
@@ -21,7 +22,7 @@ namespace TextViewer
             {
                 Width = 300,
                 Height = 200,
-                FlowDirection = FlowDirection,
+                FlowDirection = FlowDirection.RightToLeft,
                 Padding = 4,
                 Visibility = Visibility.Hidden
             };
@@ -50,13 +51,23 @@ namespace TextViewer
                     }
                 }
                 else
-                    AnnotationStart(word.Styles.HyperRef);
+                    AnnotationStart(word.Styles.HyperRef, position);
             }
         }
 
-        protected void AnnotationStart(string link)
+        protected void AnnotationStart(string text, Point position)
         {
+            if (Annotation != null)
+            {
+                if (VisualTreeHelper.GetParent(this) is Panel container && container.Children.Contains(Annotation) == false)
+                    container.Children.Add(Annotation);
 
+                Annotation.Text = text;
+                Annotation.Height = ActualHeight / 2 - 25;
+                SetLeft(Annotation, position.X - 32);
+                SetTop(Annotation, position.Y + 25);
+                Annotation.Visibility = Visibility.Visible;
+            }
         }
 
         protected override void OnMouseMove(MouseEventArgs e)
@@ -90,12 +101,6 @@ namespace TextViewer
             HyperLinks.Clear();
         }
 
-        public override void Render()
-        {
-            base.Render();
-
-
-        }
 
         protected bool IsPointOnWordArea(Point pos, WordInfo word)
         {
