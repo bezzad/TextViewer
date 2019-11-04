@@ -77,7 +77,7 @@ namespace TextViewer
             Annotation.MaxHeight = ActualHeight / 2 - Padding.Bottom - Padding.Top;
             Annotation.MaxWidth = ActualWidth / 2 - Padding.Right - Padding.Left;
             Annotation.MinHeight = Math.Max(LineHeight, Annotation.CornerRadius * 2 + Annotation.BubblePeakHeight + 1);
-            Annotation.MinWidth = Annotation.CornerRadius * 2 + Annotation.BubblePeakWidth + 1;
+            Annotation.MinWidth = Annotation.CornerRadius * 2 + Annotation.BubblePeakWidth + 1 + Annotation.BorderThickness * 2 + Annotation.Padding * 2;
             Annotation.Styles.Background = new SolidColorBrush(Colors.Bisque) { Opacity = 0.97 };
             Annotation.Styles.Foreground = Brushes.Teal;
             Annotation.Styles.FontSize = -2;
@@ -103,7 +103,7 @@ namespace TextViewer
                 left = Annotation.BubblePeakPosition.X - Annotation.Width / 2;
             }
 
-            Annotation.DrawPoint = new Point(left + Annotation.Padding, top + Annotation.Padding);
+            Annotation.DrawPoint = new Point(left + Annotation.BorderThickness + Annotation.Padding, top + Annotation.BubblePeakHeight + Annotation.BorderThickness + Annotation.Padding);
             Annotation.Area = new Rect(new Point(left, top), new Size(Annotation.Width, Annotation.Height));
         }
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Media;
 
@@ -51,22 +52,21 @@ namespace TextViewer
                 pixelsPerDip)
             {
                 LineHeight = lineHeight,
-                MaxTextWidth = MaxWidth,
+                MaxTextWidth = MaxWidth - Padding * 2 - BorderThickness * 2,
                 Trimming = TextTrimming.None
             };
 
-            Width = Math.Max(Math.Min(Format.WidthIncludingTrailingWhitespace + (Padding * 2) + BorderThickness * 2, MaxWidth), MinWidth);
-            Height = Math.Max(Math.Min(Format.Height + (Padding * 2) + BorderThickness * 2 + BubblePeakHeight, MaxHeight), MinHeight);
+            Width = Math.Max(Math.Min(Format.WidthIncludingTrailingWhitespace + Padding * 2 + BorderThickness * 2, MaxWidth), MinWidth);
+            Height = Math.Max(Math.Min(Format.Height + Padding * 2 + BorderThickness * 2 + BubblePeakHeight, MaxHeight), MinHeight);
         }
 
 
         public override DrawingVisual Render()
         {
             var dc = RenderOpen();
-            /*
             //                        Width
             //            <------------------------->  
-            //    ^                     d
+            //    ^                     d = BubblePeakPosition
             //    |                    / \
             //    |        b____2____c/3 4\e___5___f
             // H  |       (1                       6)
@@ -79,17 +79,17 @@ namespace TextViewer
             //    |       k                         h
             //   _|_    10(j___________9___________i)8
             //
-            var a = new Point(0, CornerRadius);
-            var b = new Point(CornerRadius, 0);
-            var c = new Point(BubblePeakPosition.X - BubblePeakWidth / 2, 0);
-            var d = new Point(BubblePeakPosition.X, BubblePeakPosition.Y);
-            var e = new Point(BubblePeakPosition.X + BubblePeakWidth / 2, 0);
-            var f = new Point(ActualWidth - CornerRadius, 0);
-            var g = new Point(ActualWidth, 10);
-            var h = new Point(ActualWidth, ActualHeight - CornerRadius);
-            var i = new Point(ActualWidth - CornerRadius, ActualHeight);
-            var j = new Point(CornerRadius, ActualHeight);
-            var k = new Point(0, ActualHeight - CornerRadius);
+            var a = new Point(Area.X, Area.Y + BubblePeakHeight + CornerRadius);
+            var b = new Point(Area.X + CornerRadius, Area.Y + BubblePeakHeight);
+            var c = new Point(BubblePeakPosition.X - BubblePeakWidth / 2, Area.Y + BubblePeakHeight);
+            var d = BubblePeakPosition;
+            var e = new Point(BubblePeakPosition.X + BubblePeakWidth / 2, Area.Y + BubblePeakHeight);
+            var f = new Point(Area.X + Width - CornerRadius, Area.Y + BubblePeakHeight);
+            var g = new Point(Area.X + Width, Area.Y + BubblePeakHeight + CornerRadius);
+            var h = new Point(Area.X + Width, Area.Y + BubblePeakHeight + Height - CornerRadius);
+            var i = new Point(Area.X + Width - CornerRadius, Area.Y + BubblePeakHeight + Height);
+            var j = new Point(Area.X + CornerRadius, Area.Y + BubblePeakHeight + Height);
+            var k = new Point(Area.X, Area.Y + BubblePeakHeight + Height - CornerRadius);
 
             var pathSegments = new List<PathSegment>
             {
@@ -107,10 +107,11 @@ namespace TextViewer
             };
 
             var pthFigure = new PathFigure(a, pathSegments, false) { IsFilled = true };
-            var transform = BubblePeakPosition.Y > 0 ? new ScaleTransform(1, -1, ActualWidth / 2, ActualHeight / 2) : null; // rotate around x axis 
-            var pthGeometry = new PathGeometry(new List<PathFigure> { pthFigure }, FillRule.EvenOdd, transform);            
-        */
-            dc.DrawGeometry(Styles.Background, new Pen(BorderBrush, BorderThickness), new RectangleGeometry(Area) /*pthGeometry*/);
+            //var transform = BubblePeakPosition.Y > 0 ? new ScaleTransform(1, -1, Width / 2, Height / 2) : null; // rotate around x axis 
+            //var pthGeometry = new PathGeometry(new List<PathFigure> { pthFigure }, FillRule.EvenOdd, transform);
+            var pthGeometry = new PathGeometry(new List<PathFigure> { pthFigure }, FillRule.EvenOdd, null);
+
+            dc.DrawGeometry(Styles.Background, new Pen(BorderBrush, BorderThickness), pthGeometry /*new RectangleGeometry(Area)*/);
             dc.DrawText(Format, DrawPoint);
 
 
