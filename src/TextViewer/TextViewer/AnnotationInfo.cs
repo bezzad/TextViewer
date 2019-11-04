@@ -30,6 +30,7 @@ namespace TextViewer
         public double MinHeight { get; set; }
         public double MaxWidth { get; set; }
         public double MaxHeight { get; set; }
+        public bool DrawRightToLeft { get; set; }
 
 
         public override void SetFormattedText(
@@ -53,8 +54,16 @@ namespace TextViewer
             {
                 LineHeight = lineHeight,
                 MaxTextWidth = MaxWidth - Padding * 2 - BorderThickness * 2,
-                Trimming = TextTrimming.None
+                TextAlignment = Styles.TextAlign ?? TextAlignment.Center
             };
+
+            if (lineHeight >= Format.Height)
+            {
+                Format.MaxTextWidth = 0;
+                DrawRightToLeft = Styles.IsRtl;
+            }
+            else
+                DrawRightToLeft = false; // don't need in multiline text
 
             Width = Math.Max(Math.Min(Format.WidthIncludingTrailingWhitespace + Padding * 2 + BorderThickness * 2, MaxWidth), MinWidth);
             Height = Math.Max(Math.Min(Format.Height + Padding * 2 + BorderThickness * 2 + BubblePeakHeight, MaxHeight), MinHeight);
@@ -70,12 +79,12 @@ namespace TextViewer
             //    |                    / \
             //    |        b____2____c/3 4\e___5___f
             // H  |       (1                       6)
-            // E  |       a                         g
-            // I  |       |                         |
-            // G  |       |                         |
-            // H  |     11|                         |7
-            // T  |       |                         |
-            //    |       |                         |
+            // E  |       a   TTTTTTTTTTTTTTTTTT    g
+            // I  |       |   TT              TT    |
+            // G  |       |   TT     TEXT     TT    |
+            // H  |     11|   TT              TT    |7
+            // T  |       |   TT              TT    |
+            //    |       |   TTTTTTTTTTTTTTTTTT    |
             //    |       k                         h
             //   _|_    10(j___________9___________i)8
             //
@@ -111,10 +120,8 @@ namespace TextViewer
             //var pthGeometry = new PathGeometry(new List<PathFigure> { pthFigure }, FillRule.EvenOdd, transform);
             var pthGeometry = new PathGeometry(new List<PathFigure> { pthFigure }, FillRule.EvenOdd, null);
 
-            dc.DrawGeometry(Styles.Background, new Pen(BorderBrush, BorderThickness), pthGeometry /*new RectangleGeometry(Area)*/);
+            dc.DrawGeometry(Styles.Background, new Pen(BorderBrush, BorderThickness), pthGeometry);
             dc.DrawText(Format, DrawPoint);
-
-
             dc.Close();
 
             return this;

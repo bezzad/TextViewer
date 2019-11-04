@@ -95,7 +95,8 @@ namespace TextViewer
             else if (left < minPad) // if the length of annotation over from left of page
                 left = minPad;
 
-            Annotation.DrawPoint = new Point(left + Annotation.BorderThickness + Annotation.Padding, top + Annotation.BubblePeakHeight + Annotation.BorderThickness + Annotation.Padding);
+            Annotation.DrawPoint = new Point(Annotation.DrawRightToLeft ? left + Annotation.Width - Annotation.BorderThickness - Annotation.Padding : left + Annotation.BorderThickness + Annotation.Padding,
+                top + Annotation.BubblePeakHeight + Annotation.BorderThickness + Annotation.Padding);
             Annotation.Area = new Rect(new Point(left, top), new Size(Annotation.Width, Annotation.Height));
         }
 
