@@ -126,7 +126,7 @@ namespace TextViewer
             DrawnWords.Clear();
         }
 
-        public virtual void Render() { InvalidateVisual(); }
+        public void Render() { InvalidateVisual(); }
 
 
         // Provide a required override for the GetVisualChild method.
@@ -136,28 +136,6 @@ namespace TextViewer
                 throw new ArgumentOutOfRangeException();
 
             return DrawnWords[index];
-        }
-
-        protected virtual Size MeasureString(string input, CultureInfo lang, FlowDirection dir, 
-            FontFamily fontFamily, FontWeight fontWeight, double fontSize,
-            double maxTextWidth, double lineHeight, TextAlignment textAlign)
-        {
-            var formattedText = new FormattedText(
-                input,
-                lang,
-                dir,
-                new Typeface(fontFamily, FontStyles.Normal, fontWeight, FontStretches.Normal),
-                fontSize,
-                Brushes.Black,
-                new NumberSubstitution(),
-                VisualTreeHelper.GetDpi(this).PixelsPerDip)
-            {
-                MaxTextWidth = maxTextWidth,
-                LineHeight = lineHeight,
-                TextAlignment = textAlign
-            };
-
-            return new Size(formattedText.WidthIncludingTrailingWhitespace, formattedText.Height);
         }
     }
 }

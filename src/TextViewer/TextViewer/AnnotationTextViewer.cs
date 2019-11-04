@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 
@@ -63,28 +64,23 @@ namespace TextViewer
 
             InitialAnnotationTextBlock(text);
 
-            var left = 0.0;
-            var right = 0.0;
+            double left;
             var top = position.Y + PeakHeight * 2;
-            var bottom = ActualHeight - top - Annotation.Height - PeakHeight * 2 - 39;
 
             if (position.X + Annotation.Width / 2 > ActualWidth - Padding.Right) // if the length of annotation over from right of page
             {
-                Debug.WriteLine("Right Overflow");
                 var rightSpace = ActualWidth - Padding.Right - position.X;
                 left = position.X + rightSpace - Annotation.Width;
-                right = ActualWidth - left - Annotation.Width;
                 Annotation.BubblePeakPosition = new Point(Annotation.Width - rightSpace, -PeakHeight);
             }
-            else
+            else // 98% of annotations are here
             {
-                Debug.WriteLine("Middle Position");
                 left = position.X - Annotation.Width / 2;
-                right = ActualWidth - left - Annotation.Width;
                 Annotation.BubblePeakPosition = new Point(Annotation.Width / 2, -PeakHeight);
             }
 
-            Annotation.DrawPoint = new Point(left, top);
+            Annotation.DrawPoint = new Point(left + Annotation.Padding, top + Annotation.Padding);
+            Annotation.Area = new Rect(new Point(left, top), new Size(Annotation.Width + Annotation.Padding * 2, Annotation.Height + Annotation.Padding * 2));
         }
 
         private void InitialAnnotationTextBlock(string text)
@@ -102,6 +98,7 @@ namespace TextViewer
             Annotation.Styles.TextAlign = TextAlignment.Justify;
 
             Annotation.SetFormattedText(FontFamily, FontSize, PixelsPerDip, LineHeight);
+            Render();
         }
 
 
@@ -175,6 +172,14 @@ namespace TextViewer
                     CreateNoWindow = true
                 });
             }
+        }
+
+        protected override void OnRender(DrawingContext dc)
+        {
+            base.OnRender(dc);
+
+            if (Annotation?.Format != null)
+                AddDrawnWord(Annotation.Render());
         }
     }
 }

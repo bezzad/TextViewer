@@ -63,7 +63,6 @@ namespace TextViewer
         {
             var dc = RenderOpen();
 
-            dc.DrawText(Format, DrawPoint);
             /*
             //
             //                  d
@@ -111,6 +110,7 @@ namespace TextViewer
             var pthGeometry = new PathGeometry(new List<PathFigure> { pthFigure }, FillRule.EvenOdd, transform);            
         */
             dc.DrawGeometry(Styles.Background, new Pen(BorderBrush, BorderThickness), new RectangleGeometry(Area) /*pthGeometry*/);
+            dc.DrawText(Format, DrawPoint);
 
 
             dc.Close();

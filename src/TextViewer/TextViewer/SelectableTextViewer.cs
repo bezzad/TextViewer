@@ -161,9 +161,9 @@ namespace TextViewer
             }
         }
 
-        public override void Render()
+        protected override void OnRender(DrawingContext dc)
         {
-            base.Render();
+            base.OnRender(dc);
 
             UnSelectWords();
             HighlightSelectedText();
