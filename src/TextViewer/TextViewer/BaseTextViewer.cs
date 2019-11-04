@@ -133,9 +133,7 @@ namespace TextViewer
         protected override Visual GetVisualChild(int index)
         {
             if (index < 0 || index >= DrawnWords.Count)
-            {
                 throw new ArgumentOutOfRangeException();
-            }
 
             return DrawnWords[index];
         }

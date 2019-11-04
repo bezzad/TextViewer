@@ -5,14 +5,13 @@ using System.Windows.Media;
 
 namespace TextViewer
 {
-    public class WordInfo : DrawingVisual, IComparable<WordInfo>
+    public class WordInfo : TextInfo, IComparable<WordInfo>
     {
         public WordInfo(string text, int offset, WordType type, bool isRtl, WordStyle style = null)
+        : base(text, isRtl, style)
         {
-            Text = text;
             Type = type;
             Offset = offset;
-            Styles = new WordStyle(isRtl, style);
         }
 
         public static readonly Brush SelectedBrush = new SolidColorBrush(Colors.DarkCyan) { Opacity = 0.5 };
@@ -20,21 +19,14 @@ namespace TextViewer
         public static TextDecorationCollection HyperLinkDecoration { get; set; } = TextDecorations.Underline;
         public WordInfo NextWord { get; set; }
         public WordInfo PreviousWord { get; set; }
-        public FormattedText Format { get; set; }
-        public Point DrawPoint { get; set; }
-        public Rect Area { get; set; }
         public Paragraph Paragraph { get; set; }
-        public WordStyle Styles { get; protected set; }
-        public string Text { get; set; }
         public WordType Type { get; set; }
         public bool IsSelected { get; set; }
-        public virtual double Width { get; protected set; }
-        public virtual double Height { get; protected set; }
         public bool IsImage => Type.HasFlag(WordType.Image);
         public new int Offset { get; }
 
 
-        public virtual void SetFormattedText(FontFamily fontFamily,
+        public override void SetFormattedText(FontFamily fontFamily,
             double fontSize,
             double pixelsPerDip,
             double lineHeight)
@@ -63,7 +55,7 @@ namespace TextViewer
             Height = lineHeight;
         }
 
-        public virtual DrawingVisual Render()
+        public override DrawingVisual Render()
         {
             var dc = RenderOpen();
 
