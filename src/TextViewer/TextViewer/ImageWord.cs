@@ -8,7 +8,7 @@ namespace TextViewer
         public override double Height => Styles.Height * ImageScale;
         public override double Width => Styles.Width * ImageScale;
 
-        public ImageWord(int offset, WordStyle style = null)
+        public ImageWord(int offset, TextStyle style = null)
             : base(null, offset, WordType.Image, false, style)
         {
             ImageScale = 1;

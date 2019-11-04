@@ -6,17 +6,17 @@ namespace TextViewer
 {
     public class TextInfo : DrawingVisual
     {
-        public TextInfo(string text, bool isRtl, WordStyle style = null)
+        public TextInfo(string text, bool isRtl, TextStyle style = null)
         {
             Text = text;
-            Styles = new WordStyle(isRtl, style);
+            Styles = new TextStyle(isRtl, style);
         }
         
         
         public FormattedText Format { get; set; }
         public Point DrawPoint { get; set; }
         public Rect Area { get; set; }
-        public WordStyle Styles { get; protected set; }
+        public TextStyle Styles { get; protected set; }
         public string Text { get; set; }
         public virtual double Width { get; protected set; }
         public virtual double Height { get; protected set; }

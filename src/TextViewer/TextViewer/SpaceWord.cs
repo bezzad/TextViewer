@@ -12,7 +12,7 @@ namespace TextViewer
             protected set => _width = value;
         }
 
-        public SpaceWord(int offset, bool isRtl, WordStyle style = null)
+        public SpaceWord(int offset, bool isRtl, TextStyle style = null)
             : base(" ", offset, WordType.Space, isRtl, style)
         { }
 

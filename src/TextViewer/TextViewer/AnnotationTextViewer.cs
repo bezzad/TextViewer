@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
-using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 
@@ -13,7 +10,7 @@ namespace TextViewer
     public class AnnotationTextViewer : SelectableTextViewer
     {
         protected List<WordInfo> HyperLinks { get; set; }
-        protected Annotation Annotation { get; set; }
+        protected AnnotationInfo Annotation { get; set; }
         public bool CopyLinkRefOnClick { get; set; }
         public bool OpenLinkRefOnClick { get; set; }
         public double MaxFontSize { get; set; }
@@ -26,9 +23,7 @@ namespace TextViewer
             MaxFontSize = 30;
             MinFontSize = 8;
             PeakHeight = 10;
-
             HyperLinks = new List<WordInfo>();
-
         }
 
 
@@ -37,7 +32,7 @@ namespace TextViewer
             base.OnTouchVisualHit(position, result);
             if (result.VisualHit is WordInfo word)
             {
-                AnnotationStart(word.Text);
+                AnnotationStart(word.Text, position); // todo: remove this line after test ------------------------------------------------------------------------------------------------------------------
                 if (HighlightLastWord == null && word.Styles.IsHyperLink)
                 {
                     // is external link
@@ -56,75 +51,57 @@ namespace TextViewer
                         }
                     }
                     else
-                        AnnotationStart(word.Styles.HyperRef);
+                        AnnotationStart(word.Styles.HyperRef, position);
                 }
             }
         }
 
-        protected void AnnotationStart(string text)
+        protected void AnnotationStart(string text, Point position)
         {
             if (string.IsNullOrEmpty(text))
                 return;
 
-            if (VisualTreeHelper.GetParent(this) is Panel container)
+            InitialAnnotationTextBlock(text);
+
+            var left = 0.0;
+            var right = 0.0;
+            var top = position.Y + PeakHeight * 2;
+            var bottom = ActualHeight - top - Annotation.Height - PeakHeight * 2 - 39;
+
+            if (position.X + Annotation.Width / 2 > ActualWidth - Padding.Right) // if the length of annotation over from right of page
             {
-                if (Annotation == null)
-                {
-                    Annotation = new Annotation();
-                    if (container.Children.Contains(Annotation) == false)
-                        container.Children.Add(Annotation);
-                }
-
-                InitialAnnotationTextBlock(text);
-
-                var onContainerPosition = Mouse.GetPosition(container);
-                var onCanvasPosition = Mouse.GetPosition(this);
-                var left = 0.0;
-                var right = 0.0;
-                var top = onContainerPosition.Y + PeakHeight * 2;
-                var bottom = container.ActualHeight - top - Annotation.Height - PeakHeight*2 - 39;
-
-                if (onCanvasPosition.X + Annotation.Width / 2 > ActualWidth - Padding.Right) // if the length of annotation over from right of page
-                {
-                    Debug.WriteLine("Right Overflow");
-                    var rightSpace = ActualWidth - Padding.Right - onCanvasPosition.X;
-                    left = onContainerPosition.X + rightSpace - Annotation.Width;
-                    right = container.ActualWidth - left - Annotation.Width;
-                    Annotation.BubblePeakPosition = new Point(Annotation.Width - rightSpace, -PeakHeight);
-                }
-                else
-                {
-                    Debug.WriteLine("Middle Position");
-                    left = onContainerPosition.X - Annotation.Width / 2;
-                    right = container.ActualWidth - left - Annotation.Width;
-                    Annotation.BubblePeakPosition = new Point(Annotation.Width / 2, -PeakHeight);
-                }
-
-                Annotation.Margin = new Thickness(left, top, right, bottom);
+                Debug.WriteLine("Right Overflow");
+                var rightSpace = ActualWidth - Padding.Right - position.X;
+                left = position.X + rightSpace - Annotation.Width;
+                right = ActualWidth - left - Annotation.Width;
+                Annotation.BubblePeakPosition = new Point(Annotation.Width - rightSpace, -PeakHeight);
             }
+            else
+            {
+                Debug.WriteLine("Middle Position");
+                left = position.X - Annotation.Width / 2;
+                right = ActualWidth - left - Annotation.Width;
+                Annotation.BubblePeakPosition = new Point(Annotation.Width / 2, -PeakHeight);
+            }
+
+            Annotation.DrawPoint = new Point(left, top);
         }
 
         private void InitialAnnotationTextBlock(string text)
         {
-            Annotation.Text = text;
-            Annotation.Padding = 4;
-            Annotation.FontFamily = FontFamily;
-            Annotation.FontSize = Math.Max(Math.Min(FontSize - 2, MaxFontSize), MinFontSize);
-            Annotation.FontWeight = FontWeights.Normal;
-            Annotation.TextAlign = TextAlignment.Justify;
-            Annotation.FlowDirection = FlowDirection.RightToLeft;
-            Annotation.LineHeight = Math.Max(Math.Min(LineHeight, MaxFontSize), MinFontSize);
-            Annotation.Visibility = Visibility.Visible;
-            Annotation.MaxHeight = ActualHeight / 2;
-            Annotation.MaxWidth = ActualWidth / 2;
-            Annotation.MinHeight = Annotation.LineHeight;
+            Annotation = new AnnotationInfo(text, Paragraph.IsRtl(text));
 
-            var textSize = MeasureString(text, CultureInfo.CurrentCulture, Annotation.FlowDirection,
-                Annotation.FontFamily, Annotation.FontWeight, Annotation.FontSize,
-                Annotation.MaxWidth - Annotation.Padding * 4, Annotation.LineHeight, Annotation.TextAlign);
+            Annotation.MaxHeight = ActualHeight / 2 - Annotation.Padding * 2;
+            Annotation.MaxWidth = ActualWidth / 2 - Annotation.Padding * 2;
+            Annotation.MinHeight = LineHeight;
+            Annotation.MinWidth = Annotation.CornerRadius * 2 + Annotation.BubblePeakWidth + 1;
 
-            Annotation.Width = Math.Max(Math.Min(textSize.Width + Annotation.Padding * 4 + Annotation.BorderThickness*2, Annotation.MaxWidth), Annotation.MinWidth);
-            Annotation.Height = Math.Max(Math.Min(textSize.Height + Annotation.Padding * 4 + Annotation.BorderThickness * 2, Annotation.MaxHeight), Annotation.MinHeight);
+            Annotation.Styles.Background = new SolidColorBrush(Colors.Bisque) { Opacity = 0.97 };
+            Annotation.Styles.Foreground = Brushes.Teal;
+            Annotation.Styles.FontSize = -2;
+            Annotation.Styles.TextAlign = TextAlignment.Justify;
+
+            Annotation.SetFormattedText(FontFamily, FontSize, PixelsPerDip, LineHeight);
         }
 
 
@@ -138,6 +115,14 @@ namespace TextViewer
             foreach (var link in HyperLinks)
                 if (IsPointOnWordArea(e.GetPosition(this), link))
                     Mouse.SetCursor(Cursors.Hand);
+        }
+        protected bool IsPointOnWordArea(Point pos, WordInfo word)
+        {
+            if (pos.Y > word.Area.Y + word.Area.Height || pos.Y < word.Area.Y ||
+                pos.X > word.Area.X + word.Area.Width || pos.X < word.Area.X)
+                return false;
+
+            return true;
         }
 
         public override void AddDrawnWord(DrawingVisual visual)
@@ -159,17 +144,6 @@ namespace TextViewer
             base.ClearDrawnWords();
             HyperLinks.Clear();
         }
-
-
-        protected bool IsPointOnWordArea(Point pos, WordInfo word)
-        {
-            if (pos.Y > word.Area.Y + word.Area.Height || pos.Y < word.Area.Y ||
-                pos.X > word.Area.X + word.Area.Width || pos.X < word.Area.X)
-                return false;
-
-            return true;
-        }
-
         public void OpenUrl(string url)
         {
             url = url.Replace("&", "^&");

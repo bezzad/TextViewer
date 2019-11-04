@@ -7,7 +7,7 @@ namespace TextViewer
 {
     public class WordInfo : TextInfo, IComparable<WordInfo>
     {
-        public WordInfo(string text, int offset, WordType type, bool isRtl, WordStyle style = null)
+        public WordInfo(string text, int offset, WordType type, bool isRtl, TextStyle style = null)
         : base(text, isRtl, style)
         {
             Type = type;
@@ -26,7 +26,8 @@ namespace TextViewer
         public new int Offset { get; }
 
 
-        public override void SetFormattedText(FontFamily fontFamily,
+        public override void SetFormattedText(
+            FontFamily fontFamily,
             double fontSize,
             double pixelsPerDip,
             double lineHeight)

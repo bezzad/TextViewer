@@ -8,7 +8,7 @@ using System.Windows.Media.Imaging;
 
 namespace TextViewer
 {
-    public class WordStyle
+    public class TextStyle : IDisposable
     {
         public static readonly CultureInfo RtlCulture = CultureInfo.GetCultureInfo("fa-ir");
         public static readonly CultureInfo LtrCulture = CultureInfo.GetCultureInfo("en-us");
@@ -26,6 +26,7 @@ namespace TextViewer
         public double FontSize { get; set; }
         public VerticalAlignment? VerticalAlign { get; set; }
         public Brush Foreground { get; set; }
+        public Brush Background { get; set; }
         public FontWeight FontWeight { get; set; }
         public string HyperRef { get; set; }
         public bool IsHyperLink => !string.IsNullOrEmpty(HyperRef);
@@ -34,7 +35,7 @@ namespace TextViewer
         public ImageSource Image { get; set; }
 
 
-        public WordStyle(bool isRtl, WordStyle style = null)
+        public TextStyle(bool isRtl, TextStyle style = null)
         {
             MarginBottom = MarginLeft = MarginRight = MarginTop = FontSize = Width = Height = 0;
             FontWeight = FontWeights.Normal;
@@ -45,10 +46,10 @@ namespace TextViewer
             SetDirection(isRtl);
         }
 
-        public void AddStyle(WordStyle style)
+        public void AddStyle(TextStyle style)
         {
             if (style != null)
-                foreach (var prop in typeof(WordStyle).GetProperties().Where(p => p.CanWrite && p.CanRead))
+                foreach (var prop in typeof(TextStyle).GetProperties().Where(p => p.CanWrite && p.CanRead))
                 {
                     var val = prop.GetValue(style);
                     if (val != null)
@@ -70,6 +71,18 @@ namespace TextViewer
         public void SetImage(string base64)
         {
             SetImage(Convert.FromBase64String(base64));
+        }
+
+        ~TextStyle()
+        {
+            Dispose();
+            GC.SuppressFinalize(this);
+        }
+
+        public virtual void Dispose()
+        {
+            Background = Foreground = null;
+            Image = null;
         }
     }
 }

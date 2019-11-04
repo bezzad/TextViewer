@@ -126,7 +126,7 @@ namespace TextViewer.Test
         [TestMethod]
         public void AddStylesTest()
         {
-            var styles = new WordStyle(false)
+            var styles = new TextStyle(false)
             {
                 Display = false,
                 Foreground = Brushes.Red,
