@@ -12,6 +12,7 @@ namespace TextViewer
             BorderThickness = 1;
             CornerRadius = 10;
             BubblePeakWidth = 16;
+            BubblePeakHeight = 10;
             BorderBrush = Brushes.Teal;
             Styles.FontWeight = FontWeights.Normal;
             Padding = 5;
@@ -20,6 +21,7 @@ namespace TextViewer
         public Point BubblePeakPosition { get; set; }
         public double CornerRadius { get; set; }
         public double BubblePeakWidth { get; set; }
+        public double BubblePeakHeight { get; set; }
         public Brush BorderBrush { get; set; }
         public double BorderThickness { get; set; }
         public double Padding { get; set; }
@@ -53,30 +55,29 @@ namespace TextViewer
                 Trimming = TextTrimming.None
             };
 
-            //Width = Math.Max(Math.Min(Format.WidthIncludingTrailingWhitespace + Padding * 4 + BorderThickness * 2, MaxWidth), MinWidth);
-            Width = Format.WidthIncludingTrailingWhitespace;
-            Height = Format.Height;
+            Width = Math.Max(Math.Min(Format.WidthIncludingTrailingWhitespace + (Padding * 2) + BorderThickness * 2, MaxWidth), MinWidth);
+            Height = Math.Max(Math.Min(Format.Height + (Padding * 2) + BorderThickness * 2 + BubblePeakHeight, MaxHeight), MinHeight);
         }
 
 
         public override DrawingVisual Render()
         {
             var dc = RenderOpen();
-
             /*
-            //
-            //                  d
-            //                 / \
-            //     b____2____c/3 4\e___5___f
-            //    (1                       6)
-            //    a                         g
-            //    |                         |
-            //    |                         |
-            //  11|                         |7
-            //    |                         |
-            //    |                         |
-            //    k                         h
-            //  10(j___________9___________i)8
+            //                        Width
+            //            <------------------------->  
+            //    ^                     d
+            //    |                    / \
+            //    |        b____2____c/3 4\e___5___f
+            // H  |       (1                       6)
+            // E  |       a                         g
+            // I  |       |                         |
+            // G  |       |                         |
+            // H  |     11|                         |7
+            // T  |       |                         |
+            //    |       |                         |
+            //    |       k                         h
+            //   _|_    10(j___________9___________i)8
             //
             var a = new Point(0, CornerRadius);
             var b = new Point(CornerRadius, 0);
