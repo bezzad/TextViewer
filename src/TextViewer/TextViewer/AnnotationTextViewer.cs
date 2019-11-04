@@ -82,7 +82,7 @@ namespace TextViewer
                 var left = 0.0;
                 var right = 0.0;
                 var top = onContainerPosition.Y + PeakHeight * 2;
-                var bottom = container.ActualHeight - top - Annotation.Height - Annotation.Padding*2;
+                var bottom = container.ActualHeight - top - Annotation.Height - PeakHeight*2 - 39;
 
                 if (onCanvasPosition.X + Annotation.Width / 2 > ActualWidth - Padding.Right) // if the length of annotation over from right of page
                 {
@@ -123,8 +123,8 @@ namespace TextViewer
                 Annotation.FontFamily, Annotation.FontWeight, Annotation.FontSize,
                 Annotation.MaxWidth, Annotation.LineHeight, Annotation.TextAlign);
 
-            Annotation.Width = Math.Max(Math.Min(textSize.Width + Annotation.Padding * 4, Annotation.MaxWidth), Annotation.MinWidth);
-            Annotation.Height = Math.Max(Math.Min(textSize.Height + Annotation.Padding * 4 + PeakHeight, Annotation.MaxHeight), Annotation.MinHeight);
+            Annotation.Width = Math.Max(Math.Min(textSize.Width + Annotation.Padding * 4 + 10, Annotation.MaxWidth), Annotation.MinWidth);
+            Annotation.Height = Math.Max(Math.Min(textSize.Height + Annotation.Padding * 4 + 1, Annotation.MaxHeight), Annotation.MinHeight);
         }
 
 
