@@ -121,10 +121,10 @@ namespace TextViewer
 
             var textSize = MeasureString(text, CultureInfo.CurrentCulture, Annotation.FlowDirection,
                 Annotation.FontFamily, Annotation.FontWeight, Annotation.FontSize,
-                Annotation.MaxWidth, Annotation.LineHeight, Annotation.TextAlign);
+                Annotation.MaxWidth - Annotation.Padding * 4, Annotation.LineHeight, Annotation.TextAlign);
 
-            Annotation.Width = Math.Max(Math.Min(textSize.Width + Annotation.Padding * 4 + 10, Annotation.MaxWidth), Annotation.MinWidth);
-            Annotation.Height = Math.Max(Math.Min(textSize.Height + Annotation.Padding * 4 + 1, Annotation.MaxHeight), Annotation.MinHeight);
+            Annotation.Width = Math.Max(Math.Min(textSize.Width + Annotation.Padding * 4 + Annotation.BorderThickness*2, Annotation.MaxWidth), Annotation.MinWidth);
+            Annotation.Height = Math.Max(Math.Min(textSize.Height + Annotation.Padding * 4 + Annotation.BorderThickness * 2, Annotation.MaxHeight), Annotation.MinHeight);
         }
 
 

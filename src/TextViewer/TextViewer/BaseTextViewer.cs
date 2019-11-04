@@ -156,8 +156,7 @@ namespace TextViewer
             {
                 MaxTextWidth = maxTextWidth,
                 LineHeight = lineHeight,
-                TextAlignment = textAlign,
-                Trimming = TextTrimming.None
+                TextAlignment = textAlign
             };
 
             return new Size(formattedText.WidthIncludingTrailingWhitespace, formattedText.Height);
