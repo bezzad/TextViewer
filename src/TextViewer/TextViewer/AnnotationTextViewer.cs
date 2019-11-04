@@ -74,8 +74,8 @@ namespace TextViewer
 
         protected void BuildAnnotation()
         {
-            Annotation.MaxHeight = ActualHeight / 2 - Padding.Bottom - Padding.Top;
-            Annotation.MaxWidth = ActualWidth / 2 - Padding.Right - Padding.Left;
+            Annotation.MaxHeight = ActualHeight * 0.5 - Padding.Bottom - Padding.Top;
+            Annotation.MaxWidth = ActualWidth * 0.6 - Padding.Right - Padding.Left;
             Annotation.MinHeight = Math.Max(LineHeight, Annotation.CornerRadius * 2 + Annotation.BubblePeakHeight + 1);
             Annotation.MinWidth = Annotation.CornerRadius * 2 + Annotation.BubblePeakWidth + 1 + Annotation.BorderThickness * 2 + Annotation.Padding * 2;
             Annotation.Styles.Background = new SolidColorBrush(Colors.Bisque) { Opacity = 0.97 };
@@ -84,24 +84,16 @@ namespace TextViewer
             Annotation.Styles.TextAlign = TextAlignment.Justify;
             // set width and height
             Annotation.SetFormattedText(FontFamily, FontSize, PixelsPerDip, LineHeight);
+            var minPad = Math.Max(Padding.Right - Annotation.BubblePeakWidth / 2 - Annotation.CornerRadius / 2 - 1, 2);
 
-
-            double left;
             var top = AnnotationReferenceText.Area.Y + AnnotationReferenceText.Height + 5;
             Annotation.BubblePeakPosition = new Point(AnnotationReferenceText.Area.X + AnnotationReferenceText.Width / 2, top);
+            var left = Annotation.BubblePeakPosition.X - Annotation.Width / 2;
 
-            if (Annotation.BubblePeakPosition.X + Annotation.Width / 2 > ActualWidth - Padding.Right) // if the length of annotation over from right of page
-            {
-                left = ActualWidth - Padding.Right - Annotation.Width;
-            }
-            else if (Annotation.BubblePeakPosition.X - Annotation.Width / 2 < Padding.Left) // if the length of annotation over from left of page
-            {
-                left = Padding.Left;
-            }
-            else // 98% of annotations are here
-            {
-                left = Annotation.BubblePeakPosition.X - Annotation.Width / 2;
-            }
+            if (left + Annotation.Width > ActualWidth - minPad) // if the length of annotation over from right of page
+                left = ActualWidth - Annotation.Width - minPad;
+            else if (left < minPad) // if the length of annotation over from left of page
+                left = minPad;
 
             Annotation.DrawPoint = new Point(left + Annotation.BorderThickness + Annotation.Padding, top + Annotation.BubblePeakHeight + Annotation.BorderThickness + Annotation.Padding);
             Annotation.Area = new Rect(new Point(left, top), new Size(Annotation.Width, Annotation.Height));
