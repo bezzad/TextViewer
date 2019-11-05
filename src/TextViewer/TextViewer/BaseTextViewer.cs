@@ -109,7 +109,7 @@ namespace TextViewer
 
             // ignore properties like IsMouseOver and IsMouseDirectlyOver and ...
             if (e.Property.Name.StartsWith("IsMouse") == false)
-                Render();
+                ReRender();
 
         }
 
@@ -126,7 +126,7 @@ namespace TextViewer
             DrawnWords.Clear();
         }
 
-        public void Render() { InvalidateVisual(); }
+        public void ReRender() { InvalidateVisual(); }
 
 
         // Provide a required override for the GetVisualChild method.

@@ -58,7 +58,7 @@ namespace TextViewer
             {
                 AnnotationReferenceText = null;
                 Annotation = null;
-                Render();
+                ReRender();
             }
         }
 
@@ -69,7 +69,7 @@ namespace TextViewer
 
             Annotation = new AnnotationInfo(text, Paragraph.IsRtl(text));
             AnnotationReferenceText = refText;
-            Render();
+            ReRender();
         }
 
         protected void BuildAnnotation()

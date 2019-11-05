@@ -28,9 +28,8 @@ namespace TextViewer
 
         public override DrawingVisual Render()
         {
-            var dc = RenderOpen();
-            dc.DrawGeometry(IsSelected ? SelectedBrush : Brushes.Transparent, null, new RectangleGeometry(Area));
-            dc.Close();
+            using (var dc = RenderOpen())
+                dc.DrawGeometry(IsSelected ? SelectedBrush : Brushes.Transparent, null, new RectangleGeometry(Area));
 
             return this;
         }

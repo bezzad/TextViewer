@@ -105,7 +105,7 @@ namespace TextViewer
                         {
                             if (word.IsImage && word is ImageWord imgWord) // set image scale according by image and page width
                                 imgWord.ImageScale = lineBuffer.RemainWidth / word.Styles.Width;
-                            else if(word.Format != null)
+                            else if (word.Format != null)
                                 word.Format.MaxTextWidth = lineBuffer.RemainWidth;
                         }
                     }

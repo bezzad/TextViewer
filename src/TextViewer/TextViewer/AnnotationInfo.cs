@@ -72,57 +72,58 @@ namespace TextViewer
 
         public override DrawingVisual Render()
         {
-            var dc = RenderOpen();
-            //                        Width
-            //            <------------------------->  
-            //    ^                     d = BubblePeakPosition
-            //    |                    / \
-            //    |        b____2____c/3 4\e___5___f
-            // H  |       (1                       6)
-            // E  |       a   TTTTTTTTTTTTTTTTTT    g
-            // I  |       |   TT              TT    |
-            // G  |       |   TT     TEXT     TT    |
-            // H  |     11|   TT              TT    |7
-            // T  |       |   TT              TT    |
-            //    |       |   TTTTTTTTTTTTTTTTTT    |
-            //    |       k                         h
-            //   _|_    10(j___________9___________i)8
-            //
-            var a = new Point(Area.X, Area.Y + BubblePeakHeight + CornerRadius);
-            var b = new Point(Area.X + CornerRadius, Area.Y + BubblePeakHeight);
-            var c = new Point(BubblePeakPosition.X - BubblePeakWidth / 2, Area.Y + BubblePeakHeight);
-            var d = BubblePeakPosition;
-            var e = new Point(BubblePeakPosition.X + BubblePeakWidth / 2, Area.Y + BubblePeakHeight);
-            var f = new Point(Area.X + Width - CornerRadius, Area.Y + BubblePeakHeight);
-            var g = new Point(Area.X + Width, Area.Y + BubblePeakHeight + CornerRadius);
-            var h = new Point(Area.X + Width, Area.Y + BubblePeakHeight + Height - CornerRadius);
-            var i = new Point(Area.X + Width - CornerRadius, Area.Y + BubblePeakHeight + Height);
-            var j = new Point(Area.X + CornerRadius, Area.Y + BubblePeakHeight + Height);
-            var k = new Point(Area.X, Area.Y + BubblePeakHeight + Height - CornerRadius);
-
-            var pathSegments = new List<PathSegment>
+            using (var dc = RenderOpen())
             {
-                new ArcSegment(b, new Size(CornerRadius, CornerRadius), 0, false, SweepDirection.Clockwise, true),
-                new LineSegment(c, true),
-                new LineSegment(d, true),
-                new LineSegment(e, true),
-                new LineSegment(f, true),
-                new ArcSegment(g, new Size(CornerRadius, CornerRadius), 0, false, SweepDirection.Clockwise, true),
-                new LineSegment(h, true),
-                new ArcSegment(i, new Size(CornerRadius, CornerRadius), 0, false, SweepDirection.Clockwise, true),
-                new LineSegment(j, true),
-                new ArcSegment(k, new Size(CornerRadius, CornerRadius), 0, false, SweepDirection.Clockwise, true),
-                new LineSegment(a, true)
-            };
+                //                        Width
+                //            <------------------------->  
+                //    ^                     d = BubblePeakPosition
+                //    |                    / \
+                //    |        b____2____c/3 4\e___5___f
+                // H  |       (1                       6)
+                // E  |       a   TTTTTTTTTTTTTTTTTT    g
+                // I  |       |   TT              TT    |
+                // G  |       |   TT     TEXT     TT    |
+                // H  |     11|   TT              TT    |7
+                // T  |       |   TT              TT    |
+                //    |       |   TTTTTTTTTTTTTTTTTT    |
+                //    |       k                         h
+                //   _|_    10(j___________9___________i)8
+                //
+                var a = new Point(Area.X, Area.Y + BubblePeakHeight + CornerRadius);
+                var b = new Point(Area.X + CornerRadius, Area.Y + BubblePeakHeight);
+                var c = new Point(BubblePeakPosition.X - BubblePeakWidth / 2, Area.Y + BubblePeakHeight);
+                var d = BubblePeakPosition;
+                var e = new Point(BubblePeakPosition.X + BubblePeakWidth / 2, Area.Y + BubblePeakHeight);
+                var f = new Point(Area.X + Width - CornerRadius, Area.Y + BubblePeakHeight);
+                var g = new Point(Area.X + Width, Area.Y + BubblePeakHeight + CornerRadius);
+                var h = new Point(Area.X + Width, Area.Y + BubblePeakHeight + Height - CornerRadius);
+                var i = new Point(Area.X + Width - CornerRadius, Area.Y + BubblePeakHeight + Height);
+                var j = new Point(Area.X + CornerRadius, Area.Y + BubblePeakHeight + Height);
+                var k = new Point(Area.X, Area.Y + BubblePeakHeight + Height - CornerRadius);
 
-            var pthFigure = new PathFigure(a, pathSegments, false) { IsFilled = true };
-            //var transform = BubblePeakPosition.Y > 0 ? new ScaleTransform(1, -1, Width / 2, Height / 2) : null; // rotate around x axis 
-            //var pthGeometry = new PathGeometry(new List<PathFigure> { pthFigure }, FillRule.EvenOdd, transform);
-            var pthGeometry = new PathGeometry(new List<PathFigure> { pthFigure }, FillRule.EvenOdd, null);
+                var pathSegments = new List<PathSegment>
+                {
+                    new ArcSegment(b, new Size(CornerRadius, CornerRadius), 0, false, SweepDirection.Clockwise, true),
+                    new LineSegment(c, true),
+                    new LineSegment(d, true),
+                    new LineSegment(e, true),
+                    new LineSegment(f, true),
+                    new ArcSegment(g, new Size(CornerRadius, CornerRadius), 0, false, SweepDirection.Clockwise, true),
+                    new LineSegment(h, true),
+                    new ArcSegment(i, new Size(CornerRadius, CornerRadius), 0, false, SweepDirection.Clockwise, true),
+                    new LineSegment(j, true),
+                    new ArcSegment(k, new Size(CornerRadius, CornerRadius), 0, false, SweepDirection.Clockwise, true),
+                    new LineSegment(a, true)
+                };
 
-            dc.DrawGeometry(Styles.Background, new Pen(BorderBrush, BorderThickness), pthGeometry);
-            dc.DrawText(Format, DrawPoint);
-            dc.Close();
+                var pthFigure = new PathFigure(a, pathSegments, false) { IsFilled = true };
+                //var transform = BubblePeakPosition.Y > 0 ? new ScaleTransform(1, -1, Width / 2, Height / 2) : null; // rotate around x axis 
+                //var pthGeometry = new PathGeometry(new List<PathFigure> { pthFigure }, FillRule.EvenOdd, transform);
+                var pthGeometry = new PathGeometry(new List<PathFigure> { pthFigure }, FillRule.EvenOdd, null);
+
+                dc.DrawGeometry(Styles.Background, new Pen(BorderBrush, BorderThickness), pthGeometry);
+                dc.DrawText(Format, DrawPoint);
+            }
 
             return this;
         }

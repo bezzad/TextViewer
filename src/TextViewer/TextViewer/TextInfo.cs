@@ -11,8 +11,8 @@ namespace TextViewer
             Text = text;
             Styles = new TextStyle(isRtl, style);
         }
-        
-        
+
+
         public FormattedText Format { get; set; }
         public Point DrawPoint { get; set; }
         public Rect Area { get; set; }
@@ -50,12 +50,11 @@ namespace TextViewer
 
         public virtual DrawingVisual Render()
         {
-            var dc = RenderOpen();
-
-            dc.DrawText(Format, DrawPoint);
-            dc.DrawGeometry(Brushes.Transparent, null, new RectangleGeometry(Area));
-
-            dc.Close();
+            using (var dc = RenderOpen())
+            {
+                dc.DrawText(Format, DrawPoint);
+                dc.DrawGeometry(Brushes.Transparent, null, new RectangleGeometry(Area));
+            }
 
             return this;
         }

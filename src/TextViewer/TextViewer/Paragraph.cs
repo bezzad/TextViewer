@@ -123,9 +123,8 @@ namespace TextViewer
 
         public DrawingVisual Render()
         {
-            var dc = RenderOpen();
-            dc.DrawGeometry(Brushes.Transparent, null, new RectangleGeometry(new Rect(Location, Size)));
-            dc.Close();
+            using (var dc = RenderOpen())
+                dc.DrawGeometry(Brushes.Transparent, null, new RectangleGeometry(new Rect(Location, Size)));
 
             return this;
         }
