@@ -1,5 +1,4 @@
 ﻿using HtmlAgilityPack;
-using MethodTimer;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +10,6 @@ namespace TextViewerSample
 {
     public static class TextHelper
     {
-        [Time]
         public static List<Paragraph> GetParagraphs(this string path, bool isContentRtl)
         {
             var paraOffset = 0;
@@ -24,7 +22,7 @@ namespace TextViewerSample
             {
                 var para = new Paragraph(paraOffset++, isContentRtl);
                 paragraphs.Add(para);
-                var style = new WordStyle(isContentRtl);
+                var style = new TextStyle(isContentRtl);
                 var offset = 0;
                 p.ParseInnerHtml(para, style, ref offset);
                 para.CalculateDirection();
@@ -33,9 +31,9 @@ namespace TextViewerSample
             return paragraphs;
         }
 
-        private static void ParseInnerHtml(this HtmlNode node, Paragraph parent, WordStyle parentStyle, ref int contentOffset)
+        private static void ParseInnerHtml(this HtmlNode node, Paragraph parent, TextStyle parentStyle, ref int contentOffset)
         {
-            var nodeStyle = new WordStyle(parent.Styles.IsRtl, parentStyle);
+            var nodeStyle = new TextStyle(parent.Styles.IsRtl, parentStyle);
             if (node.Name == "b")
                 nodeStyle.FontWeight = FontWeights.Bold;
 
@@ -48,9 +46,12 @@ namespace TextViewerSample
                         src = src.Substring(src.IndexOf("base64,") + 8);
 
                     nodeStyle.SetImage(src);
-                    parent.Words.Add(new WordInfo("img", contentOffset++, WordType.Image, nodeStyle.IsRtl, nodeStyle) { Paragraph = parent });
+                    parent.Words.Add(new ImageWord(contentOffset++, nodeStyle) { Paragraph = parent });
                 }
             }
+
+            if (node.Name == "a")
+                nodeStyle.HyperRef = node.GetAttributeValue("href", null);
 
             if (node.HasAttributes)
             {

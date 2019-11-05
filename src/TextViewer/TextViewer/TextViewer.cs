@@ -1,6 +1,6 @@
-﻿using MethodTimer;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Windows;
@@ -48,12 +48,11 @@ namespace TextViewer
             startPoint.Y += extendedY;
         }
 
-        [Time]
         protected void BuildPage(List<Paragraph> content)
         {
             var startPoint = new Point(content.FirstOrDefault()?.Styles.IsRtl == true ? ActualWidth - Padding.Right : Padding.Left, Padding.Top);
             var lineWidth = ActualWidth - Padding.Left - Padding.Right;
-            DrawnWords.Clear();
+            ClearDrawnWords();
             Line lineBuffer;
 
             void RemoveSpaceFromEndOfLine()
@@ -63,7 +62,7 @@ namespace TextViewer
                 {
                     lineBuffer.RemainWidth += lineBuffer.Words.Last().Width;
                     lineBuffer.Words.RemoveAt(lineBuffer.Words.Count - 1);
-                    DrawnWords.RemoveAt(DrawnWords.Count - 1);
+                    RemoveDrawnWord(VisualChildrenCount - 1);
                 }
             }
 
@@ -73,17 +72,14 @@ namespace TextViewer
                 para.Lines.Clear(); // clear old lines
                 para.Location = new Point(Padding.Left, startPoint.Y);
                 para.Size = new Size(0, 0);
-                DrawnWords.Add(para);
+                AddDrawnWord(para);
 
                 // create new line buffer, without cleaning last line
                 lineBuffer = new Line(lineWidth, para, startPoint);
 
                 foreach (var word in para.Words)
                 {
-                    if (word.IsImage)
-                        word.ImageScale = 1;
-                    else
-                        word.GetFormattedText(FontFamily, FontSize, PixelsPerDip, LineHeight);
+                    word.SetFormattedText(FontFamily, FontSize, PixelsPerDip, LineHeight);
 
                     var wordWidth = word.Width;
                     var wordPointer = word;
@@ -107,9 +103,9 @@ namespace TextViewer
                         }
                         else // the current word width is more than a line!
                         {
-                            if (word.IsImage) // set image scale according by image and page width
-                                word.ImageScale = lineBuffer.RemainWidth / word.Styles.Width;
-                            else
+                            if (word.IsImage && word is ImageWord imgWord) // set image scale according by image and page width
+                                imgWord.ImageScale = lineBuffer.RemainWidth / word.Styles.Width;
+                            else if (word.Format != null)
                                 word.Format.MaxTextWidth = lineBuffer.RemainWidth;
                         }
                     }
@@ -118,7 +114,7 @@ namespace TextViewer
                     if (lineBuffer.Count > 0 || word.Type.HasFlag(WordType.Space) == false)
                     {
                         lineBuffer.AddWord(word);
-                        DrawnWords.Add(word);
+                        AddDrawnWord(word);
                     }
                 }
 
@@ -126,64 +122,75 @@ namespace TextViewer
                 lineBuffer.Render(false);  // last line of paragraph has no justified!
                 SetStartPoint(ref startPoint, para, lineBuffer.Height); // new line
                 para.Size = new Size(lineWidth, startPoint.Y - para.Location.Y);
-                
+
 
                 // + ParagraphSpace
                 startPoint.Y += ParagraphSpace;
             }
         }
 
-
         protected override void OnRender(DrawingContext dc)
         {
-            base.OnRender(dc);
+            var sw = ShowFramePerSecond ? Stopwatch.StartNew() : null;
 
-            if (DesignerProperties.GetIsInDesignMode(this))
-                return;
-
-            BuildPage(PageContent);
-
-            foreach (var visual in DrawnWords)
+            try
             {
-                if (visual is WordInfo word)
+                base.OnRender(dc);
+
+                if (DesignerProperties.GetIsInDesignMode(this))
+                    return;
+
+                BuildPage(PageContent);
+
+                foreach (var visual in DrawnWords)
                 {
-                    word.Render();
-
-                    if (ShowWireFrame)
-                        dc.DrawRectangle(null, WordWireFramePen, word.Area);
-
-                    if (ShowOffset)
+                    if (visual is WordInfo word)
                     {
-                        var ft = new FormattedText(word.Offset.ToString(),
-                            CultureInfo.CurrentCulture, FlowDirection.LeftToRight,
-                            new Typeface(FontFamily, FontStyles.Normal, FontWeights.Normal, FontStretches.Normal),
-                            OffsetEmSize, word.Styles.IsRtl ? Brushes.Red : Brushes.Blue,
-                            PixelsPerDip);
+                        word.Render();
 
-                        if (word.Type.HasFlag(WordType.Space) || word.Type.HasFlag(WordType.InertChar)
-                        ) //rotate 90 degree the offset text at the space area
+                        if (ShowWireFrame)
+                            dc.DrawRectangle(null, WordWireFramePen, word.Area);
+
+                        if (ShowOffset)
                         {
-                            var drawPoint = new Point(word.Area.X + word.Width + 1,
-                                word.Area.Y + (word.Type.HasFlag(WordType.Space) ? word.Height / 2 - ft.Width / 2 : 1));
-                            dc.PushTransform(new RotateTransform(90, drawPoint.X, drawPoint.Y));
-                            dc.DrawText(ft, drawPoint);
-                            dc.Pop();
+                            var ft = new FormattedText(word.Offset.ToString(),
+                                CultureInfo.CurrentCulture, FlowDirection.LeftToRight,
+                                new Typeface(FontFamily, FontStyles.Normal, FontWeights.Normal, FontStretches.Normal),
+                                OffsetEmSize, word.Styles.IsRtl ? Brushes.Red : Brushes.Blue,
+                                PixelsPerDip);
+
+                            if (word.Type.HasFlag(WordType.Space) || word.Type.HasFlag(WordType.InertChar)) //rotate 90 degree the offset text at the space area
+                            {
+                                var drawPoint = new Point(word.Area.X + word.Width + 1,
+                                    word.Area.Y + (word.Type.HasFlag(WordType.Space) ? word.Height / 2 - ft.Width / 2 : 1));
+                                dc.PushTransform(new RotateTransform(90, drawPoint.X, drawPoint.Y));
+                                dc.DrawText(ft, drawPoint);
+                                dc.Pop();
+                            }
+                            else
+                                dc.DrawText(ft, new Point(word.Paragraph.Styles.IsRtl ? word.Area.X + word.Width - ft.Width : word.Area.X, word.Area.Y));
                         }
-                        else
-                            dc.DrawText(ft,
-                                new Point(word.Paragraph.Styles.IsRtl ? word.Area.X + word.Width - ft.Width : word.Area.X,
-                                    word.Area.Y));
+                    }
+                    else if (visual is Paragraph para)
+                    {
+                        para.Render();
+
+                        if (ShowWireFrame) // show paragraph area
+                            dc.DrawRoundedRectangle(null, ParagraphWireFramePen, new Rect(para.Location, para.Size), 4, 4);
                     }
                 }
-                else if (visual is Paragraph para)
+            }
+            finally
+            {
+                if (ShowFramePerSecond && sw != null)
                 {
-                    para.Render();
+                    sw.Stop();
+                    var ft = new FormattedText($"FPS: {1000 / sw.ElapsedMilliseconds}, ExecTime: {sw.ElapsedMilliseconds}ms",
+                        CultureInfo.CurrentCulture, FlowDirection.LeftToRight,
+                        new Typeface(FontFamily, FontStyles.Normal, FontWeights.Normal, FontStretches.Normal),
+                        FpsEmSize, Brushes.Blue, PixelsPerDip);
 
-                    if (ShowWireFrame) // show paragraph area
-                    {
-                        dc.DrawRoundedRectangle(null, ParagraphWireFramePen,
-                            new Rect(para.Location, para.Size), 4, 4);
-                    }
+                    dc.DrawText(ft, new Point(1, 1));
                 }
             }
         }

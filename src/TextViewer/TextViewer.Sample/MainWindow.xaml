@@ -6,15 +6,22 @@
         xmlns:textViewer="clr-namespace:TextViewer;assembly=TextViewer"
         mc:Ignorable="d"
         Title="MainWindow" Height="800" Width="900">
+    <Window.Resources>
+        <ResourceDictionary Source="pack://application:,,,/TextViewer;component/Assets/ScrollViewerStyle.xaml" />
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="40" />
         </Grid.RowDefinitions>
-        <textViewer:MagnifyingTextViewer Grid.Row="0" x:Name="Reader" Background="AntiqueWhite" Padding="20" IsSelectable="True" MagnifierZoomFactor="5" MagnifierDistanceFromMouse="0"></textViewer:MagnifyingTextViewer>
+        <Grid Grid.Row="0">
+            <textViewer:MagnifyingTextViewer x:Name="Reader" SnapsToDevicePixels="True" Background="AntiqueWhite" Padding="20" IsSelectable="True" MagnifierZoomFactor="5" OpenLinkRefOnClick="True" CopyLinkRefOnClick="True" MagnifierDistanceFromMouse="0"></textViewer:MagnifyingTextViewer>
+        </Grid>
+        
         <StackPanel Orientation="Horizontal" Grid.Row="1" Background="Azure" >
             <CheckBox Margin="5,10" IsChecked="{Binding ElementName=Reader, Path=ShowOffset, UpdateSourceTrigger=PropertyChanged}">Show Offset</CheckBox>
             <CheckBox Margin="5,10" IsChecked="{Binding ElementName=Reader, Path=ShowWireFrame, UpdateSourceTrigger=PropertyChanged}">Wire Frame</CheckBox>
+            <CheckBox Margin="5,10" IsChecked="{Binding ElementName=Reader, Path=ShowFramePerSecond, UpdateSourceTrigger=PropertyChanged}">Show FPS</CheckBox>
             <CheckBox Margin="5,10" IsChecked="{Binding ElementName=Reader, Path=IsJustify, UpdateSourceTrigger=PropertyChanged}">Justify</CheckBox>
 
             <GridSplitter Width="1" Background="Gray"/>

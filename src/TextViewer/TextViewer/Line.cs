@@ -54,8 +54,7 @@ namespace TextViewer
                     var extendSpace = RemainWidth / Words.Count(w => w.Type.HasFlag(WordType.Space));
                     foreach (var word in Words)
                     {
-                        if (word.Type.HasFlag(WordType.Space))
-                            word.ExtraWidth = extendSpace;
+                        if (word is SpaceWord space) space.ExtraWidth = extendSpace;
                         SetWordPosition(word);
                     }
                 }

@@ -13,14 +13,14 @@ namespace TextViewer
             Offset = offset;
             Words = new List<WordInfo>();
             Lines = new List<Line>();
-            Styles = new WordStyle(isRtl);
+            Styles = new TextStyle(isRtl);
         }
 
         public const string InertChars = "\\|«»<>[]{}()'/،.,:!@#$%٪^&~*_-+=~‍‍‍‍\"`×?";
         public new int Offset { get; set; }
         public List<WordInfo> Words { get; protected set; }
         public List<Line> Lines { get; protected set; }
-        public WordStyle Styles { get; protected set; }
+        public TextStyle Styles { get; protected set; }
         public Size Size { get; set; }
         public Point Location { get; set; }
 
@@ -45,7 +45,7 @@ namespace TextViewer
         /// <param name="contentOffset">The offset of attached content inflowing of this paragraph</param>
         /// <param name="content">Text of content which is want to attached at this paragraph</param>
         /// <param name="contentStyle">The given styles will be applied on the all of given content</param>
-        public void AddContent(int contentOffset, string content, WordStyle contentStyle)
+        public void AddContent(int contentOffset, string content, TextStyle contentStyle)
         {
             var wordBuffer = "";
             var offset = contentOffset;
@@ -64,7 +64,7 @@ namespace TextViewer
                     // add space char as word
                     // note: space.IsRtl will complete calculate after adding all words
                     var spaceIsRtl = Styles.IsRtl == Words.LastOrDefault()?.Styles.IsRtl;
-                    AddWord(new WordInfo(charPointer.ToString(), contentOffset + i, WordType.Space, spaceIsRtl, contentStyle));
+                    AddWord(new SpaceWord(contentOffset + i, spaceIsRtl, contentStyle));
 
                     // maybe there are exist multiple sequence space, so we set offset outside of the keeping word buffer.
                     offset = contentOffset + i + 1; // set next word offset
@@ -123,9 +123,8 @@ namespace TextViewer
 
         public DrawingVisual Render()
         {
-            var dc = RenderOpen();
-            dc.DrawGeometry(Brushes.Transparent, null, new RectangleGeometry(new Rect(Location, Size)));
-            dc.Close();
+            using (var dc = RenderOpen())
+                dc.DrawGeometry(Brushes.Transparent, null, new RectangleGeometry(new Rect(Location, Size)));
 
             return this;
         }

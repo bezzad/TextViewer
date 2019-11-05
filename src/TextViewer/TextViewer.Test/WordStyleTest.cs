@@ -10,13 +10,13 @@ namespace TextViewer.Test
         [TestMethod]
         public void ConstructorTest()
         {
-            var rtlStyle = new WordStyle(true);
+            var rtlStyle = new TextStyle(true);
             Assert.IsNotNull(rtlStyle);
             Assert.AreEqual(FlowDirection.RightToLeft, rtlStyle.Direction);
             Assert.IsTrue(rtlStyle.Display);
             Assert.IsTrue(rtlStyle.IsRtl);
             Assert.IsFalse(rtlStyle.IsLtr);
-            Assert.AreEqual(WordStyle.RtlCulture, rtlStyle.Language);
+            Assert.AreEqual(TextStyle.RtlCulture, rtlStyle.Language);
             Assert.AreEqual(Brushes.Black, rtlStyle.Foreground);
             Assert.AreEqual(0, rtlStyle.Width);
             Assert.AreEqual(0, rtlStyle.Height);
@@ -37,13 +37,13 @@ namespace TextViewer.Test
             rtlStyle.Width = 100;
             rtlStyle.TextAlign = TextAlignment.Center;
 
-            var ltrStyle = new WordStyle(false, rtlStyle);
+            var ltrStyle = new TextStyle(false, rtlStyle);
             Assert.IsNotNull(ltrStyle);
             Assert.AreEqual(FlowDirection.LeftToRight, ltrStyle.Direction);
             Assert.IsTrue(ltrStyle.Display);
             Assert.IsTrue(ltrStyle.IsLtr);
             Assert.IsFalse(ltrStyle.IsRtl);
-            Assert.AreEqual(WordStyle.LtrCulture, ltrStyle.Language);
+            Assert.AreEqual(TextStyle.LtrCulture, ltrStyle.Language);
             Assert.AreEqual(Brushes.Red, ltrStyle.Foreground);
             Assert.AreEqual(100, ltrStyle.Width);
             Assert.AreEqual(0, ltrStyle.Height);
@@ -63,7 +63,7 @@ namespace TextViewer.Test
         [TestMethod]
         public void AddStyleTest()
         {
-            var wordStyle = new WordStyle(true)
+            var wordStyle = new TextStyle(true)
             {
                 Foreground = Brushes.Blue,
                 Display = true,
@@ -73,7 +73,7 @@ namespace TextViewer.Test
                 HyperRef = "test:url"
             };
 
-            var newStyle = new WordStyle(true)
+            var newStyle = new TextStyle(true)
             {
                 Foreground = Brushes.Red,
                 Display = false
@@ -85,7 +85,7 @@ namespace TextViewer.Test
             Assert.AreEqual(FlowDirection.RightToLeft, wordStyle.Direction);
             Assert.IsFalse(wordStyle.Display);
             Assert.IsTrue(wordStyle.IsRtl);
-            Assert.AreEqual(WordStyle.RtlCulture, wordStyle.Language);
+            Assert.AreEqual(TextStyle.RtlCulture, wordStyle.Language);
             Assert.AreEqual(Brushes.Red, wordStyle.Foreground);
             Assert.AreEqual(0, wordStyle.Width);
             Assert.AreEqual(0, wordStyle.Height);
@@ -104,7 +104,7 @@ namespace TextViewer.Test
         [TestMethod]
         public void SetDirectionTest()
         {
-            var style = new WordStyle(true)
+            var style = new TextStyle(true)
             {
                 Foreground = Brushes.Red,
                 Display = false
@@ -123,7 +123,7 @@ namespace TextViewer.Test
         [TestMethod]
         public void SetImageTest()
         {
-            var style = new WordStyle(true)
+            var style = new TextStyle(true)
             {
                 Foreground = Brushes.Red,
                 Display = false
