@@ -32,7 +32,8 @@ namespace TextViewer
             base.OnTouchVisualHit(position, result);
             if (result.VisualHit is WordInfo word)
             {
-                AnnotationStart(word.Text, word); // todo: remove this line after test ------------------------------------------------------------------------------------------------------------------
+                AnnotationStart(word.Text,
+                    word); // todo: remove this line after test ------------------------------------------------------------------------------------------------------------------
                 if (HighlightLastWord == null && word.Styles.IsHyperLink)
                 {
                     // is external link
@@ -54,12 +55,7 @@ namespace TextViewer
                         AnnotationStart(word.Styles.HyperRef, word);
                 }
             }
-            else
-            {
-                AnnotationReferenceText = null;
-                Annotation = null;
-                ReRender();
-            }
+            else ClearAnnotation();
         }
 
         public void AnnotationStart(string text, TextInfo refText)
@@ -67,37 +63,55 @@ namespace TextViewer
             if (string.IsNullOrEmpty(text) || refText == null)
                 return;
 
+            ClearAnnotation();
             Annotation = new AnnotationInfo(text, Paragraph.IsRtl(text));
             AnnotationReferenceText = refText;
-            ReRender();
+            BuildAnnotation();
+        }
+
+        protected void ClearAnnotation()
+        {
+            var index = DrawnWords.IndexOf(Annotation);
+            if (Annotation != null && index >= 0)
+                RemoveDrawnWord(index);
+
+            AnnotationReferenceText = null;
+            Annotation = null;
         }
 
         protected void BuildAnnotation()
         {
-            Annotation.MaxHeight = ActualHeight * 0.5 - Padding.Bottom - Padding.Top;
-            Annotation.MaxWidth = ActualWidth * 0.6 - Padding.Right - Padding.Left;
-            Annotation.MinHeight = Math.Max(LineHeight, Annotation.CornerRadius * 2 + Annotation.BubblePeakHeight + 1);
-            Annotation.MinWidth = Annotation.CornerRadius * 2 + Annotation.BubblePeakWidth + 1 + Annotation.BorderThickness * 2 + Annotation.Padding * 2;
-            Annotation.Styles.Background = new SolidColorBrush(Colors.Bisque) { Opacity = 0.97 };
-            Annotation.Styles.Foreground = Brushes.Teal;
-            Annotation.Styles.FontSize = -2;
-            Annotation.Styles.TextAlign = TextAlignment.Justify;
-            // set width and height
-            Annotation.SetFormattedText(FontFamily, FontSize, PixelsPerDip, LineHeight);
-            var minPad = Math.Max(Padding.Right - Annotation.BubblePeakWidth / 2 - Annotation.CornerRadius / 2 - 1, 2);
+            if (string.IsNullOrEmpty(Annotation?.Text) == false && AnnotationReferenceText != null)
+            {
+                Annotation.MaxHeight = ActualHeight * 0.5 - Padding.Bottom - Padding.Top;
+                Annotation.MaxWidth = ActualWidth * 0.6 - Padding.Right - Padding.Left;
+                Annotation.MinHeight = Math.Max(LineHeight, Annotation.CornerRadius * 2 + Annotation.BubblePeakHeight + 1);
+                Annotation.MinWidth = Annotation.CornerRadius * 2 + Annotation.BubblePeakWidth + 1 + Annotation.BorderThickness * 2 + Annotation.Padding * 2;
+                Annotation.Styles.Background = new SolidColorBrush(Colors.Bisque) { Opacity = 0.97 };
+                Annotation.Styles.Foreground = Brushes.Teal;
+                Annotation.Styles.FontSize = -2;
+                Annotation.Styles.TextAlign = TextAlignment.Justify;
+                // set width and height
+                Annotation.SetFormattedText(FontFamily, FontSize, PixelsPerDip, LineHeight);
+                var minPad = Math.Max(Padding.Right - Annotation.BubblePeakWidth / 2 - Annotation.CornerRadius / 2 - 1, 2);
 
-            var top = AnnotationReferenceText.Area.Y + AnnotationReferenceText.Height + 5;
-            Annotation.BubblePeakPosition = new Point(AnnotationReferenceText.Area.X + AnnotationReferenceText.Width / 2, top);
-            var left = Annotation.BubblePeakPosition.X - Annotation.Width / 2;
+                var top = AnnotationReferenceText.Area.Y + AnnotationReferenceText.Height + 5;
+                Annotation.BubblePeakPosition = new Point(AnnotationReferenceText.Area.X + AnnotationReferenceText.Width / 2, top);
+                var left = Annotation.BubblePeakPosition.X - Annotation.Width / 2;
 
-            if (left + Annotation.Width > ActualWidth - minPad) // if the length of annotation over from right of page
-                left = ActualWidth - Annotation.Width - minPad;
-            else if (left < minPad) // if the length of annotation over from left of page
-                left = minPad;
+                if (left + Annotation.Width > ActualWidth - minPad) // if the length of annotation over from right of page
+                    left = ActualWidth - Annotation.Width - minPad;
+                else if (left < minPad) // if the length of annotation over from left of page
+                    left = minPad;
 
-            Annotation.DrawPoint = new Point(Annotation.DrawRightToLeft ? left + Annotation.Width - Annotation.BorderThickness - Annotation.Padding : left + Annotation.BorderThickness + Annotation.Padding,
-                top + Annotation.BubblePeakHeight + Annotation.BorderThickness + Annotation.Padding);
-            Annotation.Area = new Rect(new Point(left, top), new Size(Annotation.Width, Annotation.Height));
+                Annotation.DrawPoint = new Point(Annotation.DrawRightToLeft ? left + Annotation.Width - Annotation.BorderThickness - Annotation.Padding : left + Annotation.BorderThickness + Annotation.Padding,
+                    top + Annotation.BubblePeakHeight + Annotation.BorderThickness + Annotation.Padding);
+                Annotation.Area = new Rect(new Point(left, top), new Size(Annotation.Width, Annotation.Height));
+
+                Annotation.Render();
+                if (DrawnWords.Contains(Annotation) == false)
+                    AddDrawnWord(Annotation);
+            }
         }
 
         protected override void OnMouseMove(MouseEventArgs e)
@@ -174,12 +188,7 @@ namespace TextViewer
         protected override void OnRender(DrawingContext dc)
         {
             base.OnRender(dc);
-
-            if (string.IsNullOrEmpty(Annotation?.Text) == false && AnnotationReferenceText != null)
-            {
-                BuildAnnotation();
-                AddDrawnWord(Annotation.Render());
-            }
+            BuildAnnotation();
         }
     }
 }

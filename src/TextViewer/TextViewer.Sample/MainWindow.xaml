@@ -15,7 +15,7 @@
             <RowDefinition Height="40" />
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
-            <textViewer:MagnifyingTextViewer x:Name="Reader" Background="AntiqueWhite" Padding="20" IsSelectable="True" MagnifierZoomFactor="5" OpenLinkRefOnClick="True" CopyLinkRefOnClick="True" MagnifierDistanceFromMouse="0"></textViewer:MagnifyingTextViewer>
+            <textViewer:MagnifyingTextViewer x:Name="Reader" SnapsToDevicePixels="True" Background="AntiqueWhite" Padding="20" IsSelectable="True" MagnifierZoomFactor="5" OpenLinkRefOnClick="True" CopyLinkRefOnClick="True" MagnifierDistanceFromMouse="0"></textViewer:MagnifyingTextViewer>
         </Grid>
         
         <StackPanel Orientation="Horizontal" Grid.Row="1" Background="Azure" >

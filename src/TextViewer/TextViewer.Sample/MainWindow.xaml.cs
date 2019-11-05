@@ -36,7 +36,6 @@ namespace TextViewerSample
             DpiChanged += delegate
             {
                 Reader.PixelsPerDip = VisualTreeHelper.GetDpi(this).PixelsPerDip;
-                Reader.ReRender();
             };
         }
 
