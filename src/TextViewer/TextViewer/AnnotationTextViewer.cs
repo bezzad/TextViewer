@@ -95,8 +95,7 @@ namespace TextViewer
                 {
                     var posInScreen = PointToScreen(new Point(AnnotationReferenceText.Area.X + AnnotationReferenceText.Width / 2, 
                         AnnotationReferenceText.Area.Y + AnnotationReferenceText.Height / 2));
-                    var posInParent = mainCanvas.PointFromScreen(posInScreen);
-                    Annotation.Open(posInParent, mainCanvas);
+                    Annotation.Open(posInScreen, mainCanvas);
                 }
             }
         }

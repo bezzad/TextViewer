@@ -105,26 +105,27 @@ namespace TextViewer
         /// <param name="containerElement">container element which we needed it to calculate the annotation box location and size according to that.</param>
         public void Open(Point positionInScreen, Canvas containerElement)
         {
+            var posInView = containerElement.PointFromScreen(positionInScreen);
+
             if (containerElement.Children.Contains(this) == false)
                 containerElement.Children.Add(this);
 
             // cause to re-render
             Height = containerElement.ActualHeight * HeightRatio;
             Width = containerElement.ActualWidth * WidthRatio;
-            BubblePeakPosition = new Point(CornerRadius + BubblePeakWidth / 2 + 1, -BubblePeakHeight);
-            Canvas.SetLeft(this, positionInScreen.X - BubblePeakPosition.X);
+            BubblePeakPosition = new Point(CornerRadius + BubblePeakWidth + 1, -BubblePeakHeight * 2);
 
-            if (positionInScreen.Y + Height + BubblePeakHeight > containerElement.ActualHeight) // overflowed from container bottom 
+            if (posInView.Y + Height + BubblePeakHeight * 2 > containerElement.ActualHeight) // overflowed from container bottom 
             {
-                BubblePeakPosition = new Point(BubblePeakPosition.X, Height + BubblePeakHeight);
+                BubblePeakPosition = new Point(BubblePeakPosition.X, Height + BubblePeakPosition.Y);
             }
-            if (positionInScreen.X + Width > containerElement.ActualWidth) // overflowed from container right 
+            if (posInView.X + Width > containerElement.ActualWidth) // overflowed from container right 
             {
                 BubblePeakPosition = new Point(Width - BubblePeakPosition.X, BubblePeakPosition.Y);
-                Canvas.SetLeft(this, positionInScreen.X - BubblePeakPosition.X);
             }
 
-            Canvas.SetTop(this, positionInScreen.Y - BubblePeakPosition.Y);
+            Canvas.SetLeft(this, posInView.X - BubblePeakPosition.X);
+            Canvas.SetTop(this, posInView.Y - BubblePeakPosition.Y);
 
 
             Visibility = Visibility.Visible;
@@ -206,7 +207,7 @@ namespace TextViewer
             public Brush Foreground { get; set; }
             public TextAlignment TextAlign { get; set; }
             public string Text { get; set; }
-            public double ScrollBarWidth { get; set; } = 12;
+            public double ScrollBarWidth { get; set; } = 13;
             public ScrollViewer Container { get; set; }
 
 
