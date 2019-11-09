@@ -101,11 +101,9 @@ namespace TextViewer
         /// <summary>
         /// display annotation on container view
         /// </summary>
-        /// <param name="posInView">position in container</param>
-        /// <param name="text">which text should be shown</param>
-        /// <param name="dir">text flow direction</param>
+        /// <param name="positionInScreen">position in container</param>
         /// <param name="containerElement">container element which we needed it to calculate the annotation box location and size according to that.</param>
-        public void Open(Point posInView, Canvas containerElement)
+        public void Open(Point positionInScreen, Canvas containerElement)
         {
             if (containerElement.Children.Contains(this) == false)
                 containerElement.Children.Add(this);
@@ -114,19 +112,19 @@ namespace TextViewer
             Height = containerElement.ActualHeight * HeightRatio;
             Width = containerElement.ActualWidth * WidthRatio;
             BubblePeakPosition = new Point(CornerRadius + BubblePeakWidth / 2 + 1, -BubblePeakHeight);
-            Canvas.SetLeft(this, posInView.X - BubblePeakPosition.X);
+            Canvas.SetLeft(this, positionInScreen.X - BubblePeakPosition.X);
 
-            if (posInView.Y + Height + BubblePeakHeight > containerElement.ActualHeight) // overflowed from container bottom 
+            if (positionInScreen.Y + Height + BubblePeakHeight > containerElement.ActualHeight) // overflowed from container bottom 
             {
                 BubblePeakPosition = new Point(BubblePeakPosition.X, Height + BubblePeakHeight);
             }
-            if (posInView.X + Width > containerElement.ActualWidth) // overflowed from container right 
+            if (positionInScreen.X + Width > containerElement.ActualWidth) // overflowed from container right 
             {
                 BubblePeakPosition = new Point(Width - BubblePeakPosition.X, BubblePeakPosition.Y);
-                Canvas.SetLeft(this, posInView.X - BubblePeakPosition.X);
+                Canvas.SetLeft(this, positionInScreen.X - BubblePeakPosition.X);
             }
 
-            Canvas.SetTop(this, posInView.Y - BubblePeakPosition.Y);
+            Canvas.SetTop(this, positionInScreen.Y - BubblePeakPosition.Y);
 
 
             Visibility = Visibility.Visible;

@@ -34,8 +34,6 @@ namespace TextViewer
             base.OnTouchVisualHit(position, result);
             if (result.VisualHit is WordInfo word)
             {
-                AnnotationStart(word.Text,
-                    word); // todo: remove this line after test ------------------------------------------------------------------------------------------------------------------
                 if (HighlightLastWord == null && word.Styles.IsHyperLink)
                 {
                     // is external link
@@ -74,7 +72,7 @@ namespace TextViewer
 
         protected void ClearAnnotation()
         {
-            if (Annotation != null )
+            if (Annotation != null)
                 Annotation.Visibility = Visibility.Hidden;
 
             AnnotationReferenceText = null;
@@ -95,10 +93,11 @@ namespace TextViewer
 
                 if (Parent is Canvas mainCanvas)
                 {
-                    Annotation.Open(AnnotationReferenceText.Area.Location, mainCanvas);
+                    var posInScreen = PointToScreen(new Point(AnnotationReferenceText.Area.X + AnnotationReferenceText.Width / 2, 
+                        AnnotationReferenceText.Area.Y + AnnotationReferenceText.Height / 2));
+                    var posInParent = mainCanvas.PointFromScreen(posInScreen);
+                    Annotation.Open(posInParent, mainCanvas);
                 }
-
-
             }
         }
 
