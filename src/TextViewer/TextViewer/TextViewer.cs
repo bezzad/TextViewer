@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
@@ -62,6 +63,9 @@ namespace TextViewer
         {
             var startPoint = new Point(content.FirstOrDefault()?.Styles.IsRtl == true ? ActualWidth - Padding.Right : Padding.Left, Padding.Top);
             var lineWidth = ActualWidth - Padding.Left - Padding.Right;
+            if(lineWidth <= 0)
+                return; // the page has not enough space
+
             ClearDrawnWords();
             Line lineBuffer;
 
@@ -116,7 +120,7 @@ namespace TextViewer
                             if (word.IsImage && word is ImageWord imgWord) // set image scale according by image and page width
                                 imgWord.ImageScale = lineBuffer.RemainWidth / word.Styles.Width;
                             else if (word.Format != null)
-                                word.Format.MaxTextWidth = lineBuffer.RemainWidth;
+                                word.Format.MaxTextWidth = Math.Abs(lineBuffer.RemainWidth);
                         }
                     }
 
