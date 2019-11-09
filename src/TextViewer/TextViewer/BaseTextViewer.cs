@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -117,7 +116,6 @@ namespace TextViewer
         public readonly VisualCollection DrawnWords;
         public Pen WordWireFramePen { get; set; }
         public Pen ParagraphWireFramePen { get; set; }
-        public List<Paragraph> PageContent { get; set; }
         public double PixelsPerDip { get; set; }
         public double OffsetEmSize { get; set; }
         public double FpsEmSize { get; set; }
@@ -127,12 +125,7 @@ namespace TextViewer
         /// </summary>
         public double ParagraphSpace => LineHeight * 0.66;
 
-        public delegate void MessageEventHandler(object sender, TextViewerEventArgs args);
-        public event MessageEventHandler Message;
-        protected virtual void OnMessage(string message, MessageType messageType)
-        {
-            Message?.Invoke(this, new TextViewerEventArgs(message, messageType));
-        }
+
 
         protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
         {
@@ -140,13 +133,12 @@ namespace TextViewer
 
             if (IsLoaded)
             {
-                var visualAffectedProperties = new string[]
+                var visualAffectedProperties = new[]
                 {
                     nameof(FontFamily),
                     nameof(FontSize),
                     nameof(WordWireFramePen),
                     nameof(ParagraphWireFramePen),
-                    nameof(PageContent),
                     nameof(PixelsPerDip),
                     nameof(OffsetEmSize),
                     nameof(FpsEmSize),

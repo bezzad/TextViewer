@@ -39,6 +39,16 @@ namespace TextViewer
     /// </summary>
     public class TextViewer : BaseTextViewer
     {
+        public List<Paragraph> PageContent { get; set; }
+        public delegate void MessageEventHandler(object sender, TextViewerEventArgs args);
+        public event MessageEventHandler Message;
+        protected virtual void OnMessage(string message, MessageType messageType)
+        {
+            Message?.Invoke(this, new TextViewerEventArgs(message, messageType));
+        }
+
+
+
         protected void SetStartPoint(ref Point startPoint, Paragraph para, double extendedY = 0)
         {
             startPoint.X = para.Styles.IsRtl
