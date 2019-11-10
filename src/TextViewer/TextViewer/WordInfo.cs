@@ -82,7 +82,7 @@ namespace TextViewer
             }
         }
 
-        public int CompareTo([AllowNull] WordInfo other)
+        public int CompareTo(WordInfo other)
         {
             if (other == null) throw new ArgumentNullException(nameof(other));
 

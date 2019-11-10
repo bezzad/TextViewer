@@ -269,7 +269,7 @@ namespace TextViewer.Test
             Assert.AreEqual(ltrLine.CurrentParagraph.Lines.Count, lineCounter);
             Assert.AreEqual(rtlLine.CurrentParagraph.Lines.Count, lineCounter++);
             Assert.AreEqual(ltrLine.Words.First().Area.Location.X, ltrLine.Location.X);
-            Assert.IsTrue(Math.Abs(rtlLine.Words.Last().Area.Location.X) - Math.Abs(rtlLine.RemainWidth - rtlLine.ActualWidth - 200 + rtlLine.Location.X) < 0.00000000001);
+            Assert.IsTrue(Math.Abs(rtlLine.Words.Last().Area.Location.X) - Math.Abs(rtlLine.RemainWidth - rtlLine.ActualWidth - 200 + rtlLine.Location.X) < 0.5);
             //
             // Test right text-align
             LtrParent.Styles.TextAlign = TextAlignment.Right;
