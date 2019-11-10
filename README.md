@@ -6,3 +6,6 @@ WPF canvas as text viewer is similar to FlowDocument with more features like par
 
 ### LTR content sample
 ![ltr sample](https://github.com/bezzad/TextViewer/raw/master/sample2.png)
+
+### Annotation Box sample
+![ltr sample](https://github.com/bezzad/TextViewer/raw/master/sample3.png)
