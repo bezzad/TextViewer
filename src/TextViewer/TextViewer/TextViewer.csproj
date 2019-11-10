@@ -1,22 +1,25 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFrameworks>net48;netcoreapp3.0</TargetFrameworks>
     <UseWPF>true</UseWPF>
+    <AssemblyName>TextViewer</AssemblyName>
+    <Title>TextViewer</Title>
+    <RootNamespace>TextViewer</RootNamespace>
     <OutputType>Library</OutputType>
-    <Version>1.5.1</Version>
+    <Version>1.5.2</Version>
     <Authors>Behzad Khosravifar</Authors>
     <Company>Taaghche</Company>
     <Description>WPF canvas as text viewer is similar to FlowDocument with more features like paragraph layout, word selection, magnifier and etc.</Description>
     <Copyright>Taaghche @ 2019</Copyright>
     <PackageProjectUrl>https://github.com/bezzad/TextViewer</PackageProjectUrl>
     <PackageTags>wpf-controls, text-viewer, document, flow-document, canvas, 2d-text</PackageTags>
-    <AssemblyVersion>1.5.1.0</AssemblyVersion>
-    <FileVersion>1.5.1.0</FileVersion>
+    <AssemblyVersion>1.5.2.0</AssemblyVersion>
+    <FileVersion>1.5.2.0</FileVersion>
     <RepositoryUrl>https://github.com/bezzad/TextViewer</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <PackageReleaseNotes>Version 1.5.1-beta</PackageReleaseNotes>
+    <PackageReleaseNotes>Version 1.5.2</PackageReleaseNotes>
     <PackageTags>wpf controls;text viewer;document;flowDocument;canvas;2d text;text render</PackageTags>
 
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
