@@ -64,8 +64,9 @@ namespace TextViewer
 
         public void SetImage(byte[] bytes)
         {
-            using var stream = new MemoryStream(bytes);
-            Image = BitmapFrame.Create(stream, BitmapCreateOptions.None, BitmapCacheOption.OnLoad);
+            // ReSharper disable once ConvertToUsingDeclaration
+            using (var stream = new MemoryStream(bytes))
+                Image = BitmapFrame.Create(stream, BitmapCreateOptions.None, BitmapCacheOption.OnLoad);
         }
 
         public void SetImage(string base64)

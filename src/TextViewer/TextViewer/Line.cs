@@ -151,8 +151,8 @@ namespace TextViewer
         protected void PopAllNonDirectionalWords()
         {
             if (NonDirectionalWordsStack.Any())
-                while (NonDirectionalWordsStack.TryPop(out var nonWord))
-                    SetWordPositionInLine(nonWord);
+                while (NonDirectionalWordsStack.Any())
+                    SetWordPositionInLine(NonDirectionalWordsStack.Pop());
         }
 
         protected void SetWordPosition(WordInfo word)
