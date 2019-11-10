@@ -59,12 +59,14 @@ namespace TextViewer
             startPoint.Y += extendedY;
         }
 
-        protected void BuildPage(List<Paragraph> content)
+        protected bool BuildPage(List<Paragraph> content)
         {
+            if (content == null) return false;
+
             var startPoint = new Point(content.FirstOrDefault()?.Styles.IsRtl == true ? ActualWidth - Padding.Right : Padding.Left, Padding.Top);
             var lineWidth = ActualWidth - Padding.Left - Padding.Right;
-            if(lineWidth <= 0)
-                return; // the page has not enough space
+            if (lineWidth <= 0)
+                return false; // the page has not enough space
 
             ClearDrawnWords();
             Line lineBuffer;
@@ -141,6 +143,8 @@ namespace TextViewer
                 // + ParagraphSpace
                 startPoint.Y += ParagraphSpace;
             }
+
+            return true;
         }
 
         protected override void OnRender(DrawingContext dc)
@@ -151,7 +155,7 @@ namespace TextViewer
             {
                 base.OnRender(dc);
 
-                if (DesignerProperties.GetIsInDesignMode(this))
+                if (DesignerProperties.GetIsInDesignMode(this) || BuildPage(PageContent) == false)
                     return;
 
                 BuildPage(PageContent);
