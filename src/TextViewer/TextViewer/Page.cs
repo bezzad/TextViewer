@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 
@@ -30,29 +31,51 @@ namespace TextViewer
         public CultureInfo Language { get; set; }
 
 
-        public void AddBlock(Paragraph para, int startLine, int lastLine)
+        public void AddBlock(Paragraph para)
         {
-            throw new NotImplementedException();
+            TextBlocks.Add(para);
         }
 
-        public void AddBlockToTop(Paragraph para, int startLine, int lastLine)
+        public void AddBlockToTop(Paragraph para)
         {
-            throw new NotImplementedException();
+            TextBlocks.Insert(0, para);
         }
 
         public Paragraph GetTopBlock()
         {
-            throw new NotImplementedException();
+            return TextBlocks.FirstOrDefault();
         }
 
         public Paragraph GetBottomBlock()
         {
-            throw new NotImplementedException();
+            return TextBlocks.LastOrDefault();
         }
 
         public double GetContentHeight()
         {
-            throw new NotImplementedException();
+            double height = 0;
+            for (var i = 0; i < BlockCount; i++)
+            {
+                var atom = TextBlocks[i];
+                if (i == 0) // first atom
+                {
+                    var startLine = atom.GetLineIndex(TopPosition.Offset);
+                    var shownLinesCount = atom.Lines.Count - startLine - 1; // start line ... end
+                    height += shownLinesCount * LineHeight + ParagraphSpace;
+                }
+                else if (i == BlockCount - 1) // last atom
+                {
+                    var endLine = atom.GetLineIndex(BottomPosition.Offset);
+                    var shownLinesCount = endLine + 1; // 0 ... end line
+                    height += shownLinesCount * LineHeight + ParagraphSpace;
+                }
+                else // middle atoms
+                {
+                    height += atom.Lines.Count * LineHeight + ParagraphSpace;
+                }
+            }
+
+            return height;
         }
 
         public bool IsLoaded()

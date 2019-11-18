@@ -24,8 +24,9 @@ namespace TextViewer
         CultureInfo Language { set; get; }
         bool IsDisposed { get; }
 
-        void AddBlock(Paragraph para, int startLine, int lastLine);
-        void AddBlockToTop(Paragraph para, int startLine, int lastLine);
+
+        void AddBlock(Paragraph para);
+        void AddBlockToTop(Paragraph para);
         Paragraph GetTopBlock();
         Paragraph GetBottomBlock();
         double GetContentHeight();

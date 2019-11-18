@@ -83,7 +83,7 @@ namespace TextViewer
             foreach (var para in content)
             {
                 // todo: clear lines if the style of page changed!
-                para.Lines.Clear(); // clear old lines
+                para.ClearLines(); // clear old lines
                 para.Location = new Point(Padding.Left, startPoint.Y);
                 para.Size = new Size(lineWidth, 0);
                 AddDrawnWord(para);

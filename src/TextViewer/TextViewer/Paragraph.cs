@@ -13,6 +13,7 @@ namespace TextViewer
             Offset = offset;
             Words = new List<WordInfo>();
             Lines = new List<Line>();
+            LinesOffsetRange = new List<Range>();
             Styles = new TextStyle(isRtl);
         }
 
@@ -23,7 +24,7 @@ namespace TextViewer
         public TextStyle Styles { get; protected set; }
         public Size Size { get; set; }
         public Point Location { get; set; }
-
+        protected List<Range> LinesOffsetRange { get; set; }
 
 
         private void AddWord(WordInfo w)
@@ -37,6 +38,18 @@ namespace TextViewer
                 w.PreviousWord.NextWord = w;
             }
             Words.Add(w);
+        }
+
+        public void AddLine(Line line)
+        {
+            Lines.Add(line);
+            LinesOffsetRange.Add(Range.Create(line.StartOffset, line.EndOffset));
+        }
+
+        public void ClearLines()
+        {
+            Lines.Clear();
+            LinesOffsetRange.Clear();
         }
 
         /// <summary>
@@ -97,8 +110,6 @@ namespace TextViewer
             if (wordBuffer.Length > 0)
                 AddWord(new WordInfo(wordBuffer, offset, WordType.Normal, IsRtl(wordBuffer), contentStyle));
         }
-
-
         public void CalculateDirection()
         {
             //
@@ -220,6 +231,14 @@ namespace TextViewer
         public static bool IsRtl(string input)
         {
             return input.Any(IsRtl);
+        }
+
+        public int GetLineIndex(int charOffset)
+        {
+            var index = LinesOffsetRange.BinarySearch(Range.Create(charOffset));
+            if (index < 0) throw new KeyNotFoundException(nameof(charOffset) + ": " + charOffset);
+
+            return index;
         }
     }
 }
