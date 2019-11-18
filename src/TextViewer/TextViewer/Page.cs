@@ -9,6 +9,12 @@ namespace TextViewer
 {
     public class Page : IPage
     {
+        public Page()
+        {
+            TextBlocks = new List<Paragraph>();
+        }
+
+
         private volatile bool _disposed;
         public bool IsDisposed
         {

@@ -43,12 +43,22 @@ namespace TextViewerSample
         {
             if (BtnLoadSample.IsChecked == true)
             {
-                Reader.PageContent = Path.Combine(Environment.CurrentDirectory, "Data\\LtrSample.html").GetParagraphs(false);
+                var page = new Page();
+                var paragraphs = Path.Combine(Environment.CurrentDirectory, "Data\\LtrSample.html").GetParagraphs(false);
+                foreach (var para in paragraphs)
+                    page.AddBlock(para);
+
+                Reader.PageContent = page;
                 BtnLoadSample.Content = "LtrContentSample";
             }
             else
             {
-                Reader.PageContent = Path.Combine(Environment.CurrentDirectory, "Data\\RtlSample.html").GetParagraphs(true);
+                var page = new Page();
+                var paragraphs = Path.Combine(Environment.CurrentDirectory, "Data\\RtlSample.html").GetParagraphs(true);
+                foreach (var para in paragraphs)
+                    page.AddBlock(para);
+
+                Reader.PageContent = page;
                 BtnLoadSample.Content = "RtrContentSample";
             }
 

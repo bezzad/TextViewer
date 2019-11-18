@@ -54,7 +54,7 @@ namespace TextViewer
             }
             else // There are no lines! Be sure to click on the space between paragraphs.
             {
-                foreach (var paragraph in PageContent)
+                foreach (var paragraph in PageContent.TextBlocks)
                 {
                     if (position.Y < paragraph.Location.Y)
                     {
@@ -64,7 +64,7 @@ namespace TextViewer
                 }
 
                 if (selectedWord == null)
-                    selectedWord = PageContent.LastOrDefault()?.Lines.LastOrDefault()?.Words.LastOrDefault();
+                    selectedWord = PageContent.TextBlocks.LastOrDefault()?.Lines.LastOrDefault()?.Words.LastOrDefault();
             }
 
             // Set Highlight Range 

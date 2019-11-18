@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
@@ -40,7 +39,8 @@ namespace TextViewer
     /// </summary>
     public class TextViewer : BaseTextViewer
     {
-        public List<Paragraph> PageContent { get; set; }
+        //public List<Paragraph> PageContent { get; set; }
+        public IPage PageContent { get; set; }
         public delegate void MessageEventHandler(object sender, TextViewerEventArgs args);
         public event MessageEventHandler Message;
         protected virtual void OnMessage(string message, MessageType messageType)
@@ -57,11 +57,11 @@ namespace TextViewer
             startPoint.Y += extendedY;
         }
 
-        protected bool BuildPage(List<Paragraph> content)
+        protected bool BuildPage(IPage content)
         {
-            if (content == null) return false;
+            if (!(content?.BlockCount > 0)) return false;
 
-            var startPoint = new Point(content.FirstOrDefault()?.Styles.IsRtl == true ? ActualWidth - Padding.Right : Padding.Left, Padding.Top);
+            var startPoint = new Point(content.TextBlocks.FirstOrDefault()?.Styles.IsRtl == true ? ActualWidth - Padding.Right : Padding.Left, Padding.Top);
             var lineWidth = ActualWidth - Padding.Left - Padding.Right;
             if (lineWidth < MinWidth)
                 return false; // the page has not enough space
@@ -80,7 +80,7 @@ namespace TextViewer
                 }
             }
 
-            foreach (var para in content)
+            foreach (var para in content.TextBlocks)
             {
                 // todo: clear lines if the style of page changed!
                 para.ClearLines(); // clear old lines
