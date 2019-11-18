@@ -98,9 +98,8 @@ namespace TextViewer
                     var wordWidth = word.Width;
                     var wordPointer = word;
                     //
-                    // attached words has one width at all
-                    while (word.PreviousWord?.Type.HasFlag(WordType.Attached) == false &&
-                           wordPointer.Type.HasFlag(WordType.Attached))
+                    // render attached words as one word by one width
+                    while (word.PreviousWord?.Type.HasFlag(WordType.Attached) == false && wordPointer.Type.HasFlag(WordType.Attached))
                     {
                         wordPointer = wordPointer.NextWord;
                         wordWidth += wordPointer.Width;

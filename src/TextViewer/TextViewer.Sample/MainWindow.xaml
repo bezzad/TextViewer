@@ -35,28 +35,28 @@
                     <ColumnDefinition Width="*"></ColumnDefinition>
                     <ColumnDefinition Width="*"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
-                <Button Grid.Row="0" Grid.Column="1">
+                <Button Grid.Row="0" Grid.Column="1" Click="ScrollUp">
                     <Polygon Points="5,0 10,10 0,10 5,0" Stroke="Black" Cursor="ScrollNS">
                         <Polygon.Fill>
                             <SolidColorBrush Color="Black" />
                         </Polygon.Fill>
                     </Polygon>
                 </Button>
-                <Button Grid.Row="1" Grid.Column="0">
+                <Button Grid.Row="1" Grid.Column="0" Click="ScrollLeft">
                     <Polygon Points="0,5 10,0 10,10 0,5" Stroke="Black" Cursor="ScrollWE">
                         <Polygon.Fill>
                             <SolidColorBrush Color="Black" />
                         </Polygon.Fill>
                     </Polygon>
                 </Button>
-                <Button Grid.Row="1" Grid.Column="2">
+                <Button Grid.Row="1" Grid.Column="2" Click="ScrollRight">
                     <Polygon Points="10,5 0,10 0,0 10,5" Stroke="Black" Cursor="ScrollWE">
                         <Polygon.Fill>
                             <SolidColorBrush Color="Black" />
                         </Polygon.Fill>
                     </Polygon>
                 </Button>
-                <Button Grid.Row="2" Grid.Column="1">
+                <Button Grid.Row="2" Grid.Column="1" Click="ScrollDown">
                     <Polygon Points="5,10 0,0 10,0 5,10" Stroke="Black"  Cursor="ScrollNS">
                         <Polygon.Fill>
                             <SolidColorBrush Color="Black" />

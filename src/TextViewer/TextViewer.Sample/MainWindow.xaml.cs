@@ -8,30 +8,15 @@ using TextViewer;
 
 namespace TextViewerSample
 {
-    public class Model : DependencyObject
-    {
-        public static readonly DependencyProperty CurrentPageProperty = DependencyProperty.Register(nameof(CurrentPage), typeof(IPage), typeof(Model), new PropertyMetadata(default(IPage)));
-
-        public IPage CurrentPage
-        {
-            get => (IPage)GetValue(CurrentPageProperty);
-            set => SetValue(CurrentPageProperty, value);
-        }
-
-        public Model()
-        {
-            CurrentPage = new Page();
-        }
-
-    }
-
-
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
     {
         public Model MainModel { get; set; }
+        //public static ReaderService ReaderService { get; set; } = new ReaderService();
+
+
 
         public MainWindow()
         {
@@ -78,6 +63,26 @@ namespace TextViewerSample
             }
 
             Reader.ReRender();
+        }
+
+        private void ScrollUp(object sender, RoutedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void ScrollDown(object sender, RoutedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void ScrollRight(object sender, RoutedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void ScrollLeft(object sender, RoutedEventArgs e)
+        {
+            throw new NotImplementedException();
         }
     }
 }
