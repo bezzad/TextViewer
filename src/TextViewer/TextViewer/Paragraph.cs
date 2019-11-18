@@ -131,6 +131,13 @@ namespace TextViewer
                     space.Styles.SetDirection(space.NextWord.Styles.IsRtl);
             }
         }
+        public int GetLineIndex(int charOffset)
+        {
+            var index = LinesOffsetRange.BinarySearch(Range.Create(charOffset));
+            if (index < 0) throw new KeyNotFoundException(nameof(charOffset) + ": " + charOffset);
+
+            return index;
+        }
 
         public DrawingVisual Render()
         {
@@ -233,12 +240,6 @@ namespace TextViewer
             return input.Any(IsRtl);
         }
 
-        public int GetLineIndex(int charOffset)
-        {
-            var index = LinesOffsetRange.BinarySearch(Range.Create(charOffset));
-            if (index < 0) throw new KeyNotFoundException(nameof(charOffset) + ": " + charOffset);
-
-            return index;
-        }
+        
     }
 }

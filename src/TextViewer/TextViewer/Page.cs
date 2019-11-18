@@ -85,7 +85,8 @@ namespace TextViewer
 
         public bool HasEnoughSpace()
         {
-            throw new NotImplementedException();
+            var contentHeight = GetContentHeight();
+            return PageHeight > contentHeight + PagePadding.Bottom + PagePadding.Top;
         }
 
         public bool Equals(IPage other)

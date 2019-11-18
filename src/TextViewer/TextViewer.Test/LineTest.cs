@@ -40,8 +40,8 @@ namespace TextViewer.Test
         [TestInitialize]
         public void Setup()
         {
-            RtlParent = new Paragraph(0, true);
-            LtrParent = new Paragraph(1, false);
+            RtlParent = new Paragraph(0, true) { Size = new Size(_width, 0) };
+            LtrParent = new Paragraph(1, false) { Size = new Size(_width, 0) };
 
             LtrWords = new List<WordInfo>()
             {
@@ -115,8 +115,9 @@ namespace TextViewer.Test
         [TestMethod]
         public void AddWordTest()
         {
-            var ltrLine = new Line(_width, LtrParent, _ltrStartPoint);
-            var rtlLine = new Line(_width, RtlParent, _rtlStartPoint);
+            //LtrParent.Size.Width = _width;
+            var ltrLine = new Line(LtrParent, _ltrStartPoint);
+            var rtlLine = new Line(RtlParent, _rtlStartPoint);
 
             Assert.AreEqual(ltrLine.Height, 0);
             Assert.AreEqual(rtlLine.Height, 0);
@@ -194,8 +195,8 @@ namespace TextViewer.Test
         [TestMethod]
         public void RenderTest()
         {
-            var ltrLine = new Line(_width, LtrParent, _ltrStartPoint);
-            var rtlLine = new Line(_width, RtlParent, _rtlStartPoint);
+            var ltrLine = new Line(LtrParent, _ltrStartPoint);
+            var rtlLine = new Line(RtlParent, _rtlStartPoint);
             var lineCounter = 0;
             Assert.AreEqual(ltrLine.CurrentParagraph.Lines.Count, lineCounter);
             Assert.AreEqual(rtlLine.CurrentParagraph.Lines.Count, lineCounter++);
@@ -287,7 +288,7 @@ namespace TextViewer.Test
         {
             var content = "This is a test content for use متن تستی راست به چپ in ltr content";
             var ltrPara = new Paragraph(0, false);
-            var ltrLine = new Line(_width, ltrPara, new Point(0, 0));
+            var ltrLine = new Line(ltrPara, new Point(0, 0));
             var offset = 0;
             var wordCounter = 0;
 
@@ -326,7 +327,7 @@ namespace TextViewer.Test
         {
             var content = "این یک متن راست به چپ برای تست left to right content می‌باشد.";
             var rtlPara = new Paragraph(0, true);
-            var rtlLine = new Line(_width, rtlPara, new Point(1000, 0));
+            var rtlLine = new Line(rtlPara, new Point(1000, 0));
             var offset = 0;
             var wordCounter = 0;
 
