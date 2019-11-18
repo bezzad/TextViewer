@@ -17,6 +17,7 @@ namespace TextViewer
             Styles = new TextStyle(isRtl);
         }
 
+        protected List<Range> LinesOffsetRange { get; set; }
         public const string InertChars = "\\|«»<>[]{}()'/،.,:!@#$%٪^&~*_-+=~‍‍‍‍\"`×?";
         public new int Offset { get; set; }
         public List<WordInfo> Words { get; protected set; }
@@ -24,7 +25,8 @@ namespace TextViewer
         public TextStyle Styles { get; protected set; }
         public Size Size { get; set; }
         public Point Location { get; set; }
-        protected List<Range> LinesOffsetRange { get; set; }
+        public int StartCharOffset => LinesOffsetRange.FirstOrDefault().Start;
+        public int EndCharOffset => LinesOffsetRange.LastOrDefault().End;
 
 
         private void AddWord(WordInfo w)
@@ -239,7 +241,6 @@ namespace TextViewer
         {
             return input.Any(IsRtl);
         }
-
         
     }
 }
