@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 
@@ -11,7 +12,7 @@ namespace TextViewer
         public double WordPointOffset { get; set; }
 
         public List<WordInfo> Words { get; protected set; }
-        public double Width { get; set; }
+        public double Width => CurrentParagraph?.Size.Width ?? 0;
         public double Height { get; set; }
         public double RemainWidth { get; set; }
         public Point Location { get; set; }
@@ -20,14 +21,14 @@ namespace TextViewer
         public double ActualWidth => Words.Sum(w => w.Width);
 
 
-        public Line(double width, Paragraph para, Point lineLocation)
+        public Line(Paragraph para, Point lineLocation)
         {
-            RemainWidth = Width = width;
+            CurrentParagraph = para;
+            RemainWidth = Width;
             Location = lineLocation;
             WordPointOffset = Location.X;
             NonDirectionalWordsStack = new Stack<WordInfo>();
             Words = new List<WordInfo>();
-            CurrentParagraph = para;
         }
 
 

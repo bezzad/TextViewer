@@ -21,6 +21,7 @@ namespace TextViewer
             PixelsPerDip = VisualTreeHelper.GetDpi(this).PixelsPerDip;
             OffsetEmSize = 6;
             FpsEmSize = 12;
+            MinWidth = 50;
         }
 
 

@@ -48,8 +48,6 @@ namespace TextViewer
             Message?.Invoke(this, new TextViewerEventArgs(message, messageType));
         }
 
-
-
         protected void SetStartPoint(ref Point startPoint, Paragraph para, double extendedY = 0)
         {
             startPoint.X = para.Styles.IsRtl
@@ -65,7 +63,7 @@ namespace TextViewer
 
             var startPoint = new Point(content.FirstOrDefault()?.Styles.IsRtl == true ? ActualWidth - Padding.Right : Padding.Left, Padding.Top);
             var lineWidth = ActualWidth - Padding.Left - Padding.Right;
-            if (lineWidth <= 0)
+            if (lineWidth < MinWidth)
                 return false; // the page has not enough space
 
             ClearDrawnWords();
@@ -87,11 +85,11 @@ namespace TextViewer
                 // todo: clear lines if the style of page changed!
                 para.Lines.Clear(); // clear old lines
                 para.Location = new Point(Padding.Left, startPoint.Y);
-                para.Size = new Size(0, 0);
+                para.Size = new Size(lineWidth, 0);
                 AddDrawnWord(para);
 
                 // create new line buffer, without cleaning last line
-                lineBuffer = new Line(lineWidth, para, startPoint);
+                lineBuffer = new Line(para, startPoint);
 
                 foreach (var word in para.Words)
                 {
@@ -115,7 +113,7 @@ namespace TextViewer
                             RemoveSpaceFromEndOfLine();
                             lineBuffer.Render(IsJustify);
                             SetStartPoint(ref startPoint, para, lineBuffer.Height); // new line
-                            lineBuffer = new Line(lineWidth, para, startPoint); // create new line buffer, without cleaning last line
+                            lineBuffer = new Line(para, startPoint); // create new line buffer, without cleaning last line
                         }
                         else // the current word width is more than a line!
                         {
