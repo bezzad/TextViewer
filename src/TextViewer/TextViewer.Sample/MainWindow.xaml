@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:textViewer="clr-namespace:TextViewer;assembly=TextViewer"
+        xmlns:converters="clr-namespace:TextViewerSample.Converters"
         mc:Ignorable="d"
         Title="MainWindow" Height="800" Width="900">
     <Window.Resources>
@@ -18,6 +19,7 @@
             <textViewer:MagnifyingTextViewer Width="{Binding RelativeSource={RelativeSource Self}, Path=Parent.ActualWidth, FallbackValue=300,  TargetNullValue=300}"
                                              Height="{Binding RelativeSource={RelativeSource Self}, Path=Parent.ActualHeight, FallbackValue=200, TargetNullValue= 200}" 
                                              x:Name="Reader" SnapsToDevicePixels="True" Background="AntiqueWhite" Padding="20"
+                                             converters:TextViewerBehavior.PageContent="{Binding CurrentPage, NotifyOnSourceUpdated=True, NotifyOnTargetUpdated=True}"
                                              IsSelectable="True" MagnifierZoomFactor="5" OpenLinkRefOnClick="True" CopyLinkRefOnClick="True" MagnifierDistanceFromMouse="0"></textViewer:MagnifyingTextViewer>
         </Canvas>
         

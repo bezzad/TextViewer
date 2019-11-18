@@ -201,7 +201,8 @@ namespace TextViewer
                 if (ShowFramePerSecond && sw != null)
                 {
                     sw.Stop();
-                    var ft = new FormattedText($"FPS: {1000 / sw.ElapsedMilliseconds}, ExecTime: {sw.ElapsedMilliseconds}ms",
+                    var ems = sw.ElapsedMilliseconds > 0 ? sw.ElapsedMilliseconds : 1;
+                    var ft = new FormattedText($"FPS: {1000 / ems}, ExecTime: {ems}ms",
                         CultureInfo.CurrentCulture, FlowDirection.LeftToRight,
                         new Typeface(FontFamily, FontStyles.Normal, FontWeights.Normal, FontStretches.Normal),
                         FpsEmSize, Brushes.Blue, PixelsPerDip);
