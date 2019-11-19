@@ -39,9 +39,7 @@ namespace TextViewer
     /// </summary>
     public class TextViewer : BaseTextViewer
     {
-        //public List<Paragraph> PageContent { get; set; }
         public IPage PageContent { get; set; }
-        public IContentService ContentProvider { get; set; }
         public delegate void MessageEventHandler(object sender, TextViewerEventArgs args);
         public event MessageEventHandler Message;
         protected virtual void OnMessage(string message, MessageType messageType)
@@ -49,32 +47,11 @@ namespace TextViewer
             Message?.Invoke(this, new TextViewerEventArgs(message, messageType));
         }
 
-        protected IPage GetRawPage(Position pageTopPosition)
+        protected bool BuildPage()
         {
-            var page = new Page
-            {
-                TextAlign = IsJustify ? TextAlignment.Justify : TextAlignment.Left,
-                Direction = FlowDirection.RightToLeft,
-                LineHeight = LineHeight,
-                PagePadding = Padding,
-                ParagraphSpace = ParagraphSpace,
-                FontFamily = FontFamily,
-                FontSize = FontSize,
-                Language = CultureInfo.GetCultureInfo("fa-IR"),
-                PageWidth = Width,
-                PageHeight = Height,
-                TopPosition = (Position) pageTopPosition.Clone(),
-                BottomPosition = (Position) pageTopPosition.Clone()
-            };
+            if (!(PageContent?.BlockCount > 0)) return false;
 
-            return page;
-        }
-
-        protected bool BuildPage(IPage content)
-        {
-            if (!(content?.BlockCount > 0)) return false;
-
-            var startPoint = new Point(content.TextBlocks.FirstOrDefault()?.Styles.IsRtl == true ? ActualWidth - Padding.Right : Padding.Left, Padding.Top);
+            var startPoint = new Point(PageContent.TextBlocks.FirstOrDefault()?.Styles.IsRtl == true ? ActualWidth - Padding.Right : Padding.Left, Padding.Top);
             var lineWidth = ActualWidth - Padding.Left - Padding.Right;
             if (lineWidth < MinWidth)
                 return false; // the page has not enough space
@@ -93,7 +70,7 @@ namespace TextViewer
                 }
             }
 
-            foreach (var para in content.TextBlocks)
+            foreach (var para in PageContent.TextBlocks)
             {
                 // todo: clear lines if the style of page changed!
                 para.ClearLines(); // clear old lines
@@ -124,7 +101,7 @@ namespace TextViewer
                         {
                             RemoveSpaceFromEndOfLine();
                             lineBuffer.Render(IsJustify);
-                            // got to new line
+                            // go to new line
                             startPoint.X = para.Styles.IsRtl ? ActualWidth - Padding.Right : Padding.Left;
                             startPoint.Y += lineBuffer.Height;
                             lineBuffer = new Line(para, startPoint); // create new line buffer, without cleaning last line
@@ -148,7 +125,7 @@ namespace TextViewer
 
                 RemoveSpaceFromEndOfLine();
                 lineBuffer.Render(false);  // last line of paragraph has no justified!
-                // got to new line
+                // go to new line
                 startPoint.X = para.Styles.IsRtl ? ActualWidth - Padding.Right : Padding.Left;
                 startPoint.Y += lineBuffer.Height;
                 para.Size = new Size(lineWidth, startPoint.Y - para.Location.Y);
@@ -160,7 +137,29 @@ namespace TextViewer
 
             return true;
         }
+
+        protected IPage GetRawPage(Position pageTopPosition)
+        {
+            var page = new Page
+            {
+                TextAlign = IsJustify ? TextAlignment.Justify : TextAlignment.Left,
+                Direction = FlowDirection.RightToLeft,
+                LineHeight = LineHeight,
+                PagePadding = Padding,
+                ParagraphSpace = ParagraphSpace,
+                FontFamily = FontFamily,
+                FontSize = FontSize,
+                Language = CultureInfo.GetCultureInfo("fa-IR"),
+                PageWidth = Width,
+                PageHeight = Height,
+                TopPosition = (Position)pageTopPosition.Clone(),
+                BottomPosition = (Position)pageTopPosition.Clone()
+            };
+
+            return page;
+        }
         
+
         protected override void OnRender(DrawingContext dc)
         {
             var sw = ShowFramePerSecond ? Stopwatch.StartNew() : null;
@@ -170,9 +169,8 @@ namespace TextViewer
                 base.OnRender(dc);
 
                 if (DesignerProperties.GetIsInDesignMode(this) || 
-                    BuildPage(PageContent) == false)
-                    return;
-                
+                    BuildPage() == false) return;
+
                 foreach (var visual in DrawnWords)
                 {
                     if (visual is WordInfo word)
