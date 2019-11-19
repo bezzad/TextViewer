@@ -42,6 +42,7 @@ namespace TextViewer
     {
         //public List<Paragraph> PageContent { get; set; }
         public IPage PageContent { get; set; }
+        public IContentService ContentProvider { get; set; }
         public delegate void MessageEventHandler(object sender, TextViewerEventArgs args);
         public event MessageEventHandler Message;
         protected virtual void OnMessage(string message, MessageType messageType)
