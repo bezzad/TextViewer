@@ -21,11 +21,14 @@ namespace TextViewerSample
             foreach (var p in body.SelectNodes("//p"))
             {
                 var para = new Paragraph(paraOffset++, isContentRtl);
+                var lastPara = paragraphs.LastOrDefault();
+                para.PreviousParagraph = lastPara;
                 paragraphs.Add(para);
                 var style = new TextStyle(isContentRtl);
                 var offset = 0;
                 p.ParseInnerHtml(para, style, ref offset);
                 para.CalculateDirection();
+                if (lastPara != null) lastPara.NextParagraph = para;
             }
 
             return paragraphs;

@@ -25,8 +25,11 @@ namespace TextViewer
         public TextStyle Styles { get; protected set; }
         public Size Size { get; set; }
         public Point Location { get; set; }
+        public Paragraph NextParagraph { get; set; }
+        public Paragraph PreviousParagraph { get; set; }
         public int StartCharOffset => LinesOffsetRange.FirstOrDefault().Start;
         public int EndCharOffset => LinesOffsetRange.LastOrDefault().End;
+
 
 
         private void AddWord(WordInfo w)

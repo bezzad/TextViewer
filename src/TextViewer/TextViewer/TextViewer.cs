@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
@@ -143,6 +144,11 @@ namespace TextViewer
 
             return true;
         }
+
+        //public IPage BuildPageForwardly(IEnumerable<Paragraph> chapter)
+        //{
+        //    return null;
+        //}
 
         protected override void OnRender(DrawingContext dc)
         {
