@@ -6,6 +6,7 @@ namespace TextViewer
     {
         Paragraph GetParagraph(int id);
         List<string> GetChapters();
+        int ChapterCount();
         Paragraph GetChapterFirstParagraph();
     }
 }
