@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
@@ -50,13 +49,25 @@ namespace TextViewer
             Message?.Invoke(this, new TextViewerEventArgs(message, messageType));
         }
 
-        protected void SetStartPoint(ref Point startPoint, Paragraph para, double extendedY = 0)
+        protected IPage GetRawPage(Position pageTopPosition)
         {
-            startPoint.X = para.Styles.IsRtl
-                ? ActualWidth - Padding.Right
-                : Padding.Left;
+            var page = new Page
+            {
+                TextAlign = IsJustify ? TextAlignment.Justify : TextAlignment.Left,
+                Direction = FlowDirection.RightToLeft,
+                LineHeight = LineHeight,
+                PagePadding = Padding,
+                ParagraphSpace = ParagraphSpace,
+                FontFamily = FontFamily,
+                FontSize = FontSize,
+                Language = CultureInfo.GetCultureInfo("fa-IR"),
+                PageWidth = Width,
+                PageHeight = Height,
+                TopPosition = (Position) pageTopPosition.Clone(),
+                BottomPosition = (Position) pageTopPosition.Clone()
+            };
 
-            startPoint.Y += extendedY;
+            return page;
         }
 
         protected bool BuildPage(IPage content)
@@ -113,7 +124,9 @@ namespace TextViewer
                         {
                             RemoveSpaceFromEndOfLine();
                             lineBuffer.Render(IsJustify);
-                            SetStartPoint(ref startPoint, para, lineBuffer.Height); // new line
+                            // got to new line
+                            startPoint.X = para.Styles.IsRtl ? ActualWidth - Padding.Right : Padding.Left;
+                            startPoint.Y += lineBuffer.Height;
                             lineBuffer = new Line(para, startPoint); // create new line buffer, without cleaning last line
                         }
                         else // the current word width is more than a line!
@@ -135,7 +148,9 @@ namespace TextViewer
 
                 RemoveSpaceFromEndOfLine();
                 lineBuffer.Render(false);  // last line of paragraph has no justified!
-                SetStartPoint(ref startPoint, para, lineBuffer.Height); // new line
+                // got to new line
+                startPoint.X = para.Styles.IsRtl ? ActualWidth - Padding.Right : Padding.Left;
+                startPoint.Y += lineBuffer.Height;
                 para.Size = new Size(lineWidth, startPoint.Y - para.Location.Y);
 
 
@@ -145,12 +160,7 @@ namespace TextViewer
 
             return true;
         }
-
-        //public IPage BuildPageForwardly(IEnumerable<Paragraph> chapter)
-        //{
-        //    return null;
-        //}
-
+        
         protected override void OnRender(DrawingContext dc)
         {
             var sw = ShowFramePerSecond ? Stopwatch.StartNew() : null;
