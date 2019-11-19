@@ -152,11 +152,10 @@ namespace TextViewer
             {
                 base.OnRender(dc);
 
-                if (DesignerProperties.GetIsInDesignMode(this) || BuildPage(PageContent) == false)
+                if (DesignerProperties.GetIsInDesignMode(this) || 
+                    BuildPage(PageContent) == false)
                     return;
-
-                BuildPage(PageContent);
-
+                
                 foreach (var visual in DrawnWords)
                 {
                     if (visual is WordInfo word)
