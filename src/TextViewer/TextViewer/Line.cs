@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 
@@ -11,32 +12,32 @@ namespace TextViewer
         public double WordPointOffset { get; set; }
 
         public List<WordInfo> Words { get; protected set; }
-        public double Width { get; set; }
+        public double Width => CurrentParagraph?.Size.Width ?? 0;
         public double Height { get; set; }
         public double RemainWidth { get; set; }
         public Point Location { get; set; }
         public Paragraph CurrentParagraph { get; set; }
         public int Count => Words.Count;
         public double ActualWidth => Words.Sum(w => w.Width);
+        public int StartOffset => Words.FirstOrDefault()?.Offset ?? -1;
+        public int EndOffset => (Words.LastOrDefault()?.Offset ?? -1) + (Words.LastOrDefault()?.Text?.Length ?? 0) - 1;
 
-
-        public Line(double width, Paragraph para, Point lineLocation)
+        public Line(Paragraph para, Point lineLocation)
         {
-            RemainWidth = Width = width;
+            CurrentParagraph = para;
+            RemainWidth = Width;
             Location = lineLocation;
             WordPointOffset = Location.X;
             NonDirectionalWordsStack = new Stack<WordInfo>();
             Words = new List<WordInfo>();
-            CurrentParagraph = para;
         }
-
 
         public void AddWord(WordInfo word)
         {
             Words.Add(word);
             if (word.Height > Height) Height = word.Height;
 
-            SetWordPosition(word);
+            SetTheWordPosition(word);
             RemainWidth -= word.Width;
         }
 
@@ -55,7 +56,7 @@ namespace TextViewer
                     foreach (var word in Words)
                     {
                         if (word is SpaceWord space) space.ExtraWidth = extendSpace;
-                        SetWordPosition(word);
+                        SetTheWordPosition(word);
                     }
                 }
                 else if (CurrentParagraph.Styles.TextAlign.HasValue)
@@ -89,15 +90,14 @@ namespace TextViewer
                 PopAllNonDirectionalWords();
             }
 
-            CurrentParagraph.Lines.Add(this);
+            CurrentParagraph.AddLine(this);
         }
 
         protected void SetWordsPosition()
         {
             foreach (var word in Words)
-                SetWordPosition(word);
+                SetTheWordPosition(word);
         }
-
         protected WordInfo SetWordPositionInLine(WordInfo word)
         {
             var startPoint = new Point(WordPointOffset, Location.Y);
@@ -147,15 +147,13 @@ namespace TextViewer
 
             return word;
         }
-
         protected void PopAllNonDirectionalWords()
         {
             if (NonDirectionalWordsStack.Any())
                 while (NonDirectionalWordsStack.Any())
                     SetWordPositionInLine(NonDirectionalWordsStack.Pop());
         }
-
-        protected void SetWordPosition(WordInfo word)
+        protected void SetTheWordPosition(WordInfo word)
         {
             if (CurrentParagraph.Styles.IsRtl != word.Styles.IsRtl)
                 NonDirectionalWordsStack.Push(word);
@@ -165,5 +163,6 @@ namespace TextViewer
                 SetWordPositionInLine(word);
             }
         }
+
     }
 }

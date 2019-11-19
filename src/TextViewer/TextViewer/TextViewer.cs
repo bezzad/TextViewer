@@ -40,15 +40,14 @@ namespace TextViewer
     /// </summary>
     public class TextViewer : BaseTextViewer
     {
-        public List<Paragraph> PageContent { get; set; }
+        //public List<Paragraph> PageContent { get; set; }
+        public IPage PageContent { get; set; }
         public delegate void MessageEventHandler(object sender, TextViewerEventArgs args);
         public event MessageEventHandler Message;
         protected virtual void OnMessage(string message, MessageType messageType)
         {
             Message?.Invoke(this, new TextViewerEventArgs(message, messageType));
         }
-
-
 
         protected void SetStartPoint(ref Point startPoint, Paragraph para, double extendedY = 0)
         {
@@ -59,12 +58,14 @@ namespace TextViewer
             startPoint.Y += extendedY;
         }
 
-        protected void BuildPage(List<Paragraph> content)
+        protected bool BuildPage(IPage content)
         {
-            var startPoint = new Point(content.FirstOrDefault()?.Styles.IsRtl == true ? ActualWidth - Padding.Right : Padding.Left, Padding.Top);
+            if (!(content?.BlockCount > 0)) return false;
+
+            var startPoint = new Point(content.TextBlocks.FirstOrDefault()?.Styles.IsRtl == true ? ActualWidth - Padding.Right : Padding.Left, Padding.Top);
             var lineWidth = ActualWidth - Padding.Left - Padding.Right;
-            if(lineWidth <= 0)
-                return; // the page has not enough space
+            if (lineWidth < MinWidth)
+                return false; // the page has not enough space
 
             ClearDrawnWords();
             Line lineBuffer;
@@ -80,16 +81,16 @@ namespace TextViewer
                 }
             }
 
-            foreach (var para in content)
+            foreach (var para in content.TextBlocks)
             {
                 // todo: clear lines if the style of page changed!
-                para.Lines.Clear(); // clear old lines
+                para.ClearLines(); // clear old lines
                 para.Location = new Point(Padding.Left, startPoint.Y);
-                para.Size = new Size(0, 0);
+                para.Size = new Size(lineWidth, 0);
                 AddDrawnWord(para);
 
                 // create new line buffer, without cleaning last line
-                lineBuffer = new Line(lineWidth, para, startPoint);
+                lineBuffer = new Line(para, startPoint);
 
                 foreach (var word in para.Words)
                 {
@@ -98,9 +99,8 @@ namespace TextViewer
                     var wordWidth = word.Width;
                     var wordPointer = word;
                     //
-                    // attached words has one width at all
-                    while (word.PreviousWord?.Type.HasFlag(WordType.Attached) == false &&
-                           wordPointer.Type.HasFlag(WordType.Attached))
+                    // render attached words as one word by one width
+                    while (word.PreviousWord?.Type.HasFlag(WordType.Attached) == false && wordPointer.Type.HasFlag(WordType.Attached))
                     {
                         wordPointer = wordPointer.NextWord;
                         wordWidth += wordPointer.Width;
@@ -113,7 +113,7 @@ namespace TextViewer
                             RemoveSpaceFromEndOfLine();
                             lineBuffer.Render(IsJustify);
                             SetStartPoint(ref startPoint, para, lineBuffer.Height); // new line
-                            lineBuffer = new Line(lineWidth, para, startPoint); // create new line buffer, without cleaning last line
+                            lineBuffer = new Line(para, startPoint); // create new line buffer, without cleaning last line
                         }
                         else // the current word width is more than a line!
                         {
@@ -141,7 +141,14 @@ namespace TextViewer
                 // + ParagraphSpace
                 startPoint.Y += ParagraphSpace;
             }
+
+            return true;
         }
+
+        //public IPage BuildPageForwardly(IEnumerable<Paragraph> chapter)
+        //{
+        //    return null;
+        //}
 
         protected override void OnRender(DrawingContext dc)
         {
@@ -151,11 +158,10 @@ namespace TextViewer
             {
                 base.OnRender(dc);
 
-                if (DesignerProperties.GetIsInDesignMode(this))
+                if (DesignerProperties.GetIsInDesignMode(this) || 
+                    BuildPage(PageContent) == false)
                     return;
-
-                BuildPage(PageContent);
-
+                
                 foreach (var visual in DrawnWords)
                 {
                     if (visual is WordInfo word)
@@ -199,7 +205,8 @@ namespace TextViewer
                 if (ShowFramePerSecond && sw != null)
                 {
                     sw.Stop();
-                    var ft = new FormattedText($"FPS: {1000 / sw.ElapsedMilliseconds}, ExecTime: {sw.ElapsedMilliseconds}ms",
+                    var ems = sw.ElapsedMilliseconds > 0 ? sw.ElapsedMilliseconds : 1;
+                    var ft = new FormattedText($"FPS: {1000 / ems}, ExecTime: {ems}ms",
                         CultureInfo.CurrentCulture, FlowDirection.LeftToRight,
                         new Typeface(FontFamily, FontStyles.Normal, FontWeights.Normal, FontStretches.Normal),
                         FpsEmSize, Brushes.Blue, PixelsPerDip);

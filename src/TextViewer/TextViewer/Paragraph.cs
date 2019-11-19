@@ -13,9 +13,11 @@ namespace TextViewer
             Offset = offset;
             Words = new List<WordInfo>();
             Lines = new List<Line>();
+            LinesOffsetRange = new List<Range>();
             Styles = new TextStyle(isRtl);
         }
 
+        protected List<Range> LinesOffsetRange { get; set; }
         public const string InertChars = "\\|«»<>[]{}()'/،.,:!@#$%٪^&~*_-+=~‍‍‍‍\"`×?";
         public new int Offset { get; set; }
         public List<WordInfo> Words { get; protected set; }
@@ -23,6 +25,10 @@ namespace TextViewer
         public TextStyle Styles { get; protected set; }
         public Size Size { get; set; }
         public Point Location { get; set; }
+        public Paragraph NextParagraph { get; set; }
+        public Paragraph PreviousParagraph { get; set; }
+        public int StartCharOffset => LinesOffsetRange.FirstOrDefault().Start;
+        public int EndCharOffset => LinesOffsetRange.LastOrDefault().End;
 
 
 
@@ -37,6 +43,18 @@ namespace TextViewer
                 w.PreviousWord.NextWord = w;
             }
             Words.Add(w);
+        }
+
+        public void AddLine(Line line)
+        {
+            Lines.Add(line);
+            LinesOffsetRange.Add(Range.Create(line.StartOffset, line.EndOffset));
+        }
+
+        public void ClearLines()
+        {
+            Lines.Clear();
+            LinesOffsetRange.Clear();
         }
 
         /// <summary>
@@ -97,8 +115,6 @@ namespace TextViewer
             if (wordBuffer.Length > 0)
                 AddWord(new WordInfo(wordBuffer, offset, WordType.Normal, IsRtl(wordBuffer), contentStyle));
         }
-
-
         public void CalculateDirection()
         {
             //
@@ -119,6 +135,13 @@ namespace TextViewer
                 else
                     space.Styles.SetDirection(space.NextWord.Styles.IsRtl);
             }
+        }
+        public int GetLineIndex(int charOffset)
+        {
+            var index = LinesOffsetRange.BinarySearch(Range.Create(charOffset));
+            if (index < 0) throw new KeyNotFoundException(nameof(charOffset) + ": " + charOffset);
+
+            return index;
         }
 
         public DrawingVisual Render()
@@ -221,5 +244,6 @@ namespace TextViewer
         {
             return input.Any(IsRtl);
         }
+        
     }
 }
