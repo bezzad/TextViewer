@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows;
@@ -144,6 +145,74 @@ namespace TextViewer
             return index;
         }
 
+
+        
+        public void Build(Point startPoint, double maxWidth, FontFamily fontFamily, double fontSize, double pixelsPerDip, double lineHeight, bool isJustify)
+        {
+            ClearLines(); // clear old lines
+            Location = startPoint;
+            Size = new Size(maxWidth, 0);
+
+            // create new line buffer, without cleaning last line
+            var lineBuffer = new Line(this, startPoint);
+            
+            void RemoveSpaceFromEndOfLine()
+            {
+                // Note: end of line has no space (is important point for justify)
+                while (lineBuffer.Words.LastOrDefault()?.Type.HasFlag(WordType.Space) == true)
+                {
+                    lineBuffer.RemainWidth += lineBuffer.Words.Last().Width;
+                    lineBuffer.Words.RemoveAt(lineBuffer.Words.Count - 1);
+                }
+            }
+
+            foreach (var word in Words)
+            {
+                word.SetFormattedText(fontFamily, fontSize, pixelsPerDip, lineHeight);
+                var wordWidth = word.Width;
+                var wordPointer = word;
+                //
+                // render attached words as one word by one width
+                while (word.PreviousWord?.Type.HasFlag(WordType.Attached) == false && wordPointer.Type.HasFlag(WordType.Attached))
+                {
+                    wordPointer = wordPointer.NextWord;
+                    wordWidth += wordPointer.Width;
+                }
+
+                if (lineBuffer.RemainWidth - wordWidth <= 0)
+                {
+                    if (lineBuffer.Count > 0)
+                    {
+                        RemoveSpaceFromEndOfLine();
+                        lineBuffer.Render(isJustify);
+                        startPoint.X = Location.X;
+                        startPoint.Y += lineBuffer.Height; // new line
+                        lineBuffer = new Line(this, startPoint); // create new line buffer, without cleaning last line
+                    }
+                    else // the current word width is more than a line!
+                    {
+                        if (word.IsImage && word is ImageWord imgWord) // set image scale according by image and page width
+                            imgWord.ImageScale = lineBuffer.RemainWidth / word.Styles.Width;
+                        else if (word.Format != null)
+                            word.Format.MaxTextWidth = Math.Abs(lineBuffer.RemainWidth);
+                    }
+                }
+
+                // Note: The line should not start with space char
+                if (lineBuffer.Count > 0 || word.Type.HasFlag(WordType.Space) == false)
+                {
+                    lineBuffer.AddWord(word);
+                }
+            }
+
+            RemoveSpaceFromEndOfLine();
+            lineBuffer.Render(false);  // last line of paragraph has no justified!
+            startPoint.X = Location.X;
+            startPoint.Y += lineBuffer.Height; // new line
+            Size = new Size(maxWidth, startPoint.Y - Location.Y);
+        }
+
+
         public DrawingVisual Render()
         {
             using (var dc = RenderOpen())
@@ -244,6 +313,6 @@ namespace TextViewer
         {
             return input.Any(IsRtl);
         }
-        
+
     }
 }
