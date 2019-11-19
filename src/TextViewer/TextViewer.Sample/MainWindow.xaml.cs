@@ -14,7 +14,7 @@ namespace TextViewerSample
     public partial class MainWindow : Window
     {
         public Model MainModel { get; set; }
-        //public static ReaderService ReaderService { get; set; } = new ReaderService();
+        public static ReaderService ReaderService { get; set; }
 
 
 
@@ -36,11 +36,17 @@ namespace TextViewerSample
             CmbMagnifier.SelectedIndex = magnifierTypes.IndexOf(Reader.MagnifierType.ToString());
             BtnLoadSample.Checked += delegate { BtnLoadSampleChecking(); };
             BtnLoadSample.Unchecked += delegate { BtnLoadSampleChecking(); };
-            
-            DpiChanged += delegate { Reader.PixelsPerDip = VisualTreeHelper.GetDpi(this).PixelsPerDip; };
+
+            ReaderService = new ReaderService
+            {
+                PixelsPerDip = VisualTreeHelper.GetDpi(this).PixelsPerDip,
+                ContentProvider = new ContentProvider(Path.Combine(Environment.CurrentDirectory, "Data\\LtrSample.html"), false)
+            };
+
+            DpiChanged += delegate { ReaderService.PixelsPerDip = VisualTreeHelper.GetDpi(this).PixelsPerDip; };
             Loaded += delegate { BtnLoadSampleChecking(); };
         }
-        
+
         private void BtnLoadSampleChecking()
         {
             if (BtnLoadSample.IsChecked == true)

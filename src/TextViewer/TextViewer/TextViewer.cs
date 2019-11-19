@@ -138,28 +138,6 @@ namespace TextViewer
             return true;
         }
 
-        protected IPage GetRawPage(Position pageTopPosition)
-        {
-            var page = new Page
-            {
-                TextAlign = IsJustify ? TextAlignment.Justify : TextAlignment.Left,
-                Direction = FlowDirection.RightToLeft,
-                LineHeight = LineHeight,
-                PagePadding = Padding,
-                ParagraphSpace = ParagraphSpace,
-                FontFamily = FontFamily,
-                FontSize = FontSize,
-                Language = CultureInfo.GetCultureInfo("fa-IR"),
-                PageWidth = Width,
-                PageHeight = Height,
-                TopPosition = (Position)pageTopPosition.Clone(),
-                BottomPosition = (Position)pageTopPosition.Clone()
-            };
-
-            return page;
-        }
-        
-
         protected override void OnRender(DrawingContext dc)
         {
             var sw = ShowFramePerSecond ? Stopwatch.StartNew() : null;
