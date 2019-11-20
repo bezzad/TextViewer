@@ -174,7 +174,9 @@ namespace TextViewerSample
             {
                 IsDisposed = true;
                 // Expect thread cross exception
-                //Dispatcher?.Invoke(() => Blocks.Clear());
+                // Dispatcher?.Invoke(() => ...);
+                TextBlocks.Clear(); 
+                TextBlocks = null;
             }
         }
         ~Page() => Dispose(false);
