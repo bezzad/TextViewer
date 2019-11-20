@@ -55,8 +55,8 @@ namespace TextViewerSample
                 Language = CultureInfo.GetCultureInfo("fa-IR"),
                 PageWidth = Width,
                 PageHeight = Height,
-                TopPosition = (Position)pageTopPosition.Clone(),
-                BottomPosition = (Position)pageTopPosition.Clone()
+                TopPosition = pageTopPosition,
+                BottomPosition = pageTopPosition
             };
 
             return page;
@@ -87,7 +87,7 @@ namespace TextViewerSample
             PreviousPagesCache[current.BottomPosition] = current.TopPosition;
 
             // create new page top position from end (bottom position) of current page
-            var newPageTopPosition = (Position)current.BottomPosition.Clone();
+            var newPageTopPosition = current.BottomPosition;
 
             if (IsNextAvailable(current))
             {
@@ -129,7 +129,7 @@ namespace TextViewerSample
             // 
 
             // create new page bottom position from begin (top position) of current page
-            var newPageBottomPosition = (Position)current.TopPosition.Clone();
+            var newPageBottomPosition = current.TopPosition;
 
             if (IsPreviousAvailable(current))
             {
@@ -188,8 +188,6 @@ namespace TextViewerSample
         [Time]
         public IPage BuildPageBackwardly(Position pageBottomPosition)
         {
-            
-
             return null;
         }
 

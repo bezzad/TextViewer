@@ -113,15 +113,15 @@ namespace TextViewer
             unchecked
             {
                 var hashCode = BlockCount.GetHashCode();
-                hashCode = (hashCode * 397) ^ (TopPosition?.GetHashCode() ?? 0);
-                hashCode = (hashCode * 17) ^ (BottomPosition?.GetHashCode() ?? 0);
+                hashCode = (hashCode * 397) ^ (TopPosition.GetHashCode());
+                hashCode = (hashCode * 17) ^ (BottomPosition.GetHashCode());
                 return hashCode;
             }
         }
 
         public int CompareTo(IPage other)
         {
-            return TopPosition.CompareTo(other?.TopPosition);
+            return TopPosition.CompareTo(other.TopPosition);
         }
 
         public static bool operator <(Page left, Page right)
