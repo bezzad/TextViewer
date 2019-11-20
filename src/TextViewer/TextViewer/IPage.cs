@@ -9,8 +9,6 @@ namespace TextViewer
     public interface IPage : IDisposable, IEquatable<IPage>, IComparable<IPage>
     {
         FlowDirection Direction { get; set; }
-        Position TopPosition { get; set; }
-        Position BottomPosition { get; set; }
         List<Paragraph> TextBlocks { get; set; }
         int BlockCount { get; }
         double PageWidth { get; set; }

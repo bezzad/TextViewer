@@ -5,6 +5,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 using TextViewer;
+using TextViewerSample.Reader;
 
 namespace TextViewerSample
 {

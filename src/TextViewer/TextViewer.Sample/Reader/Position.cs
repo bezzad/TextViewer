@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
-namespace TextViewer
+namespace TextViewerSample.Reader
 {
     public struct Position : IComparable<Position>, IComparer<Position>, IEquatable<Position>, IEqualityComparer<Position>
     {

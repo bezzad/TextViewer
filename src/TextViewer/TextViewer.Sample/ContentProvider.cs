@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using TextViewer;
+using TextViewerSample.Reader;
 
 namespace TextViewerSample
 {
@@ -14,12 +15,12 @@ namespace TextViewerSample
             Chapters = new List<List<Paragraph>>() { Path.Combine(path).GetParagraphs(true) };
         }
 
-        public Paragraph GetParagraph(int chapterIndex, int id)
+        public IAtom GetParagraph(int chapterIndex, int id)
         {
             throw new NotImplementedException();
         }
 
-        public Paragraph GetParagraph(Position pos)
+        public IAtom GetParagraph(Position pos)
         {
             throw new NotImplementedException();
         }
@@ -34,12 +35,12 @@ namespace TextViewerSample
             throw new NotImplementedException();
         }
 
-        public Paragraph GetChapterFirstParagraph(int chapterIndex)
+        public IAtom GetChapterFirstParagraph(int chapterIndex)
         {
             throw new NotImplementedException();
         }
 
-        public Paragraph GetChapterLastParagraph(int chapterIndex)
+        public IAtom GetChapterLastParagraph(int chapterIndex)
         {
             throw new NotImplementedException();
         }

@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
-using System.IO;
-using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 using MethodTimer;
 using TextViewer;
 
-namespace TextViewerSample
+namespace TextViewerSample.Reader
 {
     public class ReaderService
     {
@@ -25,7 +22,7 @@ namespace TextViewerSample
         }
 
 
-        protected IPage CurrentPage { get; set; }
+        protected Page CurrentPage { get; set; }
         public double ColumnGap { get; set; }
         public Thickness PagePadding { get; set; }
         public double ParagraphSpace { get; set; }
@@ -41,7 +38,7 @@ namespace TextViewerSample
         public TextAlignment TextAlign = TextAlignment.Left;
 
 
-        protected IPage GetRawPage(Position pageTopPosition)
+        protected Page GetRawPage(Position pageTopPosition)
         {
             var page = new Page()
             {
@@ -67,7 +64,7 @@ namespace TextViewerSample
             ContentProvider = new ContentProvider(fileName, true, decryptionKey);
         }
 
-        public IPage BuildNextPage(IPage current)
+        public IPage BuildNextPage(Page current)
         {
             //         
             //         |            |
@@ -111,7 +108,7 @@ namespace TextViewerSample
             CurrentPage = BuildPageForwardly(newPageTopPosition);
             return CurrentPage;
         }
-        public IPage BuildPreviousPage(IPage current, double width, double height)
+        public IPage BuildPreviousPage(Page current, double width, double height)
         {
             //         
             //          |            |
@@ -147,7 +144,7 @@ namespace TextViewerSample
                 {
                     newPageBottomPosition.ChapterIndex--;
                     var chapterLastPara = ContentProvider.GetChapterLastParagraph(newPageBottomPosition.ChapterIndex);
-                    newPageBottomPosition.ParagraphId = chapterLastPara.Offset;
+                    newPageBottomPosition.ParagraphId = (int)chapterLastPara.Offset;
                     newPageBottomPosition.Offset = chapterLastPara.EndCharOffset;
                 }
             }
@@ -160,7 +157,7 @@ namespace TextViewerSample
         }
 
         [Time]
-        public IPage BuildPageForwardly(Position pageTopPosition)
+        public Page BuildPageForwardly(Position pageTopPosition)
         {
             var page = GetRawPage(pageTopPosition);
             var actualWidth = page.PageWidth - page.PagePadding.Left - page.PagePadding.Right;
@@ -172,11 +169,11 @@ namespace TextViewerSample
 
                 do
                 {
-                    para.Build(actualWidth, FontFamily, FontSize, PixelsPerDip, LineHeight, TextAlign == TextAlignment.Justify);
-                    var firstLineIndex = para.GetLineIndex(page.BottomPosition.Offset);
-                    var lastLineIndex = para.Lines.Count - 1;
-                    //var paraHeight = para.Size.Height - (firstLineIndex * LineHeight) - (lastLineIndex );
-                    para = para.NextParagraph;
+//                    para.Build(actualWidth, FontFamily, FontSize, PixelsPerDip, LineHeight, TextAlign == TextAlignment.Justify);
+//                    var firstLineIndex = para.GetLineIndex(page.BottomPosition.Offset);
+//                    var lastLineIndex = para.Lines.Count - 1;
+//                    var paraHeight = para.Size.Height - (firstLineIndex * LineHeight) - (lastLineIndex );
+//                    para = para.NextParagraph;
                 } while (actualHeight > LineHeight && para != null);
 
             }
@@ -186,14 +183,14 @@ namespace TextViewerSample
 
 
         [Time]
-        public IPage BuildPageBackwardly(Position pageBottomPosition)
+        public Page BuildPageBackwardly(Position pageBottomPosition)
         {
             return null;
         }
 
 
 
-        public bool IsNextAvailable(IPage current)
+        public bool IsNextAvailable(Page current)
         {
             if (current == null)
                 throw new ArgumentNullException(nameof(current));
@@ -202,9 +199,9 @@ namespace TextViewerSample
                 throw new ArgumentNullException(nameof(current.BottomPosition));
 
             var bottomPara = ContentProvider.GetParagraph(current.BottomPosition);
-            return bottomPara.NextParagraph != null || bottomPara.EndCharOffset > current.BottomPosition.Offset;
+            return bottomPara.NextAtomOffset >= 0 || bottomPara.EndCharOffset > current.BottomPosition.Offset;
         }
-        public bool IsPreviousAvailable(IPage current)
+        public bool IsPreviousAvailable(Page current)
         {
             if (current == null)
                 throw new ArgumentNullException(nameof(current));
@@ -214,9 +211,9 @@ namespace TextViewerSample
 
 
             var topPara = ContentProvider.GetParagraph(current.TopPosition);
-            return topPara.PreviousParagraph != null || current.TopPosition.Offset > topPara.StartCharOffset;
+            return topPara.PrevAtomOffset >= 0 || current.TopPosition.Offset > topPara.StartCharOffset;
         }
-        public bool IsLineForwardAvailable(IPage current)
+        public bool IsLineForwardAvailable(Page current)
         {
             if (current != null && IsEndOfChapter(current))
             {
@@ -226,12 +223,12 @@ namespace TextViewerSample
 
             return true;
         }
-        public bool IsLineBackwardAvailable(IPage current)
+        public bool IsLineBackwardAvailable(Page current)
         {
             return current != null && !IsStartOfChapter(current);
         }
 
-        public bool IsStartOfChapter(IPage current)
+        public bool IsStartOfChapter(Page current)
         {
             if (current == null)
                 throw new ArgumentNullException(nameof(current));
@@ -240,9 +237,9 @@ namespace TextViewerSample
                 throw new ArgumentNullException(nameof(current.TopPosition));
 
             var topPara = ContentProvider.GetParagraph(current.TopPosition);
-            return topPara.PreviousParagraph != null && current.TopPosition.Offset <= topPara.StartCharOffset;
+            return topPara.PrevAtomOffset >= 0 && current.TopPosition.Offset <= topPara.StartCharOffset;
         }
-        public bool IsEndOfChapter(IPage current)
+        public bool IsEndOfChapter(Page current)
         {
             if (current == null)
                 throw new ArgumentNullException(nameof(current));
@@ -251,7 +248,7 @@ namespace TextViewerSample
                 throw new ArgumentNullException(nameof(current.BottomPosition));
 
             var bottomPara = ContentProvider.GetParagraph(current.BottomPosition);
-            return bottomPara.NextParagraph != null && bottomPara.EndCharOffset <= current.BottomPosition.Offset;
+            return bottomPara.NextAtomOffset >= 0 && bottomPara.EndCharOffset <= current.BottomPosition.Offset;
         }
     }
 }
