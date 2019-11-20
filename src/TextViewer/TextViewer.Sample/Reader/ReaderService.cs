@@ -169,11 +169,11 @@ namespace TextViewerSample.Reader
 
                 do
                 {
-//                    para.Build(actualWidth, FontFamily, FontSize, PixelsPerDip, LineHeight, TextAlign == TextAlignment.Justify);
-//                    var firstLineIndex = para.GetLineIndex(page.BottomPosition.Offset);
-//                    var lastLineIndex = para.Lines.Count - 1;
-//                    var paraHeight = para.Size.Height - (firstLineIndex * LineHeight) - (lastLineIndex );
-//                    para = para.NextParagraph;
+                    //para.Build(actualWidth, FontFamily, FontSize, PixelsPerDip, LineHeight, TextAlign == TextAlignment.Justify);
+                    //var firstLineIndex = para.GetLineIndex(page.BottomPosition.Offset);
+                    //var lastLineIndex = para.Lines.Count - 1;
+                    // //var paraHeight = para.Size.Height - (firstLineIndex * LineHeight) - (lastLineIndex);
+                    //para = para.NextParagraph;
                 } while (actualHeight > LineHeight && para != null);
 
             }

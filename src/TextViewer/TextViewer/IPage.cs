@@ -21,14 +21,5 @@ namespace TextViewer
         double ParagraphSpace { get; set; }
         CultureInfo Language { set; get; }
         bool IsDisposed { get; }
-
-
-        void AddBlock(Paragraph para);
-        void AddBlockToTop(Paragraph para);
-        Paragraph GetTopBlock();
-        Paragraph GetBottomBlock();
-        double GetContentHeight();
-        bool IsLoaded();
-        bool HasEnoughSpace();
     }
 }

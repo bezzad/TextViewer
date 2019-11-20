@@ -50,21 +50,22 @@ namespace TextViewerSample
 
         private void BtnLoadSampleChecking()
         {
+            var page = new Page();
+            MainModel.CurrentPage = page;
+
             if (BtnLoadSample.IsChecked == true)
             {
-                MainModel.CurrentPage = new Page();
                 var paragraphs = Path.Combine(Environment.CurrentDirectory, "Data\\LtrSample.html").GetParagraphs(false);
                 foreach (var para in paragraphs)
-                    MainModel.CurrentPage.AddBlock(para);
+                    page.AddBlock(para);
 
                 BtnLoadSample.Content = "LtrContentSample";
             }
             else
             {
-                MainModel.CurrentPage = new Page();
                 var paragraphs = Path.Combine(Environment.CurrentDirectory, "Data\\RtlSample.html").GetParagraphs(true);
                 foreach (var para in paragraphs)
-                    MainModel.CurrentPage.AddBlock(para);
+                    page.AddBlock(para);
 
                 BtnLoadSample.Content = "RtrContentSample";
             }
