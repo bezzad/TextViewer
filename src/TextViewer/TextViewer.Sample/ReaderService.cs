@@ -168,16 +168,16 @@ namespace TextViewerSample
 
             if (page.BottomPosition.ChapterIndex < ContentProvider.ChapterCount())
             {
-                var topPara = ContentProvider.GetParagraph(pageTopPosition.ChapterIndex, page.TopPosition.ParagraphId);
-                var startPoint = new Point(-1, PagePadding.Top);
+                var para = ContentProvider.GetParagraph(pageTopPosition.ChapterIndex, page.TopPosition.ParagraphId);
 
                 do
                 {
-                    startPoint.X = topPara.Styles.IsRtl ? page.PageWidth - PagePadding.Right : PagePadding.Left;
-                    topPara.Build(new Point(PagePadding.Left, startPoint.Y), actualWidth, FontFamily, FontSize, PixelsPerDip, LineHeight, TextAlign == TextAlignment.Justify);
-                    topPara = topPara.NextParagraph;
-                    startPoint.Y += ParagraphSpace;
-                } while (actualHeight > LineHeight && topPara != null);
+                    para.Build(actualWidth, FontFamily, FontSize, PixelsPerDip, LineHeight, TextAlign == TextAlignment.Justify);
+                    var firstLineIndex = para.GetLineIndex(page.BottomPosition.Offset);
+                    var lastLineIndex = para.Lines.Count - 1;
+                    //var paraHeight = para.Size.Height - (firstLineIndex * LineHeight) - (lastLineIndex );
+                    para = para.NextParagraph;
+                } while (actualHeight > LineHeight && para != null);
 
             }
 

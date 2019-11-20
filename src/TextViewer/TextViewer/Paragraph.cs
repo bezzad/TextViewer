@@ -146,16 +146,15 @@ namespace TextViewer
         }
 
 
-        
-        public void Build(Point startPoint, double maxWidth, FontFamily fontFamily, double fontSize, double pixelsPerDip, double lineHeight, bool isJustify)
+        public void Build(double maxWidth, FontFamily fontFamily, double fontSize, double pixelsPerDip, double lineHeight, bool isJustify)
         {
             ClearLines(); // clear old lines
-            Location = startPoint;
+            var startPoint = Location = new Point(Styles.IsRtl ? maxWidth : 0, 0);
             Size = new Size(maxWidth, 0);
 
             // create new line buffer, without cleaning last line
             var lineBuffer = new Line(this, startPoint);
-            
+
             void RemoveSpaceFromEndOfLine()
             {
                 // Note: end of line has no space (is important point for justify)
