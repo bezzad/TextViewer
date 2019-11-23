@@ -35,15 +35,13 @@ namespace TextViewer
         public ImageSource Image { get; set; }
 
 
-        public TextStyle(bool isRtl, TextStyle style = null)
+        public TextStyle(TextStyle style = null)
         {
             MarginBottom = MarginLeft = MarginRight = MarginTop = FontSize = Width = Height = 0;
             FontWeight = FontWeights.Normal;
             Foreground = Brushes.Black;
             Display = true;
-
             AddStyle(style);
-            SetDirection(isRtl);
         }
 
         public void AddStyle(TextStyle style)
@@ -76,14 +74,20 @@ namespace TextViewer
 
         ~TextStyle()
         {
-            Dispose();
+            Dispose(false);
+        }
+        public void Dispose()
+        {
+            Dispose(true);
             GC.SuppressFinalize(this);
         }
-
-        public virtual void Dispose()
+        protected virtual void Dispose(bool disposing)
         {
-            Background = Foreground = null;
-            Image = null;
+            if (disposing)
+            {
+                Background = Foreground = null;
+                Image = null;
+            }
         }
     }
 }

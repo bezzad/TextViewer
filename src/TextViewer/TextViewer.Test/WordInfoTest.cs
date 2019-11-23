@@ -17,31 +17,31 @@ namespace TextViewer.Test
         [TestInitialize]
         public void Setup()
         {
-            Parent = new Paragraph(0, false) { Styles = { VerticalAlign = VerticalAlignment.Top } };
+            Parent = new Paragraph(0) { Styles = { VerticalAlign = VerticalAlignment.Top } };
 
             // cover test for parental styles
 
             Words = new List<WordInfo>()
             {
-                new WordInfo("Test1", 0, WordType.Normal, false, Parent.Styles) {Paragraph = Parent}, // 0
-                new SpaceWord(5, false, Parent.Styles) {Paragraph = Parent}, // 1
-                new WordInfo("Test2", 6, WordType.Normal, false, Parent.Styles) {Paragraph = Parent}, // 2
-                new SpaceWord(11, false, Parent.Styles) {Paragraph = Parent}, // 3
-                new WordInfo("Test3", 12, WordType.Normal, false, Parent.Styles) {Paragraph = Parent}, // 4
-                new SpaceWord(17, false, Parent.Styles) {Paragraph = Parent}, // 5
-                new WordInfo("Test4", 18, WordType.Normal, false, Parent.Styles) {Paragraph = Parent}, // 6
-                new SpaceWord(23, false, Parent.Styles) {Paragraph = Parent}, // 7
-                new WordInfo("Test", 24, WordType.Normal | WordType.Attached, false, Parent.Styles) {Paragraph = Parent}, // 8
-                new WordInfo(".", 25, WordType.InertChar | WordType.Attached, false, Parent.Styles) {Paragraph = Parent}, // 9
-                new WordInfo("5", 26, WordType.Normal, false, Parent.Styles) {Paragraph = Parent}, // 10
-                new SpaceWord(29, false, Parent.Styles) {Paragraph = Parent}, // 11
-                new WordInfo("Test6", 30, WordType.Normal, false, Parent.Styles) {Paragraph = Parent}, // 12
-                new SpaceWord(33, false, Parent.Styles) {Paragraph = Parent}, // 13
-                new WordInfo("تست۱", 36, WordType.Normal, true, Parent.Styles) {Paragraph = Parent}, // 14
-                new SpaceWord(41, true, Parent.Styles) {Paragraph = Parent}, // 15
-                new WordInfo("تست۲", 42, WordType.Normal, true, Parent.Styles) {Paragraph = Parent}, // 16
-                new SpaceWord(47, true, Parent.Styles) {Paragraph = Parent}, // 17
-                new WordInfo("تست۳", 48, WordType.Normal, true, Parent.Styles) {Paragraph = Parent}, // 18
+                new WordInfo("Test1", 0, WordType.Normal, Parent.Styles) {Paragraph = Parent}, // 0
+                new SpaceWord(5, Parent.Styles) {Paragraph = Parent}, // 1
+                new WordInfo("Test2", 6, WordType.Normal, Parent.Styles) {Paragraph = Parent}, // 2
+                new SpaceWord(11, Parent.Styles) {Paragraph = Parent}, // 3
+                new WordInfo("Test3", 12, WordType.Normal, Parent.Styles) {Paragraph = Parent}, // 4
+                new SpaceWord(17, Parent.Styles) {Paragraph = Parent}, // 5
+                new WordInfo("Test4", 18, WordType.Normal, Parent.Styles) {Paragraph = Parent}, // 6
+                new SpaceWord(23, Parent.Styles) {Paragraph = Parent}, // 7
+                new WordInfo("Test", 24, WordType.Normal | WordType.Attached, Parent.Styles) {Paragraph = Parent}, // 8
+                new WordInfo(".", 25, WordType.InertChar | WordType.Attached, Parent.Styles) {Paragraph = Parent}, // 9
+                new WordInfo("5", 26, WordType.Normal, Parent.Styles) {Paragraph = Parent}, // 10
+                new SpaceWord(29, Parent.Styles) {Paragraph = Parent}, // 11
+                new WordInfo("Test6", 30, WordType.Normal, Parent.Styles) {Paragraph = Parent}, // 12
+                new SpaceWord(33, Parent.Styles) {Paragraph = Parent, Styles = { Direction = FlowDirection.RightToLeft }}, // 13
+                new WordInfo("تست۱", 36, WordType.Normal, Parent.Styles) {Paragraph = Parent}, // 14
+                new SpaceWord(41, Parent.Styles) {Paragraph = Parent, Styles = { Direction = FlowDirection.RightToLeft }}, // 15
+                new WordInfo("تست۲", 42, WordType.Normal, Parent.Styles) {Paragraph = Parent}, // 16
+                new SpaceWord(47, Parent.Styles) {Paragraph = Parent, Styles = { Direction = FlowDirection.RightToLeft }}, // 17
+                new WordInfo("تست۳", 48, WordType.Normal, Parent.Styles) {Paragraph = Parent}, // 18
                 new ImageWord(55, Parent.Styles) {Paragraph = Parent} // 19
             };
 
@@ -89,7 +89,7 @@ namespace TextViewer.Test
         [TestMethod]
         public void SetDirectionTest()
         {
-            var word = new WordInfo("test", 0, WordType.Normal, true);
+            var word = new WordInfo("test", 0, WordType.Normal);
             Assert.AreEqual(word.Styles.Direction, FlowDirection.RightToLeft);
             Assert.IsTrue(word.Styles.IsRtl);
 
@@ -126,7 +126,7 @@ namespace TextViewer.Test
         [TestMethod]
         public void AddStylesTest()
         {
-            var styles = new TextStyle(false)
+            var styles = new TextStyle
             {
                 Display = false,
                 Foreground = Brushes.Red,

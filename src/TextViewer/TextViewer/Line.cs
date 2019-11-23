@@ -13,7 +13,7 @@ namespace TextViewer
         public List<WordInfo> Words { get; protected set; }
         public double Width => CurrentParagraph?.Size.Width ?? 0;
         public double Height { get; set; }
-        public double RemainWidth { get; set; }
+        public double RemainWidth => Width - ActualWidth;
         public Point Location { get; set; }
         public Paragraph CurrentParagraph { get; set; }
         public int Count => Words.Count;
@@ -21,15 +21,13 @@ namespace TextViewer
         public int StartOffset => Words.FirstOrDefault()?.Offset ?? -1;
         public int EndOffset => (Words.LastOrDefault()?.Offset ?? -1) + (Words.LastOrDefault()?.Text?.Length ?? 0) - 1;
 
-        public Line(Paragraph para, Point lineLocation)
+
+        public Line(Point lineLocation)
         {
-            CurrentParagraph = para;
-            RemainWidth = Width;
             Location = lineLocation;
             WordPointOffset = Location.X;
             NonDirectionalWordsStack = new Stack<WordInfo>();
             Words = new List<WordInfo>();
-            CurrentParagraph.AddLine(this);
         }
 
         public void AddWord(WordInfo word)
@@ -38,7 +36,6 @@ namespace TextViewer
             if (word.Height > Height) Height = word.Height;
 
             SetTheWordPosition(word);
-            RemainWidth -= word.Width;
         }
 
         public void Build(bool justify)

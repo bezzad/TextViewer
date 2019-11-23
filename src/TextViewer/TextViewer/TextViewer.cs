@@ -64,7 +64,6 @@ namespace TextViewer
                 // Note: end of line has no space (important for justify)
                 while (lineBuffer.Words.LastOrDefault()?.Type.HasFlag(WordType.Space) == true)
                 {
-                    lineBuffer.RemainWidth += lineBuffer.Words.Last().Width;
                     lineBuffer.Words.RemoveAt(lineBuffer.Words.Count - 1);
                     RemoveDrawnWord(VisualChildrenCount - 1);
                 }
@@ -79,7 +78,7 @@ namespace TextViewer
                 AddDrawnWord(para);
 
                 // create new line buffer, without cleaning last line
-                lineBuffer = new Line(para, startPoint);
+                lineBuffer = para.AddLine(new Line(startPoint));
 
                 foreach (var word in para.Words)
                 {
@@ -104,7 +103,7 @@ namespace TextViewer
                             // go to new line
                             startPoint.X = para.Styles.IsRtl ? ActualWidth - Padding.Right : Padding.Left;
                             startPoint.Y += lineBuffer.Height;
-                            lineBuffer = new Line(para, startPoint); // create new line buffer, without cleaning last line
+                            lineBuffer = para.AddLine(new Line(startPoint)); // create new line buffer, without cleaning last line
                         }
                         else // the current word width is more than a line!
                         {
@@ -146,7 +145,7 @@ namespace TextViewer
             {
                 base.OnRender(dc);
 
-                if (DesignerProperties.GetIsInDesignMode(this) || 
+                if (DesignerProperties.GetIsInDesignMode(this) ||
                     BuildPage() == false) return;
 
                 foreach (var visual in DrawnWords)

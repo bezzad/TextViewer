@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Windows;
 using System.Windows.Media;
 
@@ -7,8 +6,8 @@ namespace TextViewer
 {
     public class WordInfo : TextInfo, IComparable<WordInfo>
     {
-        public WordInfo(string text, int offset, WordType type, bool isRtl, TextStyle style = null)
-        : base(text, isRtl, style)
+        public WordInfo(string text, int offset, WordType type, TextStyle style = null)
+        : base(text, style)
         {
             Type = type;
             Offset = offset;

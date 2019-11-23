@@ -20,11 +20,13 @@ namespace TextViewerSample
             var body = doc.DocumentNode.SelectSingleNode("//body");
             foreach (var p in body.SelectNodes("//p"))
             {
-                var para = new Paragraph(paraOffset++, isContentRtl);
+                var para = new Paragraph(paraOffset++);
+                para.Styles.SetDirection(isContentRtl);
                 var lastPara = paragraphs.LastOrDefault();
                 para.PreviousParagraph = lastPara;
                 paragraphs.Add(para);
-                var style = new TextStyle(isContentRtl);
+                var style = new TextStyle();
+                style.SetDirection(isContentRtl);
                 var offset = 0;
                 p.ParseInnerHtml(para, style, ref offset);
                 para.CalculateDirection();
@@ -36,7 +38,8 @@ namespace TextViewerSample
 
         private static void ParseInnerHtml(this HtmlNode node, Paragraph parent, TextStyle parentStyle, ref int contentOffset)
         {
-            var nodeStyle = new TextStyle(parent.Styles.IsRtl, parentStyle);
+            var nodeStyle = new TextStyle(parentStyle);
+            nodeStyle.SetDirection(parent.Styles.IsRtl);
             if (node.Name == "b")
                 nodeStyle.FontWeight = FontWeights.Bold;
 

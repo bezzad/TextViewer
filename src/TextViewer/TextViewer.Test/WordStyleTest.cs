@@ -10,7 +10,7 @@ namespace TextViewer.Test
         [TestMethod]
         public void ConstructorTest()
         {
-            var rtlStyle = new TextStyle(true);
+            var rtlStyle = new TextStyle();
             Assert.IsNotNull(rtlStyle);
             Assert.AreEqual(FlowDirection.RightToLeft, rtlStyle.Direction);
             Assert.IsTrue(rtlStyle.Display);
@@ -37,7 +37,7 @@ namespace TextViewer.Test
             rtlStyle.Width = 100;
             rtlStyle.TextAlign = TextAlignment.Center;
 
-            var ltrStyle = new TextStyle(false, rtlStyle);
+            var ltrStyle = new TextStyle(rtlStyle);
             Assert.IsNotNull(ltrStyle);
             Assert.AreEqual(FlowDirection.LeftToRight, ltrStyle.Direction);
             Assert.IsTrue(ltrStyle.Display);
@@ -63,7 +63,7 @@ namespace TextViewer.Test
         [TestMethod]
         public void AddStyleTest()
         {
-            var wordStyle = new TextStyle(true)
+            var wordStyle = new TextStyle
             {
                 Foreground = Brushes.Blue,
                 Display = true,
@@ -73,7 +73,7 @@ namespace TextViewer.Test
                 HyperRef = "test:url"
             };
 
-            var newStyle = new TextStyle(true)
+            var newStyle = new TextStyle
             {
                 Foreground = Brushes.Red,
                 Display = false
@@ -104,7 +104,7 @@ namespace TextViewer.Test
         [TestMethod]
         public void SetDirectionTest()
         {
-            var style = new TextStyle(true)
+            var style = new TextStyle
             {
                 Foreground = Brushes.Red,
                 Display = false
@@ -123,7 +123,7 @@ namespace TextViewer.Test
         [TestMethod]
         public void SetImageTest()
         {
-            var style = new TextStyle(true)
+            var style = new TextStyle
             {
                 Foreground = Brushes.Red,
                 Display = false
