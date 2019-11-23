@@ -213,8 +213,8 @@ namespace TextViewer.Test
                 rtlLine.AddWord(rtlWord);
             }
 
-            ltrLine.Render(false); // test after line rendering
-            rtlLine.Render(false); // test after line rendering
+            ltrLine.Build(false); // test after line rendering
+            rtlLine.Build(false); // test after line rendering
             Assert.AreEqual(ltrLine.CurrentParagraph.Lines.Count, lineCounter);
             Assert.AreEqual(rtlLine.CurrentParagraph.Lines.Count, lineCounter);
             Assert.IsTrue(ltrLine.RemainWidth < 0);
@@ -238,8 +238,8 @@ namespace TextViewer.Test
             rtlLine.RemainWidth = 100; // change real remain with to test text-align
 
             // Test justify text-align
-            ltrLine.Render(true);
-            rtlLine.Render(true);
+            ltrLine.Build(true);
+            rtlLine.Build(true);
             Assert.AreEqual(ltrLine.CurrentParagraph.Lines.Count, lineCounter);
             Assert.AreEqual(rtlLine.CurrentParagraph.Lines.Count, lineCounter);
             for (var i = 0; i < LtrWords.Count; i++)
@@ -255,8 +255,8 @@ namespace TextViewer.Test
             // Test center text-align
             LtrParent.Styles.TextAlign = TextAlignment.Center;
             RtlParent.Styles.TextAlign = TextAlignment.Center;
-            ltrLine.Render(false);
-            rtlLine.Render(false);
+            ltrLine.Build(false);
+            rtlLine.Build(false);
             Assert.AreEqual(ltrLine.CurrentParagraph.Lines.Count, lineCounter);
             Assert.AreEqual(rtlLine.CurrentParagraph.Lines.Count, lineCounter);
             Assert.AreEqual(ltrLine.Words.First().Area.Location.X, ltrLine.RemainWidth / 2 + _ltrStartPoint.X);
@@ -265,8 +265,8 @@ namespace TextViewer.Test
             // Test left text-align
             LtrParent.Styles.TextAlign = TextAlignment.Left;
             RtlParent.Styles.TextAlign = TextAlignment.Left;
-            ltrLine.Render(false);
-            rtlLine.Render(false);
+            ltrLine.Build(false);
+            rtlLine.Build(false);
             Assert.AreEqual(ltrLine.CurrentParagraph.Lines.Count, lineCounter);
             Assert.AreEqual(rtlLine.CurrentParagraph.Lines.Count, lineCounter);
             Assert.AreEqual(ltrLine.Words.First().Area.Location.X, ltrLine.Location.X);
@@ -275,8 +275,8 @@ namespace TextViewer.Test
             // Test right text-align
             LtrParent.Styles.TextAlign = TextAlignment.Right;
             RtlParent.Styles.TextAlign = TextAlignment.Right;
-            ltrLine.Render(false);
-            rtlLine.Render(false);
+            ltrLine.Build(false);
+            rtlLine.Build(false);
             Assert.AreEqual(ltrLine.CurrentParagraph.Lines.Count, lineCounter);
             Assert.AreEqual(rtlLine.CurrentParagraph.Lines.Count, lineCounter);
             Assert.AreEqual(ltrLine.Words.First().Area.Location.X, ltrLine.RemainWidth + _ltrStartPoint.X);
@@ -306,7 +306,7 @@ namespace TextViewer.Test
                 Assert.AreEqual(++wordCounter, ltrLine.Words.Count);
             }
 
-            ltrLine.Render(false);
+            ltrLine.Build(false);
 
             for (var i = 0; i < ltrLine.Words.Count - 1; i++)
             {
@@ -345,7 +345,7 @@ namespace TextViewer.Test
                 Assert.AreEqual(++wordCounter, rtlLine.Words.Count);
             }
 
-            rtlLine.Render(false);
+            rtlLine.Build(false);
 
             for (var i = 0; i < rtlLine.Words.Count - 1; i++)
             {

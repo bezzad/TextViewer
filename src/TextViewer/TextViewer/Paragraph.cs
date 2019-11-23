@@ -183,7 +183,7 @@ namespace TextViewer
                     if (lineBuffer.Count > 0)
                     {
                         RemoveSpaceFromEndOfLine();
-                        lineBuffer.Render(isJustify);
+                        lineBuffer.Build(isJustify);
                         startPoint.X = Location.X;
                         startPoint.Y += lineBuffer.Height; // new line
                         lineBuffer = new Line(this, startPoint); // create new line buffer, without cleaning last line
@@ -205,7 +205,7 @@ namespace TextViewer
             }
 
             RemoveSpaceFromEndOfLine();
-            lineBuffer.Render(false);  // last line of paragraph has no justified!
+            lineBuffer.Build(false);  // last line of paragraph has no justified!
             startPoint.X = Location.X;
             startPoint.Y += lineBuffer.Height; // new line
             Size = new Size(maxWidth, startPoint.Y - Location.Y);

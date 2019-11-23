@@ -100,7 +100,7 @@ namespace TextViewer
                         if (lineBuffer.Count > 0)
                         {
                             RemoveSpaceFromEndOfLine();
-                            lineBuffer.Render(IsJustify);
+                            lineBuffer.Build(IsJustify);
                             // go to new line
                             startPoint.X = para.Styles.IsRtl ? ActualWidth - Padding.Right : Padding.Left;
                             startPoint.Y += lineBuffer.Height;
@@ -124,7 +124,7 @@ namespace TextViewer
                 }
 
                 RemoveSpaceFromEndOfLine();
-                lineBuffer.Render(false);  // last line of paragraph has no justified!
+                lineBuffer.Build(false);  // last line of paragraph has no justified!
                 // go to new line
                 startPoint.X = para.Styles.IsRtl ? ActualWidth - Padding.Right : Padding.Left;
                 startPoint.Y += lineBuffer.Height;
