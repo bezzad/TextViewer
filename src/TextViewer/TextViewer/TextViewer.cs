@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
@@ -40,7 +39,6 @@ namespace TextViewer
     /// </summary>
     public class TextViewer : BaseTextViewer
     {
-        //public List<Paragraph> PageContent { get; set; }
         public IPage PageContent { get; set; }
         public delegate void MessageEventHandler(object sender, TextViewerEventArgs args);
         public event MessageEventHandler Message;
@@ -49,20 +47,11 @@ namespace TextViewer
             Message?.Invoke(this, new TextViewerEventArgs(message, messageType));
         }
 
-        protected void SetStartPoint(ref Point startPoint, Paragraph para, double extendedY = 0)
+        protected bool BuildPage()
         {
-            startPoint.X = para.Styles.IsRtl
-                ? ActualWidth - Padding.Right
-                : Padding.Left;
+            if (!(PageContent?.BlockCount > 0)) return false;
 
-            startPoint.Y += extendedY;
-        }
-
-        protected bool BuildPage(IPage content)
-        {
-            if (!(content?.BlockCount > 0)) return false;
-
-            var startPoint = new Point(content.TextBlocks.FirstOrDefault()?.Styles.IsRtl == true ? ActualWidth - Padding.Right : Padding.Left, Padding.Top);
+            var startPoint = new Point(PageContent.TextBlocks.FirstOrDefault()?.Styles.IsRtl == true ? ActualWidth - Padding.Right : Padding.Left, Padding.Top);
             var lineWidth = ActualWidth - Padding.Left - Padding.Right;
             if (lineWidth < MinWidth)
                 return false; // the page has not enough space
@@ -75,13 +64,12 @@ namespace TextViewer
                 // Note: end of line has no space (important for justify)
                 while (lineBuffer.Words.LastOrDefault()?.Type.HasFlag(WordType.Space) == true)
                 {
-                    lineBuffer.RemainWidth += lineBuffer.Words.Last().Width;
                     lineBuffer.Words.RemoveAt(lineBuffer.Words.Count - 1);
                     RemoveDrawnWord(VisualChildrenCount - 1);
                 }
             }
 
-            foreach (var para in content.TextBlocks)
+            foreach (var para in PageContent.TextBlocks)
             {
                 // todo: clear lines if the style of page changed!
                 para.ClearLines(); // clear old lines
@@ -90,7 +78,7 @@ namespace TextViewer
                 AddDrawnWord(para);
 
                 // create new line buffer, without cleaning last line
-                lineBuffer = new Line(para, startPoint);
+                lineBuffer = para.AddLine(new Line(startPoint));
 
                 foreach (var word in para.Words)
                 {
@@ -111,9 +99,11 @@ namespace TextViewer
                         if (lineBuffer.Count > 0)
                         {
                             RemoveSpaceFromEndOfLine();
-                            lineBuffer.Render(IsJustify);
-                            SetStartPoint(ref startPoint, para, lineBuffer.Height); // new line
-                            lineBuffer = new Line(para, startPoint); // create new line buffer, without cleaning last line
+                            lineBuffer.Build(IsJustify);
+                            // go to new line
+                            startPoint.X = para.Styles.IsRtl ? ActualWidth - Padding.Right : Padding.Left;
+                            startPoint.Y += lineBuffer.Height;
+                            lineBuffer = para.AddLine(new Line(startPoint)); // create new line buffer, without cleaning last line
                         }
                         else // the current word width is more than a line!
                         {
@@ -133,8 +123,10 @@ namespace TextViewer
                 }
 
                 RemoveSpaceFromEndOfLine();
-                lineBuffer.Render(false);  // last line of paragraph has no justified!
-                SetStartPoint(ref startPoint, para, lineBuffer.Height); // new line
+                lineBuffer.Build(false);  // last line of paragraph has no justified!
+                // go to new line
+                startPoint.X = para.Styles.IsRtl ? ActualWidth - Padding.Right : Padding.Left;
+                startPoint.Y += lineBuffer.Height;
                 para.Size = new Size(lineWidth, startPoint.Y - para.Location.Y);
 
 
@@ -145,11 +137,6 @@ namespace TextViewer
             return true;
         }
 
-        //public IPage BuildPageForwardly(IEnumerable<Paragraph> chapter)
-        //{
-        //    return null;
-        //}
-
         protected override void OnRender(DrawingContext dc)
         {
             var sw = ShowFramePerSecond ? Stopwatch.StartNew() : null;
@@ -158,10 +145,9 @@ namespace TextViewer
             {
                 base.OnRender(dc);
 
-                if (DesignerProperties.GetIsInDesignMode(this) || 
-                    BuildPage(PageContent) == false)
-                    return;
-                
+                if (DesignerProperties.GetIsInDesignMode(this) ||
+                    BuildPage() == false) return;
+
                 foreach (var visual in DrawnWords)
                 {
                     if (visual is WordInfo word)

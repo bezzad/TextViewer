@@ -1,4 +1,5 @@
-﻿using System.Windows.Media;
+﻿using System.Windows;
+using System.Windows.Media;
 
 namespace TextViewer
 {
@@ -9,9 +10,10 @@ namespace TextViewer
         public override double Width => Styles.Width * ImageScale;
 
         public ImageWord(int offset, TextStyle style = null)
-            : base(null, offset, WordType.Image, false, style)
+            : base(null, offset, WordType.Image, style)
         {
             ImageScale = 1;
+            Styles.Direction = FlowDirection.LeftToRight;
         }
 
         public override void SetFormattedText(FontFamily fontFamily, double fontSize, double pixelsPerDip, double lineHeight)

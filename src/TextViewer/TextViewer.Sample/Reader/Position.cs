@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
-namespace TextViewer
+namespace TextViewerSample.Reader
 {
-    public class Position : IComparable<Position>, IComparer<Position>, IEquatable<Position>, IEqualityComparer<Position>, ICloneable
+    public struct Position : IComparable<Position>, IComparer<Position>, IEquatable<Position>, IEqualityComparer<Position>
     {
         public int ChapterIndex { get; set; }
         public int ParagraphId { get; set; }
@@ -40,7 +41,7 @@ namespace TextViewer
 
         public int Compare(Position x, Position y)
         {
-            return x?.CompareTo(y) ?? -1;
+            return x.CompareTo(y);
         }
 
         #endregion
@@ -49,19 +50,16 @@ namespace TextViewer
 
         public bool Equals(Position other)
         {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
             return ChapterIndex == other.ChapterIndex && ParagraphId == other.ParagraphId && Offset == other.Offset;
         }
 
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (obj?.GetType() != GetType()) return false;
             return Equals((Position)obj);
         }
 
+        [SuppressMessage("ReSharper", "NonReadonlyMemberInGetHashCode")]
         public override int GetHashCode()
         {
             unchecked
@@ -73,31 +71,18 @@ namespace TextViewer
             }
         }
 
-        public object Clone()
-        {
-            return new Position(ChapterIndex, ParagraphId, Offset);
-        }
-
         #endregion
 
         #region Implement IEqualityComparer<Position>
 
         public bool Equals(Position x, Position y)
         {
-            if (ReferenceEquals(null, y)) return false;
-            if (ReferenceEquals(x, y)) return true;
-            return x.ChapterIndex == y.ChapterIndex && x.ParagraphId == y.ParagraphId && x.Offset == y.Offset;
+            return x.Equals(y);
         }
 
         public int GetHashCode(Position obj)
         {
-            unchecked
-            {
-                var hashCode = obj.ChapterIndex;
-                hashCode = (hashCode * 397) ^ obj.ParagraphId.GetHashCode();
-                hashCode = (hashCode * 397) ^ obj.Offset;
-                return hashCode;
-            }
+            return obj.GetHashCode();
         }
 
         #endregion
@@ -120,11 +105,11 @@ namespace TextViewer
         }
         public static bool operator ==(Position left, Position right)
         {
-            return left?.Equals(right) == true;
+            return left.Equals(right);
         }
         public static bool operator !=(Position left, Position right)
         {
-            return !left?.Equals(right) == true;
+            return !left.Equals(right);
         }
     }
 }

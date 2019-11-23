@@ -12,8 +12,8 @@ namespace TextViewer
             protected set => _width = value;
         }
 
-        public SpaceWord(int offset, bool isRtl, TextStyle style = null)
-            : base(" ", offset, WordType.Space, isRtl, style)
+        public SpaceWord(int offset, TextStyle style = null)
+            : base(" ", offset, WordType.Space, style)
         { }
 
         public override void SetFormattedText(FontFamily fontFamily,

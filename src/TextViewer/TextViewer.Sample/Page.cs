@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Windows;
 using System.Windows.Media;
+using TextViewer;
+using TextViewerSample.Reader;
 
-namespace TextViewer
+namespace TextViewerSample
 {
     public class Page : IPage
     {
@@ -97,7 +100,10 @@ namespace TextViewer
 
         public bool Equals(IPage other)
         {
-            return TopPosition.Equals(other?.TopPosition);
+            if (other is Page page)
+                return TopPosition.Equals(page.TopPosition);
+
+            return false;
         }
 
         public override bool Equals(object obj)
@@ -108,20 +114,24 @@ namespace TextViewer
             return false;
         }
 
+        [SuppressMessage("ReSharper", "NonReadonlyMemberInGetHashCode")]
         public override int GetHashCode()
         {
             unchecked
             {
                 var hashCode = BlockCount.GetHashCode();
-                hashCode = (hashCode * 397) ^ (TopPosition?.GetHashCode() ?? 0);
-                hashCode = (hashCode * 17) ^ (BottomPosition?.GetHashCode() ?? 0);
+                hashCode = (hashCode * 397) ^ (TopPosition.GetHashCode());
+                hashCode = (hashCode * 17) ^ (BottomPosition.GetHashCode());
                 return hashCode;
             }
         }
 
         public int CompareTo(IPage other)
         {
-            return TopPosition.CompareTo(other?.TopPosition);
+            if (other is Page page)
+                return TopPosition.CompareTo(page.TopPosition);
+
+            return -1;
         }
 
         public static bool operator <(Page left, Page right)
@@ -148,8 +158,8 @@ namespace TextViewer
         {
             return !left?.Equals(right) == true;
         }
-        
-        
+
+
         public void Dispose()
         {
             Dispose(true);
@@ -164,7 +174,9 @@ namespace TextViewer
             {
                 IsDisposed = true;
                 // Expect thread cross exception
-                //Dispatcher?.Invoke(() => Blocks.Clear());
+                // Dispatcher?.Invoke(() => ...);
+                TextBlocks.Clear(); 
+                TextBlocks = null;
             }
         }
         ~Page() => Dispose(false);

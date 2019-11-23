@@ -5,6 +5,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 using TextViewer;
+using TextViewerSample.Reader;
 
 namespace TextViewerSample
 {
@@ -14,7 +15,7 @@ namespace TextViewerSample
     public partial class MainWindow : Window
     {
         public Model MainModel { get; set; }
-        //public static ReaderService ReaderService { get; set; } = new ReaderService();
+        public static ReaderService ReaderService { get; set; }
 
 
 
@@ -36,28 +37,35 @@ namespace TextViewerSample
             CmbMagnifier.SelectedIndex = magnifierTypes.IndexOf(Reader.MagnifierType.ToString());
             BtnLoadSample.Checked += delegate { BtnLoadSampleChecking(); };
             BtnLoadSample.Unchecked += delegate { BtnLoadSampleChecking(); };
-            
-            DpiChanged += delegate { Reader.PixelsPerDip = VisualTreeHelper.GetDpi(this).PixelsPerDip; };
+
+            ReaderService = new ReaderService
+            {
+                PixelsPerDip = VisualTreeHelper.GetDpi(this).PixelsPerDip,
+                ContentProvider = new ContentProvider(Path.Combine(Environment.CurrentDirectory, "Data\\LtrSample.html"), false)
+            };
+
+            DpiChanged += delegate { ReaderService.PixelsPerDip = VisualTreeHelper.GetDpi(this).PixelsPerDip; };
             Loaded += delegate { BtnLoadSampleChecking(); };
         }
-        
+
         private void BtnLoadSampleChecking()
         {
+            var page = new Page();
+            MainModel.CurrentPage = page;
+
             if (BtnLoadSample.IsChecked == true)
             {
-                MainModel.CurrentPage = new Page();
                 var paragraphs = Path.Combine(Environment.CurrentDirectory, "Data\\LtrSample.html").GetParagraphs(false);
                 foreach (var para in paragraphs)
-                    MainModel.CurrentPage.AddBlock(para);
+                    page.AddBlock(para);
 
                 BtnLoadSample.Content = "LtrContentSample";
             }
             else
             {
-                MainModel.CurrentPage = new Page();
                 var paragraphs = Path.Combine(Environment.CurrentDirectory, "Data\\RtlSample.html").GetParagraphs(true);
                 foreach (var para in paragraphs)
-                    MainModel.CurrentPage.AddBlock(para);
+                    page.AddBlock(para);
 
                 BtnLoadSample.Content = "RtrContentSample";
             }

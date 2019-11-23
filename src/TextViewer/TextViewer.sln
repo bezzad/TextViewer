@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TextViewer", "TextViewer\Te
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TextViewerSample", "TextViewer.Sample\TextViewerSample.csproj", "{642E4EC1-584C-4121-A4D3-D0FE2075774F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TextViewer.Test", "TextViewer.Test\TextViewer.Test.csproj", "{13E36136-C4DF-4C35-B3CB-07B9867E97FE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TextViewer.Test", "TextViewer.Test\TextViewer.Test.csproj", "{13E36136-C4DF-4C35-B3CB-07B9867E97FE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

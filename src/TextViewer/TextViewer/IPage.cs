@@ -9,8 +9,6 @@ namespace TextViewer
     public interface IPage : IDisposable, IEquatable<IPage>, IComparable<IPage>
     {
         FlowDirection Direction { get; set; }
-        Position TopPosition { get; set; }
-        Position BottomPosition { get; set; }
         List<Paragraph> TextBlocks { get; set; }
         int BlockCount { get; }
         double PageWidth { get; set; }
@@ -23,14 +21,5 @@ namespace TextViewer
         double ParagraphSpace { get; set; }
         CultureInfo Language { set; get; }
         bool IsDisposed { get; }
-
-
-        void AddBlock(Paragraph para);
-        void AddBlockToTop(Paragraph para);
-        Paragraph GetTopBlock();
-        Paragraph GetBottomBlock();
-        double GetContentHeight();
-        bool IsLoaded();
-        bool HasEnoughSpace();
     }
 }

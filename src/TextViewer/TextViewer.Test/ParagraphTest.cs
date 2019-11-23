@@ -24,8 +24,8 @@ namespace TextViewer.Test
         [TestMethod]
         public void AddContent()
         {
-            var rtlPara = new Paragraph(0, true);
-            var ltrPara = new Paragraph(0, false);
+            var rtlPara = new Paragraph(0);
+            var ltrPara = new Paragraph(0);
 
             rtlPara.AddContent(0, _rtlContent, null);
             ltrPara.AddContent(0, _ltrContent, null);
@@ -51,8 +51,8 @@ namespace TextViewer.Test
         [TestMethod]
         public void RenderTest()
         {
-            var rtlPara = new Paragraph(0, true);
-            var ltrPara = new Paragraph(1, false);
+            var rtlPara = new Paragraph(0);
+            var ltrPara = new Paragraph(1);
 
             rtlPara.AddContent(0, _rtlContent, null);
             ltrPara.AddContent(0, _ltrContent, null);

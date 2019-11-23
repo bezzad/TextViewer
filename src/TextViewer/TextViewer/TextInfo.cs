@@ -6,10 +6,10 @@ namespace TextViewer
 {
     public class TextInfo : DrawingVisual
     {
-        public TextInfo(string text, bool isRtl, TextStyle style = null)
+        public TextInfo(string text, TextStyle style = null)
         {
             Text = text;
-            Styles = new TextStyle(isRtl, style);
+            Styles = new TextStyle(style);
         }
 
 
