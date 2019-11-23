@@ -29,6 +29,7 @@ namespace TextViewer
             WordPointOffset = Location.X;
             NonDirectionalWordsStack = new Stack<WordInfo>();
             Words = new List<WordInfo>();
+            CurrentParagraph.AddLine(this);
         }
 
         public void AddWord(WordInfo word)
@@ -88,8 +89,6 @@ namespace TextViewer
                 // maybe last word is non directional word
                 PopAllNonDirectionalWords();
             }
-
-            CurrentParagraph.AddLine(this);
         }
 
         protected void SetWordsPosition()

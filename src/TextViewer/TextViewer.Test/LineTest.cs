@@ -197,9 +197,9 @@ namespace TextViewer.Test
         {
             var ltrLine = new Line(LtrParent, _ltrStartPoint);
             var rtlLine = new Line(RtlParent, _rtlStartPoint);
-            var lineCounter = 0;
+            var lineCounter = 1;
             Assert.AreEqual(ltrLine.CurrentParagraph.Lines.Count, lineCounter);
-            Assert.AreEqual(rtlLine.CurrentParagraph.Lines.Count, lineCounter++);
+            Assert.AreEqual(rtlLine.CurrentParagraph.Lines.Count, lineCounter);
 
             for (var i = 0; i < LtrWords.Count; i++)
             {
@@ -216,7 +216,7 @@ namespace TextViewer.Test
             ltrLine.Render(false); // test after line rendering
             rtlLine.Render(false); // test after line rendering
             Assert.AreEqual(ltrLine.CurrentParagraph.Lines.Count, lineCounter);
-            Assert.AreEqual(rtlLine.CurrentParagraph.Lines.Count, lineCounter++);
+            Assert.AreEqual(rtlLine.CurrentParagraph.Lines.Count, lineCounter);
             Assert.IsTrue(ltrLine.RemainWidth < 0);
             Assert.IsTrue(rtlLine.RemainWidth < 0);
 
@@ -241,7 +241,7 @@ namespace TextViewer.Test
             ltrLine.Render(true);
             rtlLine.Render(true);
             Assert.AreEqual(ltrLine.CurrentParagraph.Lines.Count, lineCounter);
-            Assert.AreEqual(rtlLine.CurrentParagraph.Lines.Count, lineCounter++);
+            Assert.AreEqual(rtlLine.CurrentParagraph.Lines.Count, lineCounter);
             for (var i = 0; i < LtrWords.Count; i++)
             {
                 var ltrWord = LtrWords[i];
@@ -258,7 +258,7 @@ namespace TextViewer.Test
             ltrLine.Render(false);
             rtlLine.Render(false);
             Assert.AreEqual(ltrLine.CurrentParagraph.Lines.Count, lineCounter);
-            Assert.AreEqual(rtlLine.CurrentParagraph.Lines.Count, lineCounter++);
+            Assert.AreEqual(rtlLine.CurrentParagraph.Lines.Count, lineCounter);
             Assert.AreEqual(ltrLine.Words.First().Area.Location.X, ltrLine.RemainWidth / 2 + _ltrStartPoint.X);
             Assert.AreEqual(rtlLine.Words.First().DrawPoint.X, _rtlStartPoint.X - rtlLine.RemainWidth / 2);
             //
@@ -268,7 +268,7 @@ namespace TextViewer.Test
             ltrLine.Render(false);
             rtlLine.Render(false);
             Assert.AreEqual(ltrLine.CurrentParagraph.Lines.Count, lineCounter);
-            Assert.AreEqual(rtlLine.CurrentParagraph.Lines.Count, lineCounter++);
+            Assert.AreEqual(rtlLine.CurrentParagraph.Lines.Count, lineCounter);
             Assert.AreEqual(ltrLine.Words.First().Area.Location.X, ltrLine.Location.X);
             Assert.IsTrue(Math.Abs(rtlLine.Words.Last().Area.Location.X) - Math.Abs(rtlLine.RemainWidth - rtlLine.ActualWidth - 200 + rtlLine.Location.X) < 0.5);
             //
